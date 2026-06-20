@@ -8,7 +8,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:whisper_ggml_plus/whisper_ggml_plus.dart';
 import '../core/ml/services/text_analyzer.dart';
 import '../data/models/session.dart';
+import '../data/notifiers/score_reminder_notifier.dart';
 import '../data/notifiers/session_notifier.dart';
+import '../features/score_reminder/score_reminder_settings_screen.dart';
 
 class AudioRecordingScreen extends StatefulWidget {
   final TextAnalyzer analyzer;
@@ -169,6 +171,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> {
 
   Future<void> _analyzeAndSave(String text) async {
     final notifier = context.read<SessionNotifier>();
+    final reminderNotifier = context.read<ScoreReminderNotifier>();
     final messenger = ScaffoldMessenger.of(context);
     try {
       final analysisResult = await widget.analyzer.analyze(text);
@@ -186,6 +189,18 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> {
         messenger.showSnackBar(
           const SnackBar(content: Text('Entry saved')),
         );
+
+        final overallScore = ((analysisResult.mood + 1) / 2 * 100).clamp(0.0, 100.0);
+        if (reminderNotifier.isActive && overallScore < reminderNotifier.threshold) {
+          messenger.showSnackBar(
+            SnackBar(
+              content: Text(
+                'Your score (${overallScore.round()}) dropped below ${reminderNotifier.threshold} — check your evaluation.',
+              ),
+              duration: const Duration(seconds: 5),
+            ),
+          );
+        }
       }
     } catch (e) {
       debugPrint('Analysis error: $e');
@@ -229,10 +244,25 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> {
                       color: colorScheme.onSurface.withOpacity(0.8),
                     ),
                   ),
-                  Icon(
-                    Icons.arrow_forward,
-                    color: colorScheme.onSurface,
-                    size: 22,
+                  GestureDetector(
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const ScoreReminderSettingsScreen(),
+                      ),
+                    ),
+                    child: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: colorScheme.primary,
+                      ),
+                      child: const Icon(
+                        Icons.settings,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                    ),
                   ),
                 ],
               ),

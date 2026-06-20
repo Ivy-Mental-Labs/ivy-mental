@@ -7,6 +7,7 @@ import 'core/ml/services/text_analyzer.dart';
 import 'core/ml/services/onnx_text_analyzer.dart';
 import 'data/repositories/session_repository.dart';
 import 'data/notifiers/session_notifier.dart';
+import 'data/notifiers/score_reminder_notifier.dart';
 import 'features/main_navigation_screen.dart';
 
 void main() async {
@@ -25,8 +26,11 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => SessionNotifier(SessionRepository()),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => SessionNotifier(SessionRepository())),
+        ChangeNotifierProvider(create: (_) => ScoreReminderNotifier()),
+      ],
       child: MaterialApp(
         theme: appTheme,
         home: MainNavigationScreen(analyzer: analyzer),
