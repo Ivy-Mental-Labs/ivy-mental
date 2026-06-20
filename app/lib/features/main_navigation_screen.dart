@@ -22,7 +22,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       body: IndexedStack(
         index: _currentIndex,
         children: [
-          const AudioRecordingScreen(),
+          AudioRecordingScreen(analyzer: widget.analyzer),
           EvaluationScreen(analyzer: widget.analyzer),
           const HistoryScreen(),
         ],
