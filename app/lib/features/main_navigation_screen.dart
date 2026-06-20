@@ -1,6 +1,5 @@
 import 'package:app/recording/audio_recording_screen.dart';
 import 'package:flutter/material.dart';
-import 'evaluation/evaluation_screen.dart';
 import 'history/history_screen.dart';
 import '../core/ml/services/text_analyzer.dart';
 
@@ -23,7 +22,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         index: _currentIndex,
         children: [
           AudioRecordingScreen(analyzer: widget.analyzer),
-          EvaluationScreen(analyzer: widget.analyzer),
           const HistoryScreen(),
         ],
       ),
@@ -35,11 +33,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             icon: Icon(Icons.mic),
             selectedIcon: Icon(Icons.mic),
             label: 'Record',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.analytics_outlined),
-            selectedIcon: Icon(Icons.analytics),
-            label: 'Evaluation',
           ),
           NavigationDestination(
             icon: Icon(Icons.history_outlined),
