@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import onnx
 import torch
 
 from app.config import MODEL_DIR
@@ -37,6 +38,9 @@ def export_to_onnx():
         },
         opset_version=18,
     )
+
+    onnx_model = onnx.load(str(output_path))
+    onnx.save(onnx_model, str(output_path))
     print(f"ONNX model exported to {output_path}")
 
 
