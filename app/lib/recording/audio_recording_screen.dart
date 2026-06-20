@@ -9,7 +9,9 @@ import 'package:whisper_ggml_plus/whisper_ggml_plus.dart';
 import 'package:video_player/video_player.dart';
 import '../core/ml/services/text_analyzer.dart';
 import '../data/models/session.dart';
+import '../data/notifiers/score_reminder_notifier.dart';
 import '../data/notifiers/session_notifier.dart';
+import '../features/score_reminder/score_reminder_settings_screen.dart';
 import '../features/overview/overview_pager_screen.dart';
 import '../shared/widgets/ivy_visuals.dart';
 import '../theme.dart';
@@ -205,6 +207,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
 
   Future<void> _analyzeAndSave(String text) async {
     final notifier = context.read<SessionNotifier>();
+    final reminderNotifier = context.read<ScoreReminderNotifier>();
     final messenger = ScaffoldMessenger.of(context);
     try {
       final analysisResult = await widget.analyzer.analyze(text);
@@ -217,6 +220,18 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
       if (mounted) {
         await notifier.upsert(session);
         messenger.showSnackBar(const SnackBar(content: Text('Entry saved')));
+
+        final overallScore = ((analysisResult.mood + 1) / 2 * 100).clamp(0.0, 100.0);
+        if (reminderNotifier.isActive && overallScore < reminderNotifier.threshold) {
+          messenger.showSnackBar(
+            SnackBar(
+              content: Text(
+                'Your score (${overallScore.round()}) dropped below ${reminderNotifier.threshold} — check your evaluation.',
+              ),
+              duration: const Duration(seconds: 5),
+            ),
+          );
+        }
       }
     } catch (e) {
       debugPrint('Analysis error: $e');
@@ -273,6 +288,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
               child: Column(
                 children: [
                   IvyHeader(
+                    showSettings: false,
                     trailing: IconButton(
                       onPressed: _openOverview,
                       splashRadius: 22,
