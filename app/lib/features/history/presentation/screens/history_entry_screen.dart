@@ -1,0 +1,656 @@
+﻿import 'dart:ui';
+
+import 'package:flutter/material.dart';
+
+import '../../../../data/models/session.dart';
+import '../../../../shared/widgets/ivy_visuals.dart';
+
+class HistoryEntryViewData {
+  final double moodScore;
+  final String analysisText;
+  final String patternText;
+  final String patternFrequency;
+  final List<EmotionalLayerViewData> emotionalLayers;
+  final String? transcript;
+
+  const HistoryEntryViewData({
+    required this.moodScore,
+    required this.analysisText,
+    required this.patternText,
+    required this.patternFrequency,
+    required this.emotionalLayers,
+    this.transcript,
+  });
+
+  factory HistoryEntryViewData.fromSession(Session session) {
+    final evaluation = session.evaluation;
+    final moodScore = (evaluation?['mood'] as num?)?.toDouble() ?? 0.24;
+    final emotions = evaluation?['emotions'];
+    final emotionalLayers = emotions is Map
+        ? emotions.entries
+              .where((entry) => entry.value is num)
+              .map(
+                (entry) => EmotionalLayerViewData.fromScore(
+                  label: _titleCase(entry.key.toString()),
+                  score: (entry.value as num).toDouble(),
+                ),
+              )
+              .toList()
+        : <EmotionalLayerViewData>[];
+
+    return HistoryEntryViewData(
+      moodScore: moodScore.clamp(-1.0, 1.0),
+      analysisText: _analysisTextFor(moodScore),
+      patternText: "Your stress levels rise after you don't get enough sleep",
+      patternFrequency: '3x this week',
+      emotionalLayers: emotionalLayers.isEmpty
+          ? HistoryEntryViewData.fallback().emotionalLayers
+          : emotionalLayers,
+      transcript: session.transcript,
+    );
+  }
+
+  factory HistoryEntryViewData.fallback() {
+    return const HistoryEntryViewData(
+      moodScore: 0.24,
+      analysisText:
+          'You sounded mentally tired but still grounded. Work pressure was present, yet moments of optimism and self-awareness came through.',
+      patternText: "Your stress levels rise after you don't get enough sleep",
+      patternFrequency: '3x this week',
+      emotionalLayers: [
+        EmotionalLayerViewData(
+          label: 'Calm',
+          value: 63,
+          color: Color(0xFF8DA6AE),
+        ),
+        EmotionalLayerViewData(
+          label: 'Joy',
+          value: 42,
+          color: Color(0xFFD7DED4),
+        ),
+        EmotionalLayerViewData(
+          label: 'Stress',
+          value: 42,
+          color: Color(0xFFEABDB5),
+        ),
+        EmotionalLayerViewData(
+          label: 'Joy',
+          value: 42,
+          color: Color(0xFFD7DED4),
+        ),
+        EmotionalLayerViewData(
+          label: 'Joy',
+          value: 42,
+          color: Color(0xFFD7DED4),
+        ),
+        EmotionalLayerViewData(
+          label: 'Joy',
+          value: 42,
+          color: Color(0xFFD7DED4),
+        ),
+        EmotionalLayerViewData(
+          label: 'Joy',
+          value: 42,
+          color: Color(0xFFD7DED4),
+        ),
+        EmotionalLayerViewData(
+          label: 'Joy',
+          value: 42,
+          color: Color(0xFFD7DED4),
+        ),
+      ],
+    );
+  }
+
+  static String _analysisTextFor(double moodScore) {
+    if (moodScore <= -0.2) {
+      return 'You sounded mentally tired but still grounded. Work pressure was present, yet moments of optimism and self-awareness came through.';
+    }
+    if (moodScore >= 0.35) {
+      return 'Your check-in carried a steadier tone today, with clear signs of optimism and self-awareness coming through.';
+    }
+    return 'You sounded mentally tired but still grounded. Work pressure was present, yet moments of optimism and self-awareness came through.';
+  }
+
+  static String _titleCase(String value) {
+    if (value.isEmpty) return value;
+    return '${value[0].toUpperCase()}${value.substring(1).toLowerCase()}';
+  }
+}
+
+class EmotionalLayerViewData {
+  final String label;
+  final int value;
+  final Color color;
+
+  const EmotionalLayerViewData({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  factory EmotionalLayerViewData.fromScore({
+    required String label,
+    required double score,
+  }) {
+    return EmotionalLayerViewData(
+      label: label,
+      value: (score.clamp(0.0, 1.0) * 100).round(),
+      color: _colorFor(label),
+    );
+  }
+
+  static Color _colorFor(String label) {
+    switch (label.toLowerCase()) {
+      case 'stress':
+      case 'anger':
+      case 'sadness':
+        return const Color(0xFFEABDB5);
+      case 'joy':
+      case 'hope':
+        return const Color(0xFFD7DED4);
+      case 'calm':
+      default:
+        return const Color(0xFF8DA6AE);
+    }
+  }
+}
+
+class HistoryEntryScreen extends StatelessWidget {
+  final Session? session;
+  final HistoryEntryViewData? data;
+
+  const HistoryEntryScreen({super.key, this.session, this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    final viewData =
+        data ??
+        (session == null
+            ? HistoryEntryViewData.fallback()
+            : HistoryEntryViewData.fromSession(session!));
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFF4F1EC),
+      body: SafeArea(
+        child: ListView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(22, 27, 22, 30),
+          children: [
+            Text(
+              'IvyMental',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: const Color(0xFF9B9D9A),
+                fontSize: 16,
+                fontWeight: FontWeight.w200,
+              ),
+            ),
+            const SizedBox(height: 21),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(Icons.arrow_back),
+                color: const Color(0xFFA7AAA7),
+                iconSize: 20,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints.tightFor(
+                  width: 32,
+                  height: 32,
+                ),
+                tooltip: 'Back',
+              ),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              'Todayâ€™s Analysis',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: const Color(0xFFB4B6B4),
+                fontSize: 18,
+                fontWeight: FontWeight.w200,
+              ),
+            ),
+            const SizedBox(height: 55),
+            Center(child: _MoodOrb(score: viewData.moodScore)),
+            const SizedBox(height: 56),
+            const _SectionLabel('Mood'),
+            const SizedBox(height: 11),
+            _MoodCard(score: viewData.moodScore),
+            const SizedBox(height: 14),
+            _AnalysisCard(text: viewData.analysisText),
+            const SizedBox(height: 25),
+            const _SectionLabel('Pattern Recognition'),
+            const SizedBox(height: 11),
+            _PatternCard(
+              text: viewData.patternText,
+              frequency: viewData.patternFrequency,
+            ),
+            const SizedBox(height: 24),
+            const _SectionLabel('Emotional Layers'),
+            const SizedBox(height: 11),
+            ...viewData.emotionalLayers.map(
+              (layer) => Padding(
+                padding: const EdgeInsets.only(bottom: 9),
+                child: _EmotionalLayerTile(layer: layer),
+              ),
+            ),
+            if (viewData.transcript?.trim().isNotEmpty ?? false) ...[
+              const SizedBox(height: 11),
+              const _SectionLabel('Transcript'),
+              const SizedBox(height: 11),
+              _TranscriptCard(text: viewData.transcript!.trim()),
+            ],
+            const SizedBox(height: 39),
+            const PrivacyHint(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SectionLabel extends StatelessWidget {
+  final String label;
+
+  const _SectionLabel(this.label);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      label,
+      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+        color: const Color(0xFF838784),
+        fontSize: 12,
+        fontWeight: FontWeight.w300,
+      ),
+    );
+  }
+}
+
+class _SoftCard extends StatelessWidget {
+  final Widget child;
+  final EdgeInsetsGeometry padding;
+
+  const _SoftCard({required this.child, required this.padding});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: padding,
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFFEFC),
+        borderRadius: BorderRadius.circular(13),
+        border: Border.all(color: const Color(0x16D7D0C8)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0F776F66),
+            blurRadius: 15,
+            offset: Offset(0, 8),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+}
+
+class _MoodOrb extends StatelessWidget {
+  final double score;
+
+  const _MoodOrb({required this.score});
+
+  @override
+  Widget build(BuildContext context) {
+    final intensity = score.abs().clamp(0.18, 1.0);
+    final baseColor = score < 0
+        ? const Color(0xFFDDA89C)
+        : const Color(0xFF6EA4A0);
+
+    return Container(
+      width: 76,
+      height: 76,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: baseColor.withValues(alpha: 0.24 + intensity * 0.1),
+            blurRadius: 21,
+            spreadRadius: 1,
+          ),
+          const BoxShadow(
+            color: Color(0x26000000),
+            blurRadius: 13,
+            offset: Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ClipOval(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 1.5, sigmaY: 1.5),
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                center: const Alignment(-0.32, -0.34),
+                radius: 0.98,
+                colors: [
+                  Colors.white.withValues(alpha: 0.86),
+                  baseColor.withValues(alpha: 0.37 + intensity * 0.28),
+                  const Color(0xFF2F756F).withValues(alpha: 0.44),
+                  const Color(0xFFE6DED3).withValues(alpha: 0.7),
+                ],
+                stops: const [0, 0.43, 0.76, 1],
+              ),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.66),
+                width: 1.2,
+              ),
+            ),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.white.withValues(alpha: 0.48),
+                    Colors.transparent,
+                    const Color(0xFF124B5F).withValues(alpha: 0.1),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MoodCard extends StatelessWidget {
+  final double score;
+
+  const _MoodCard({required this.score});
+
+  @override
+  Widget build(BuildContext context) {
+    return _SoftCard(
+      padding: const EdgeInsets.fromLTRB(28, 30, 28, 23),
+      child: Column(
+        children: [
+          Text(
+            score.toStringAsFixed(2),
+            style: Theme.of(context).textTheme.displaySmall?.copyWith(
+              color: const Color(0xFF124B5F),
+              fontSize: 36,
+              fontWeight: FontWeight.w300,
+              height: 1,
+            ),
+          ),
+          const SizedBox(height: 23),
+          _MoodScale(value: score),
+        ],
+      ),
+    );
+  }
+}
+
+class _MoodScale extends StatelessWidget {
+  final double value;
+
+  const _MoodScale({required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const SizedBox(
+          width: 27,
+          child: Text(
+            '-1',
+            style: TextStyle(
+              color: Color(0xFFE6A99E),
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        Expanded(
+          child: SizedBox(
+            height: 18,
+            child: CustomPaint(
+              painter: _MoodScalePainter(value: value.clamp(-1.0, 1.0)),
+            ),
+          ),
+        ),
+        const SizedBox(
+          width: 27,
+          child: Text(
+            '1',
+            textAlign: TextAlign.right,
+            style: TextStyle(
+              color: Color(0xFF8FAFA9),
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _MoodScalePainter extends CustomPainter {
+  final double value;
+
+  const _MoodScalePainter({required this.value});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final y = size.height / 2;
+    final centerX = size.width / 2;
+    final leftPaint = Paint()
+      ..color = const Color(0xFFE7A89C)
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round;
+    final rightPaint = Paint()
+      ..color = const Color(0xFF92B5AD)
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round;
+    final dashPaint = Paint()
+      ..color = const Color(0xFFD9D7D2)
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round;
+
+    canvas.drawLine(Offset(0, y), Offset(centerX - 9, y), leftPaint);
+    canvas.drawLine(Offset(centerX + 9, y), Offset(size.width, y), rightPaint);
+
+    for (var x = centerX - 8; x < centerX + 18; x += 6) {
+      canvas.drawLine(Offset(x, y), Offset(x + 1.5, y), dashPaint);
+    }
+
+    final markerX = ((value + 1) / 2) * size.width;
+    canvas.drawCircle(
+      Offset(markerX, y),
+      6,
+      Paint()..color = const Color(0xFFFFFEFC),
+    );
+    canvas.drawCircle(
+      Offset(markerX, y),
+      4.4,
+      Paint()..color = const Color(0xFF2E6770),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _MoodScalePainter oldDelegate) {
+    return oldDelegate.value != value;
+  }
+}
+
+class _AnalysisCard extends StatelessWidget {
+  final String text;
+
+  const _AnalysisCard({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return _SoftCard(
+      padding: const EdgeInsets.fromLTRB(34, 23, 34, 22),
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+          color: const Color(0xFF7A8589),
+          fontSize: 14,
+          fontWeight: FontWeight.w300,
+          height: 1.18,
+        ),
+      ),
+    );
+  }
+}
+
+class _PatternCard extends StatelessWidget {
+  final String text;
+  final String frequency;
+
+  const _PatternCard({required this.text, required this.frequency});
+
+  @override
+  Widget build(BuildContext context) {
+    return _SoftCard(
+      padding: const EdgeInsets.fromLTRB(35, 28, 35, 23),
+      child: Column(
+        children: [
+          Text(
+            text,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: const Color(0xFF124B5F),
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              height: 1.17,
+            ),
+          ),
+          const SizedBox(height: 13),
+          Text(
+            frequency,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: const Color(0xFFB1B4B2),
+              fontSize: 12,
+              fontWeight: FontWeight.w300,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EmotionalLayerTile extends StatelessWidget {
+  final EmotionalLayerViewData layer;
+
+  const _EmotionalLayerTile({required this.layer});
+
+  @override
+  Widget build(BuildContext context) {
+    final progress = layer.value.clamp(0, 100) / 100;
+
+    return _SoftCard(
+      padding: const EdgeInsets.fromLTRB(15, 13, 15, 13),
+      child: Row(
+        children: [
+          Container(
+            width: 9,
+            height: 9,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: layer.color,
+            ),
+          ),
+          const SizedBox(width: 13),
+          SizedBox(
+            width: 40,
+            child: Text(
+              layer.label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: const Color(0xFF596164),
+                fontSize: 12,
+                fontWeight: FontWeight.w300,
+              ),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return Stack(
+                  alignment: Alignment.centerLeft,
+                  children: [
+                    Container(
+                      height: 2.4,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF0EEEA),
+                        borderRadius: BorderRadius.circular(99),
+                      ),
+                    ),
+                    Container(
+                      width: constraints.maxWidth * progress,
+                      height: 2.4,
+                      decoration: BoxDecoration(
+                        color: layer.color,
+                        borderRadius: BorderRadius.circular(99),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+          const SizedBox(width: 15),
+          SizedBox(
+            width: 25,
+            child: Text(
+              '${layer.value}',
+              textAlign: TextAlign.right,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: const Color(0xFF3F474A),
+                fontSize: 12,
+                fontWeight: FontWeight.w300,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TranscriptCard extends StatelessWidget {
+  final String text;
+
+  const _TranscriptCard({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return _SoftCard(
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: const Color(0xFF7A8589),
+          fontSize: 12,
+          fontWeight: FontWeight.w300,
+          height: 1.35,
+        ),
+      ),
+    );
+  }
+}
+

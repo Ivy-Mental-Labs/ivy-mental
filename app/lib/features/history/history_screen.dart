@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../data/models/session.dart';
 import '../../data/notifiers/session_notifier.dart';
+import '../../shared/widgets/ivy_visuals.dart';
+import '../../theme.dart';
+import 'presentation/screens/history_entry_screen.dart';
 
 class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
@@ -10,206 +14,231 @@ class HistoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('History')),
-      body: Consumer<SessionNotifier>(
-        builder: (context, notifier, _) {
-          final sessions = notifier.sessions;
-          if (sessions.isEmpty) {
-            return const Center(child: Text('No entries yet'));
-          }
-          return ListView.builder(
-            itemCount: sessions.length,
-            itemBuilder: (context, index) => _SessionListItem(
-              session: sessions[index],
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => SessionDetailScreen(
-                    session: sessions[index],
-                  ),
-                ),
-              ),
+    final colors = context.appColors;
+    final sessions = context.watch<SessionNotifier>().sessions;
+    final items = sessions.isEmpty
+        ? _fallbackItems()
+        : _itemsFromSessions(sessions);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(22, 20, 22, 0),
+      child: Column(
+        children: [
+          IvyHeader(
+            trailing: _OverviewOrbButton(
+              onTap: () => Navigator.of(context).pop(),
             ),
-          );
-        },
+          ),
+          const SizedBox(height: 52),
+          Text(
+            'Your experiences',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: colors.textSecondary,
+              fontSize: 18,
+              fontWeight: FontWeight.w200,
+            ),
+          ),
+          const SizedBox(height: 42),
+          Expanded(
+            child: ListView.separated(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.only(bottom: 24),
+              itemCount: items.length,
+              separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
+              itemBuilder: (context, index) {
+                final item = items[index];
+                return ExperienceCard(
+                  item: item,
+                  onTap: item.session == null
+                      ? null
+                      : () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                HistoryEntryScreen(session: item.session!),
+                          ),
+                        ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
+
+  List<ExperienceItem> _itemsFromSessions(List<Session> sessions) {
+    return sessions.take(8).map((session) {
+      final mood = (session.evaluation?['mood'] as num?)?.toDouble() ?? 0;
+      return ExperienceItem(
+        meta:
+            '${_relativeDate(session.createdAt)} - ${_durationFor(session)} min',
+        title: _snippet(session.transcript),
+        variant: mood >= 0.2
+            ? MoodOrbVariant.mint
+            : mood <= -0.2
+            ? MoodOrbVariant.peach
+            : MoodOrbVariant.deep,
+        session: session,
+      );
+    }).toList();
+  }
+
+  List<ExperienceItem> _fallbackItems() {
+    return const [
+      ExperienceItem(
+        meta: 'Today - 7 min',
+        title: 'A little tired from a hard day...',
+        variant: MoodOrbVariant.peach,
+      ),
+      ExperienceItem(
+        meta: 'Yesterday - 3 min',
+        title: 'Awesome day, awesome we...',
+        variant: MoodOrbVariant.mint,
+      ),
+      ExperienceItem(
+        meta: 'Yesterday - 3 min',
+        title: 'Awesome day, awesome we...',
+        variant: MoodOrbVariant.peach,
+      ),
+      ExperienceItem(
+        meta: 'Yesterday - 3 min',
+        title: 'Awesome day, awesome we...',
+        variant: MoodOrbVariant.peach,
+      ),
+      ExperienceItem(
+        meta: 'Yesterday - 3 min',
+        title: 'Awesome day, awesome we...',
+        variant: MoodOrbVariant.peach,
+      ),
+    ];
+  }
+
+  String _relativeDate(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final day = DateTime(date.year, date.month, date.day);
+    final diff = today.difference(day).inDays;
+    if (diff == 0) return 'Today';
+    if (diff == 1) return 'Yesterday';
+    return '${date.day}.${date.month}.${date.year}';
+  }
+
+  int _durationFor(Session session) {
+    final words = session.transcript?.trim().split(RegExp(r'\s+')).length ?? 45;
+    return (words / 26).clamp(1, 9).round();
+  }
+
+  String _snippet(String? transcript) {
+    final text = transcript?.trim();
+    if (text == null || text.isEmpty) {
+      return 'A quiet check-in with IvyMental...';
+    }
+    if (text.length <= 30) {
+      return text;
+    }
+    return '${text.substring(0, 30)}...';
+  }
 }
 
-class _SessionListItem extends StatelessWidget {
-  final Session session;
+class _OverviewOrbButton extends StatelessWidget {
   final VoidCallback onTap;
 
-  const _SessionListItem({required this.session, required this.onTap});
-
-  Color _moodColor() {
-    final mood = session.evaluation?['mood'] as double?;
-    if (mood == null) return Colors.grey;
-    if (mood >= 0.3) return Colors.green;
-    if (mood <= -0.3) return Colors.red;
-    return Colors.amber;
-  }
-
-  static const _months = [
-    '', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-  ];
-
-  String _formattedDate() {
-    final d = session.createdAt;
-    return '${d.day} ${_months[d.month]} ${d.year}';
-  }
+  const _OverviewOrbButton({required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: ListTile(
-        title: Text(_formattedDate()),
-        subtitle: session.transcript != null
-            ? Text(
-                session.transcript!,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              )
-            : null,
-        trailing: Container(
-          width: 16,
-          height: 16,
-          decoration: BoxDecoration(
-            color: _moodColor(),
-            shape: BoxShape.circle,
-          ),
-        ),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: const SizedBox(
+        width: 48,
+        height: 48,
+        child: Center(child: MoodOrb(size: 45, variant: MoodOrbVariant.deep)),
+      ),
+    );
+  }
+}
+
+class ExperienceItem {
+  final String meta;
+  final String title;
+  final MoodOrbVariant variant;
+  final Session? session;
+
+  const ExperienceItem({
+    required this.meta,
+    required this.title,
+    required this.variant,
+    this.session,
+  });
+}
+
+class ExperienceCard extends StatelessWidget {
+  final ExperienceItem item;
+  final VoidCallback? onTap;
+
+  const ExperienceCard({required this.item, this.onTap, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Material(
+      color: colors.backgroundGlass,
+      borderRadius: BorderRadius.circular(AppRadius.md),
+      child: InkWell(
         onTap: onTap,
-      ),
-    );
-  }
-}
-
-class SessionDetailScreen extends StatelessWidget {
-  final Session session;
-
-  const SessionDetailScreen({required this.session, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final mood = session.evaluation?['mood'] as double?;
-    final emotions = session.evaluation?['emotions'] as Map<String, dynamic>?;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          '${session.createdAt.day}.${session.createdAt.month}.${session.createdAt.year}',
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: ListView(
-          children: [
-            if (session.transcript != null) ...[
-              Text('Transcript',
-                  style: Theme.of(context).textTheme.titleMedium),
-              const SizedBox(height: 8),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(session.transcript!),
-                ),
-              ),
-              const SizedBox(height: 24),
-            ],
-            if (mood != null) ...[
-              _MoodIndicator(mood: mood),
-              const SizedBox(height: 24),
-            ],
-            if (emotions != null && emotions.isNotEmpty) ...[
-              Text('Emotions',
-                  style: Theme.of(context).textTheme.titleMedium),
-              const SizedBox(height: 12),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: emotions.entries.map((e) {
-                      final value = (e.value as num).toDouble();
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        child: Row(
-                          children: [
-                            SizedBox(
-                              width: 100,
-                              child: Text(e.key),
-                            ),
-                            Expanded(
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(4),
-                                child: LinearProgressIndicator(
-                                  value: value,
-                                  minHeight: 12,
-                                  backgroundColor: Colors.grey.shade200,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            SizedBox(
-                              width: 48,
-                              child: Text(
-                                (value * 100).toStringAsFixed(0),
-                                textAlign: TextAlign.right,
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        child: Container(
+          height: 79,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppRadius.md),
+            border: Border.all(color: colors.borderSubtle),
+            boxShadow: [
+              BoxShadow(
+                color: colors.shadowSoft,
+                blurRadius: 22,
+                offset: const Offset(0, 12),
               ),
             ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _MoodIndicator extends StatelessWidget {
-  final double mood;
-
-  const _MoodIndicator({required this.mood});
-
-  Color _moodColor() {
-    if (mood >= 0.3) return Colors.green;
-    if (mood <= -0.3) return Colors.red;
-    return Colors.amber;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Text('Mood', style: Theme.of(context).textTheme.titleMedium),
-            const Spacer(),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                color: _moodColor().withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Text(
-                mood.toStringAsFixed(2),
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: _moodColor(),
+          ),
+          child: Row(
+            children: [
+              MoodOrb(size: 42, variant: item.variant),
+              const SizedBox(width: AppSpacing.lg),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.meta,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: colors.textMuted,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      item.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: colors.textPrimary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ],
+              const SizedBox(width: AppSpacing.sm),
+              Icon(Icons.arrow_forward, size: 18, color: colors.textMuted),
+            ],
+          ),
         ),
       ),
     );
