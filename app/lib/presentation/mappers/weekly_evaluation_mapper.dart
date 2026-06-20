@@ -34,16 +34,25 @@ class WeeklyEvaluationMapper {
   DateTime weekStart(DateTime date) =>
       DateTime(date.year, date.month, date.day - (date.weekday - 1));
 
-  // --- Anpassungspunkte: je eine Methode pro Score (default: 1) ---
+  double _e(Map<String, dynamic>? eval, String key) =>
+      ((eval?['emotions'] as Map?)?[key] as num?)?.toDouble() ?? 0.0;
 
-  // ignore: unused_element
-  double _overallScore(Map<String, dynamic>? eval) => 1; // TODO aus eval-JSON
-  // ignore: unused_element
-  double _calmScore(Map<String, dynamic>? eval) => 1;
-  // ignore: unused_element
-  double _energyScore(Map<String, dynamic>? eval) => 1;
-  // ignore: unused_element
-  double _stressScore(Map<String, dynamic>? eval) => 1;
+  double _overallScore(Map<String, dynamic>? eval) {
+    final mood = (eval?['mood'] as num?)?.toDouble() ?? 0.0;
+    return ((mood + 1) / 2 * 100).clamp(0.0, 100.0);
+  }
+
+  double _calmScore(Map<String, dynamic>? eval) =>
+      ((1 - (_e(eval, 'anxious') + _e(eval, 'angry') + _e(eval, 'afraid')) / 3) * 100)
+          .clamp(0.0, 100.0);
+
+  double _energyScore(Map<String, dynamic>? eval) =>
+      ((_e(eval, 'happy') + _e(eval, 'proud') + _e(eval, 'satisfied')) / 3 * 100)
+          .clamp(0.0, 100.0);
+
+  double _stressScore(Map<String, dynamic>? eval) =>
+      ((_e(eval, 'anxious') + _e(eval, 'angry') + _e(eval, 'afraid')) / 3 * 100)
+          .clamp(0.0, 100.0);
 
   double _avg(
     List<Session> sessions,
