@@ -1,0 +1,121 @@
+diary_entry,mood,happy,sad,satisfied,proud,anxious,angry,afraid,jealous
+"Today I started the day with clear focus and finished my most important task early. I felt productive and things went smoothly at work. In the evening I relaxed and felt grateful for the progress. I went to bed feeling satisfied and calm.",0.9,1,0,1,1,0,0,0,0
+"Everything went well today and I managed my schedule efficiently. I completed multiple tasks without stress. Later I met a friend and enjoyed a good conversation. I felt happy and proud.",0.8,1,0,1,1,0,0,0,0
+"I had a very successful day with strong results at work. I felt confident in my decisions and completed everything on time. In the evening I celebrated small wins. I felt satisfied and happy.",0.9,1,0,1,1,0,0,0,0
+"Today was smooth and positive with no major issues. I worked steadily and felt in control. Later I enjoyed a calm evening at home. I felt peaceful and content.",0.7,1,0,1,0,0,0,0,0
+"I made good progress on my project and felt motivated. Tasks were easy to manage today. In the evening I listened to music and relaxed. I felt satisfied overall.",0.7,1,0,1,0,0,0,0,0
+"Today I had a cheerful mood and enjoyed my morning routine. Work went fine and I stayed productive. Later I spent time with family and felt happy. I ended the day in a good mood.",0.8,1,0,0,0,0,0,0,0
+"I achieved most of my goals today and felt proud. Everything aligned well at work. In the evening I reflected on my progress positively. I felt happy and confident.",0.9,1,0,1,1,0,0,0,0
+"It was a good day with steady progress and no stress. I completed my tasks on time. Later I relaxed with a movie. I felt content and calm.",0.7,1,0,1,0,0,0,0,0
+"I had a productive and enjoyable day overall. Work was smooth and I felt efficient. In the evening I felt grateful and relaxed. I went to bed happy.",0.8,1,0,1,1,0,0,0,0
+"Today I felt positive energy throughout the day. I handled everything well and stayed focused. Later I enjoyed dinner with friends. I felt satisfied.",0.8,1,0,1,0,0,0,0,0
+"Today was mostly neutral with routine tasks at work. I completed everything without stress or excitement. I had lunch alone and spent the evening resting. I felt neither happy nor sad.",0.0,0,0,0,0,0,0,0,0
+"It was an ordinary day with predictable activities. I followed my schedule and got things done. In the evening I watched TV and relaxed. I felt neutral.",0.0,0,0,0,0,0,0,0,0
+"I went through my usual routine without any major events. Work was steady and uneventful. I felt emotionally flat but stable. I ended the day okay.",0.0,0,0,0,0,0,0,0,0
+"Today I did my normal tasks and errands. Nothing particularly good or bad happened. I relaxed in the evening and felt fine.",0.0,0,0,0,0,0,0,0,0
+"It was a quiet day with standard workload. I completed my tasks without pressure. Later I read a book and went to sleep early. I felt neutral.",0.0,0,0,0,0,0,0,0,0
+"Today felt balanced but uneventful. I worked steadily and had no strong emotions. In the evening I rested at home. I felt okay.",0.0,0,0,0,0,0,0,0,0
+"It was a normal day with no surprises. I handled responsibilities adequately. I spent the evening relaxing. I felt emotionally neutral.",0.0,0,0,0,0,0,0,0,0
+"I had a standard workday with regular tasks. Everything went as expected. I watched something light in the evening. I felt steady.",0.0,0,0,0,0,0,0,0,0
+"Today was uneventful and calm. I finished my work and had no emotional highs or lows. I went to bed feeling okay.",0.0,0,0,0,0,0,0,0,0
+"It was a simple day with routine activities. I felt stable and unaffected emotionally. I ended the day without stress.",0.0,0,0,0,0,0,0,0,0
+"Today I felt stressed due to multiple deadlines at work. I struggled to keep up with tasks. I felt anxious throughout the day. In the evening I couldn't relax properly.",-0.6,0,0,0,0,1,0,0,0
+"It was a difficult day with constant pressure. I felt overwhelmed and worried. I had trouble focusing. The anxiety stayed with me all day.",-0.6,0,0,0,0,1,0,0,0
+"Today I had too many tasks and felt stressed. I kept thinking about unfinished work. I felt anxious and tired. In the evening I remained uneasy.",-0.5,0,0,0,0,1,0,0,0
+"It was a tense day with work problems piling up. I felt nervous and distracted. I couldn't fully rest afterward.",-0.5,0,0,0,0,1,0,0,0
+"Today I felt pressure from responsibilities. I struggled to manage my time. I felt anxious and overwhelmed. I went to bed still worried.",-0.6,0,0,0,0,1,0,0,0
+"It was a stressful and tiring day. I had trouble keeping up with expectations. I felt uneasy most of the time.",-0.5,0,0,0,0,1,0,0,0
+"Today I was anxious about unfinished tasks. I kept checking my work repeatedly. I felt nervous throughout the day.",-0.5,0,0,0,0,1,0,0,0
+"It was a chaotic day at work with many interruptions. I felt stressed and overwhelmed. I couldn't relax in the evening.",-0.6,0,0,0,0,1,0,0,0
+"Today I felt worried about upcoming deadlines. I struggled to stay calm. I felt anxious most of the day.",-0.5,0,0,0,0,1,0,0,0
+"It was a pressured day with too many demands. I felt stressed and exhausted. I ended the day feeling uneasy.",-0.6,0,0,0,0,1,0,0,0
+"Today I got into an argument at work and felt angry. I was irritated throughout the day. I couldn't stop thinking about it later. I went to bed upset.",-0.7,0,0,0,0,0,1,0,0
+"It was a frustrating day with constant mistakes from others. I felt angry and annoyed. I struggled to stay calm.",-0.7,0,0,0,0,0,1,0,0
+"Today I felt irritated due to repeated interruptions. I lost my temper briefly. I stayed upset afterward.",-0.7,0,0,0,0,0,1,0,0
+"It was a heated day with disagreements. I felt angry and stressed. I couldn't relax in the evening.",-0.7,0,0,0,0,0,1,0,0
+"Today I was frustrated by unfair treatment. I felt anger building up. I remained irritated later.",-0.7,0,0,0,0,0,1,0,0
+"It was a difficult day with conflict at work. I felt angry and overwhelmed. I stayed upset afterward.",-0.7,0,0,0,0,0,1,0,0
+"Today I felt annoyed by repeated issues. I struggled emotionally. I felt angry most of the day.",-0.7,0,0,0,0,0,1,0,0
+"It was a frustrating day with arguments. I felt irritated and tense. I couldn't shake the feeling.",-0.7,0,0,0,0,0,1,0,0
+"Today I had conflicts that made me angry. I felt upset and restless. I stayed annoyed in the evening.",-0.7,0,0,0,0,0,1,0,0
+"It was a stressful and angry day. I felt frustrated and emotionally drained. I couldn't calm down easily.",-0.7,0,0,0,0,0,1,0,0
+"Today I felt very sad after receiving bad news. I struggled to stay motivated. I felt low all day. In the evening I felt emotionally drained.",-0.8,0,1,0,0,0,0,1,0
+"It was a heavy emotional day with sadness. I felt withdrawn and tired. I avoided social interaction.",-0.8,0,1,0,0,0,0,1,0
+"Today I felt lonely and down. I had no energy to do much. I felt sad throughout the day.",-0.8,0,1,0,0,0,0,1,0
+"It was a difficult day with grief. I felt emotionally exhausted. I stayed quiet and withdrawn.",-0.8,0,1,0,0,0,0,1,0
+"Today I struggled with sadness and low motivation. I felt disconnected from others. I ended the day feeling empty.",-0.8,0,1,0,0,0,0,1,0
+"It was a sorrowful day with little energy. I felt down and unmotivated. I stayed in bed a lot.",-0.8,0,1,0,0,0,0,1,0
+"Today I felt emotional pain and sadness. I avoided interaction. I felt drained all day.",-0.8,0,1,0,0,0,0,1,0
+"It was a low day with grief and fatigue. I felt sad and quiet. I struggled emotionally.",-0.8,0,1,0,0,0,0,1,0
+"Today I felt deeply sad and withdrawn. I had no motivation. I stayed alone.",-0.8,0,1,0,0,0,0,1,0
+"It was an emotionally heavy day. I felt low and exhausted. I ended the day feeling sad.",-0.8,0,1,0,0,0,0,1,0
+"Today I felt afraid due to uncertain events at work. I was anxious and alert. I struggled to relax.",-0.7,0,0,0,0,1,0,1,0
+"It was a fearful day with constant worry. I felt tense and uneasy. I stayed on edge.",-0.7,0,0,0,0,1,0,1,0
+"Today I felt nervous about possible outcomes. I was stressed and cautious. I couldn't calm down.",-0.7,0,0,0,0,1,0,1,0
+"It was a tense day with fear of mistakes. I felt anxious and afraid. I remained restless.",-0.7,0,0,0,0,1,0,1,0
+"Today I felt uneasy and scared about responsibilities. I stayed alert all day. I struggled to sleep.",-0.7,0,0,0,0,1,0,1,0
+"It was a worrying day with anxiety. I felt afraid and stressed. I couldn't relax.",-0.7,0,0,0,0,1,0,1,0
+"Today I felt fear due to uncertainty. I was tense and distracted. I stayed worried.",-0.7,0,0,0,0,1,0,1,0
+"It was a frightening day with stress. I felt anxious and afraid. I remained uneasy.",-0.7,0,0,0,0,1,0,1,0
+"Today I felt nervous and afraid about the future. I stayed tense all day. I couldn't relax.",-0.7,0,0,0,0,1,0,1,0
+"It was a fearful and stressful day. I felt anxious and exhausted. I went to bed worried.",-0.7,0,0,0,0,1,0,1,0
+"Today I felt jealous of a colleague's success. I kept comparing myself. I felt low and distracted.",-0.6,0,0,0,0,0,0,0,1
+"It was an envious day with self-doubt. I felt jealous and insecure. I stayed quiet.",-0.6,0,0,0,0,0,0,0,1
+"Today I struggled with comparison. I felt jealous and unhappy. I couldn't focus.",-0.6,0,0,0,0,0,0,0,1
+"It was a jealous day with emotional discomfort. I felt envious and sad. I reflected a lot.",-0.6,0,0,0,0,0,0,0,1
+"Today I felt jealousy about others' achievements. I was distracted and low. I stayed withdrawn.",-0.6,0,0,0,0,0,0,0,1
+"It was an envious day with insecurity. I felt jealous and tired. I kept thinking about others.",-0.6,0,0,0,0,0,0,0,1
+"Today I compared myself constantly. I felt jealous and uneasy. I struggled emotionally.",-0.6,0,0,0,0,0,0,0,1
+"It was a jealous day with sadness. I felt envious and unmotivated. I stayed quiet.",-0.6,0,0,0,0,0,0,0,1
+"Today I felt envy and self-doubt. I was distracted all day. I felt low in the evening.",-0.6,0,0,0,0,0,0,0,1
+"It was an envious and emotional day. I felt jealous and reflective. I ended the day quietly.",-0.6,0,0,0,0,0,0,0,1
+"Today was mixed with both good and bad moments. I felt happy in the morning but stressed later. I struggled to balance emotions.",0.0,1,0,0,0,1,0,0,0
+"It was a confusing day emotionally. I felt proud of some work but anxious about other tasks. I felt torn.",0.0,0,0,0,1,1,0,0,0
+"Today I had ups and downs throughout the day. I felt satisfied but also irritated. I couldn't settle emotionally.",-0.1,0,0,1,0,0,1,0,0
+"It was a mixed emotional day. I felt happy but also sad at different times. I reflected a lot.",-0.1,1,1,0,0,0,0,0,0
+"Today I experienced both success and stress. I felt proud but anxious. My mood kept changing.",0.1,0,0,0,1,1,0,0,0
+"It was a day of emotional contrast. I felt calm in the morning and angry later. I struggled to adjust.",-0.1,0,0,0,0,0,1,0,0
+"Today I felt both joy and worry. I was happy with progress but afraid of mistakes.",0.0,1,0,0,0,1,0,1,0
+"It was a mixed day with satisfaction and stress. I felt accomplished but uneasy.",0.0,0,0,1,0,1,0,0,0
+"Today I felt proud and also jealous at times. I struggled with comparison.",-0.1,0,0,0,1,0,0,0,1
+"It was a complex emotional day. I felt happy but also anxious. I ended the day tired.",0.0,1,0,0,0,1,0,0,0
+"Today I had a very productive day and felt proud of my progress. I completed important tasks early. I ended the day satisfied and happy.",0.9,1,0,1,1,0,0,0,0
+"Everything went smoothly today and I felt confident. I finished my work efficiently. I felt happy and relaxed in the evening.",0.8,1,0,1,1,0,0,0,0
+"Today I achieved my goals and felt proud. Work was successful and smooth. I felt satisfied at the end of the day.",0.9,1,0,1,1,0,0,0,0
+"It was a productive and positive day. I felt energized and completed everything on time. I felt good overall.",0.8,1,0,1,0,0,0,0,0
+"Today I had strong performance at work and felt proud. I enjoyed the results of my effort. I felt happy and content.",0.9,1,0,1,1,0,0,0,0
+"Today I worked steadily and achieved key tasks. I felt satisfied with progress. I relaxed in the evening.",0.8,1,0,1,0,0,0,0,0
+"It was a successful day with good outcomes. I felt confident and happy. I ended the day calmly.",0.9,1,0,1,1,0,0,0,0
+"Today I finished tasks early and felt proud. Everything went well. I felt satisfied and relaxed.",0.9,1,0,1,1,0,0,0,0
+"It was a great day with steady progress. I felt happy and productive. I ended the day in a good mood.",0.8,1,0,1,0,0,0,0,0
+"Today I accomplished my objectives and felt proud. I was satisfied with my work. I felt calm in the evening.",0.9,1,0,1,1,0,0,0,0
+"Today I felt stressed due to workload pressure. I struggled to keep up. I felt anxious all day.",-0.6,0,0,0,0,1,0,0,0
+"It was a hectic day with many tasks. I felt overwhelmed and tired. I couldn't relax afterward.",-0.5,0,0,0,0,1,0,0,0
+"Today I faced tight deadlines and felt nervous. I was anxious throughout the day.",-0.5,0,0,0,0,1,0,0,0
+"It was a stressful day with interruptions. I felt overwhelmed and uneasy.",-0.6,0,0,0,0,1,0,0,0
+"Today I felt pressure from responsibilities. I struggled emotionally. I felt anxious.",-0.5,0,0,0,0,1,0,0,0
+"It was a difficult day with stress. I felt tired and worried. I couldn't relax.",-0.5,0,0,0,0,1,0,0,0
+"Today I was anxious about work tasks. I kept worrying. I felt stressed all day.",-0.6,0,0,0,0,1,0,0,0
+"It was a chaotic day with pressure. I felt overwhelmed and nervous.",-0.5,0,0,0,0,1,0,0,0
+"Today I felt stress from deadlines. I was anxious and distracted.",-0.5,0,0,0,0,1,0,0,0
+"It was a worrying day with workload issues. I felt tense and tired.",-0.6,0,0,0,0,1,0,0,0
+"Today I got into an argument and felt angry. I was irritated throughout the day.",-0.7,0,0,0,0,0,1,0,0
+"It was a frustrating day with conflicts. I felt angry and upset.",-0.7,0,0,0,0,0,1,0,0
+"Today I felt irritation due to mistakes around me. I was angry and tense.",-0.7,0,0,0,0,0,1,0,0
+"It was a heated day with disagreements. I felt angry and stressed.",-0.7,0,0,0,0,0,1,0,0
+"Today I was upset due to unfairness. I felt anger building up.",-0.7,0,0,0,0,0,1,0,0
+"It was a difficult emotional day with anger. I felt frustrated and tired.",-0.7,0,0,0,0,0,1,0,0
+"Today I felt annoyed all day due to issues. I was irritated and restless.",-0.7,0,0,0,0,0,1,0,0
+"It was a frustrating day with arguments. I felt angry and uneasy.",-0.7,0,0,0,0,0,1,0,0
+"Today I experienced conflict and anger. I felt upset and tense.",-0.7,0,0,0,0,0,1,0,0
+"It was a stressful day full of anger. I felt frustrated and drained.",-0.7,0,0,0,0,0,1,0,0
+"Today I felt very sad and withdrawn after personal issues. I had no motivation. I felt low all day.",-0.8,0,1,0,0,0,0,1,0
+"It was a heavy emotional day with sadness. I felt exhausted and quiet.",-0.8,0,1,0,0,0,0,1,0
+"Today I felt lonely and down. I struggled emotionally. I stayed withdrawn.",-0.8,0,1,0,0,0,0,1,0
+"It was a sorrowful day with grief. I felt sad and tired.",-0.8,0,1,0,0,0,0,1,0
+"Today I felt emotional pain and sadness. I avoided interaction.",-0.8,0,1,0,0,0,0,1,0
+"It was a low day with sadness. I felt unmotivated and drained.",-0.8,0,1,0,0,0,0,1,0
+"Today I felt deep sadness and fatigue. I stayed quiet all day.",-0.8,0,1,0,0,0,0,1,0
+"It was an emotionally heavy day. I felt low and withdrawn.",-0.8,0,1,0,0,0,0,1,0
+"Today I struggled with grief and sadness. I felt exhausted.",-0.8,0,1,0,0,0,0,1,0
+"It was a sad and draining day. I felt low and quiet.",-0.8,0,1,0,0,0,0,1,0
