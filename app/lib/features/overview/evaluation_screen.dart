@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -8,17 +6,48 @@ import '../../data/notifiers/session_notifier.dart';
 import '../../shared/widgets/ivy_visuals.dart';
 import '../../theme.dart';
 
-class EvaluationScreen extends StatelessWidget {
+class EvaluationScreen extends StatefulWidget {
   const EvaluationScreen({super.key});
+
+  @override
+  State<EvaluationScreen> createState() => _EvaluationScreenState();
+}
+
+class _EvaluationScreenState extends State<EvaluationScreen> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _animation;
+  List<Session>? _lastSessions;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(duration: const Duration(milliseconds: 1400), vsync: this);
+    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeOutQuart);
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _restartAnimationIfNeeded(List<Session> sessions) {
+    if (!identical(_lastSessions, sessions)) {
+      _lastSessions = sessions;
+      _controller
+        ..reset()
+        ..forward();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final sessions = context.watch<SessionNotifier>().sessions;
+    _restartAnimationIfNeeded(sessions);
     final score = _overallScore(sessions);
-    final calm = _emotionScore(sessions, 'satisfied', fallback: 72);
-    final energy = _emotionScore(sessions, 'happy', fallback: 61);
-    final stress = _emotionScore(sessions, 'anxious', fallback: 34);
+    final topEmotions = _topEmotionScores(sessions);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -40,13 +69,19 @@ class EvaluationScreen extends StatelessWidget {
               SizedBox(height: compact ? 18 : 28),
               ScoreOrb(score: score),
               const SizedBox(height: AppSpacing.md),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  MetricItem(label: 'Calm', value: calm, color: colors.accentDeep),
-                  MetricItem(label: 'Energy', value: energy, color: colors.accentMint),
-                  MetricItem(label: 'Stress', value: stress, color: colors.accentPeach),
-                ],
+              AnimatedBuilder(
+                animation: _animation,
+                builder: (context, child) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: List.generate(3, (index) {
+                      final emotion = topEmotions[index];
+                      final animatedValue = (emotion.value * _animation.value).round();
+                      final color = [colors.accentDeep, colors.accentMint, colors.accentPeach][index];
+                      return MetricItem(label: emotion.key, value: animatedValue, color: color);
+                    }),
+                  );
+                },
               ),
               SizedBox(height: compact ? 24 : 50),
               MoodTrendCard(sessions: sessions),
@@ -68,17 +103,50 @@ class EvaluationScreen extends StatelessWidget {
     return (((average + 1) / 2) * 100).clamp(0, 100).round();
   }
 
-  int _emotionScore(List<Session> sessions, String key, {required int fallback}) {
-    final values = <double>[];
+  List<MapEntry<String, int>> _topEmotionScores(List<Session> sessions) {
+    final totals = <String, double>{};
+    final counts = <String, int>{};
+
     for (final session in sessions) {
       final emotions = session.evaluation?['emotions'];
-      if (emotions is Map && emotions[key] is num) {
-        values.add((emotions[key] as num).toDouble());
+      if (emotions is Map) {
+        for (final entry in emotions.entries) {
+          final label = entry.key.toString();
+          final value = entry.value;
+          if (value is num) {
+            totals[label] = (totals[label] ?? 0.0) + value.toDouble();
+            counts[label] = (counts[label] ?? 0) + 1;
+          }
+        }
       }
     }
-    if (values.isEmpty) return fallback;
-    final average = values.reduce((a, b) => a + b) / math.max(values.length, 1);
-    return (average * 100).clamp(0, 100).round();
+
+    final averages = totals.entries.map((entry) {
+      final count = counts[entry.key] ?? 1;
+      return MapEntry(entry.key, (entry.value / count).clamp(0.0, 1.0));
+    }).toList();
+
+    if (averages.isEmpty) {
+      return const [MapEntry('Satisfied', 72), MapEntry('Happy', 61), MapEntry('Anxious', 34)];
+    }
+
+    averages.sort((a, b) => b.value.compareTo(a.value));
+    final top = averages.take(3).map((entry) {
+      return MapEntry(_titleCase(entry.key), (entry.value * 100).round());
+    }).toList();
+
+    while (top.length < 3) {
+      final fallback = ['Satisfied', 'Happy', 'Anxious'][top.length];
+      final values = {'Satisfied': 72, 'Happy': 61, 'Anxious': 34};
+      top.add(MapEntry(fallback, values[fallback]!));
+    }
+
+    return top;
+  }
+
+  String _titleCase(String value) {
+    if (value.isEmpty) return value;
+    return '${value[0].toUpperCase()}${value.substring(1).toLowerCase()}';
   }
 }
 
