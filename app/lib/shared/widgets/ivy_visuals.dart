@@ -4,11 +4,12 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 import '../../theme.dart';
+import '../../features/score_reminder/score_reminder_settings_screen.dart';
 
 class IvyHeader extends StatelessWidget {
   final Widget trailing;
-
-  const IvyHeader({required this.trailing, super.key});
+  final bool showSettings;
+  const IvyHeader({required this.trailing, this.showSettings = true, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +26,20 @@ class IvyHeader extends StatelessWidget {
             letterSpacing: 0.1,
           ),
         ),
-        trailing,
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (showSettings)
+              IconButton(
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ScoreReminderSettingsScreen()));
+                },
+                splashRadius: 22,
+                icon: Icon(Icons.settings, size: 20, color: colors.textMuted),
+              ),
+            trailing,
+          ],
+        ),
       ],
     );
   }
@@ -44,11 +58,9 @@ class PrivacyHint extends StatelessWidget {
         const SizedBox(width: AppSpacing.sm),
         Text(
           'On-device analysis',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: colors.textMuted,
-            fontSize: 12,
-            fontWeight: FontWeight.w300,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: colors.textMuted, fontSize: 12, fontWeight: FontWeight.w300),
         ),
       ],
     );
@@ -88,11 +100,7 @@ class MoodOrb extends StatelessWidget {
   final double size;
   final MoodOrbVariant variant;
 
-  const MoodOrb({
-    this.size = 190,
-    this.variant = MoodOrbVariant.deep,
-    super.key,
-  });
+  const MoodOrb({this.size = 190, this.variant = MoodOrbVariant.deep, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -109,16 +117,8 @@ class MoodOrb extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               boxShadow: [
-                BoxShadow(
-                  color: colors.shadowSoft,
-                  blurRadius: size * 0.24,
-                  offset: Offset(0, size * 0.14),
-                ),
-                BoxShadow(
-                  color: colors.glowLight,
-                  blurRadius: size * 0.18,
-                  offset: Offset(0, -size * 0.08),
-                ),
+                BoxShadow(color: colors.shadowSoft, blurRadius: size * 0.24, offset: Offset(0, size * 0.14)),
+                BoxShadow(color: colors.glowLight, blurRadius: size * 0.18, offset: Offset(0, -size * 0.08)),
               ],
             ),
           ),
@@ -164,10 +164,7 @@ class MoodOrbPainter extends CustomPainter {
       ..shader = RadialGradient(
         center: const Alignment(0.45, -0.25),
         radius: 0.65,
-        colors: [
-          colors.glowLight.withValues(alpha: 0.76),
-          colors.glowLight.withValues(alpha: 0),
-        ],
+        colors: [colors.glowLight.withValues(alpha: 0.76), colors.glowLight.withValues(alpha: 0)],
       ).createShader(rect);
     canvas.drawCircle(center, radius, haze);
 
@@ -175,10 +172,7 @@ class MoodOrbPainter extends CustomPainter {
       ..shader = RadialGradient(
         center: const Alignment(0.62, 0.18),
         radius: 0.55,
-        colors: [
-          colors.accentPeach.withValues(alpha: 0.52),
-          colors.accentPeach.withValues(alpha: 0),
-        ],
+        colors: [colors.accentPeach.withValues(alpha: 0.52), colors.accentPeach.withValues(alpha: 0)],
       ).createShader(rect);
     canvas.drawCircle(center, radius * 0.95, peachPaint);
 
@@ -202,17 +196,9 @@ class MoodOrbPainter extends CustomPainter {
     canvas.drawCircle(center, radius, rim);
 
     final dotPaint = Paint()..color = colors.glowLight.withValues(alpha: 0.62);
-    for (final offset in const [
-      Offset(-0.18, -0.22),
-      Offset(0.18, -0.1),
-      Offset(-0.02, 0.16),
-      Offset(0.28, 0.28),
-    ]) {
+    for (final offset in const [Offset(-0.18, -0.22), Offset(0.18, -0.1), Offset(-0.02, 0.16), Offset(0.28, 0.28)]) {
       canvas.drawCircle(
-        Offset(
-          center.dx + offset.dx * size.width,
-          center.dy + offset.dy * size.height,
-        ),
+        Offset(center.dx + offset.dx * size.width, center.dy + offset.dy * size.height),
         size.shortestSide * 0.006,
         dotPaint,
       );
@@ -275,13 +261,7 @@ class ScoreOrb extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: colors.backgroundGlass,
-              boxShadow: [
-                BoxShadow(
-                  color: colors.glowLight.withValues(alpha: 0.78),
-                  blurRadius: 28,
-                  spreadRadius: 4,
-                ),
-              ],
+              boxShadow: [BoxShadow(color: colors.glowLight.withValues(alpha: 0.78), blurRadius: 28, spreadRadius: 4)],
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -298,10 +278,7 @@ class ScoreOrb extends StatelessWidget {
                 const SizedBox(height: 7),
                 Text(
                   'Overall',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: colors.textSecondary,
-                    fontSize: 11,
-                  ),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: colors.textSecondary, fontSize: 11),
                 ),
               ],
             ),
@@ -339,13 +316,9 @@ class ScoreOrbPainter extends CustomPainter {
       final baseRadius = size.shortestSide * (0.32 + i * 0.025);
       for (var p = 0; p <= points; p++) {
         final angle = (p / points) * math.pi * 2;
-        final wobble =
-            math.sin(angle * 5 + i) * 5 + math.cos(angle * 3 - i) * 3;
+        final wobble = math.sin(angle * 5 + i) * 5 + math.cos(angle * 3 - i) * 3;
         final r = baseRadius + wobble;
-        final point = Offset(
-          center.dx + math.cos(angle) * r,
-          center.dy + math.sin(angle) * r,
-        );
+        final point = Offset(center.dx + math.cos(angle) * r, center.dy + math.sin(angle) * r);
         if (p == 0) {
           path.moveTo(point.dx, point.dy);
         } else {
@@ -356,8 +329,7 @@ class ScoreOrbPainter extends CustomPainter {
       final paint = Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.4
-        ..color = (i.isEven ? colors.accentMint : colors.accentPeach)
-            .withValues(alpha: 0.28);
+        ..color = (i.isEven ? colors.accentMint : colors.accentPeach).withValues(alpha: 0.28);
       canvas.drawPath(path, paint);
     }
   }
@@ -373,12 +345,7 @@ class MetricItem extends StatelessWidget {
   final int value;
   final Color color;
 
-  const MetricItem({
-    required this.label,
-    required this.value,
-    required this.color,
-    super.key,
-  });
+  const MetricItem({required this.label, required this.value, required this.color, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -387,20 +354,16 @@ class MetricItem extends StatelessWidget {
       children: [
         Text(
           label,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: colors.textPrimary,
-            fontSize: 12,
-            fontWeight: FontWeight.w400,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: colors.textPrimary, fontSize: 12, fontWeight: FontWeight.w400),
         ),
         const SizedBox(height: AppSpacing.xs),
         Text(
           '$value',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: colors.accentDeep,
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(color: colors.accentDeep, fontSize: 18, fontWeight: FontWeight.w500),
         ),
         const SizedBox(height: AppSpacing.sm),
         Container(
@@ -425,13 +388,7 @@ class MoodTrendCard extends StatelessWidget {
         color: colors.backgroundGlass,
         borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: colors.borderSubtle),
-        boxShadow: [
-          BoxShadow(
-            color: colors.shadowSoft,
-            blurRadius: 28,
-            offset: const Offset(0, 16),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: colors.shadowSoft, blurRadius: 28, offset: const Offset(0, 16))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -453,10 +410,7 @@ class MoodTrendCard extends StatelessWidget {
                     const SizedBox(height: 3),
                     Text(
                       '+8% steadier',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: colors.textSecondary,
-                        fontSize: 10,
-                      ),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: colors.textSecondary, fontSize: 10),
                     ),
                   ],
                 ),
@@ -501,14 +455,7 @@ class MoodTrendPainter extends CustomPainter {
       final next = points[i + 1];
       final control = Offset((current.dx + next.dx) / 2, current.dy);
       final control2 = Offset((current.dx + next.dx) / 2, next.dy);
-      path.cubicTo(
-        control.dx,
-        control.dy,
-        control2.dx,
-        control2.dy,
-        next.dx,
-        next.dy,
-      );
+      path.cubicTo(control.dx, control.dy, control2.dx, control2.dy, next.dx, next.dy);
     }
 
     final fillPath = Path.from(path)
@@ -557,17 +504,10 @@ class MoodTrendPainter extends CustomPainter {
     for (var i = 0; i < labels.length; i++) {
       textPainter.text = TextSpan(
         text: labels[i],
-        style: TextStyle(
-          color: colors.textMuted,
-          fontSize: 10,
-          fontWeight: FontWeight.w300,
-        ),
+        style: TextStyle(color: colors.textMuted, fontSize: 10, fontWeight: FontWeight.w300),
       );
       textPainter.layout();
-      textPainter.paint(
-        canvas,
-        Offset(points[i].dx - textPainter.width / 2, size.height - 12),
-      );
+      textPainter.paint(canvas, Offset(points[i].dx - textPainter.width / 2, size.height - 12));
     }
   }
 

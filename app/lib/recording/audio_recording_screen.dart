@@ -288,21 +288,11 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
               child: Column(
                 children: [
                   IvyHeader(
+                    showSettings: false,
                     trailing: IconButton(
                       onPressed: _openOverview,
                       splashRadius: 22,
                       icon: Icon(Icons.arrow_forward, size: 20, color: colors.accentDeep),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () => Navigator.of(
-                      context,
-                    ).push(MaterialPageRoute(builder: (_) => const ScoreReminderSettingsScreen())),
-                    child: Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(shape: BoxShape.circle, color: Theme.of(context).primaryColor),
-                      child: const Icon(Icons.settings, color: Colors.white, size: 18),
                     ),
                   ),
 
