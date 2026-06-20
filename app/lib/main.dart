@@ -1,3 +1,4 @@
+import 'package:app/recording/audio_recording_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
@@ -7,7 +8,6 @@ import 'core/ml/services/onnx_text_analyzer.dart';
 import 'data/repositories/session_repository.dart';
 import 'data/notifiers/session_notifier.dart';
 import 'features/main_navigation_screen.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
