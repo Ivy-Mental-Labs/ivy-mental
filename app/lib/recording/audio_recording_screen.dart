@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
-// ignore: unused_import
-import 'package:flutter_sound/flutter_sound.dart';
+import 'package:whisper_ggml_plus/whisper_ggml_plus.dart';
 
 class AudioRecordingScreen extends StatefulWidget {
   const AudioRecordingScreen({super.key});
@@ -16,11 +16,38 @@ class AudioRecordingScreen extends StatefulWidget {
 class _AudioRecordingScreenState extends State<AudioRecordingScreen> {
   bool _isRecording = false;
   final AudioRecorder _audioRecorder = AudioRecorder();
-  String? _recordedFilePath;
+  final WhisperController _whisperController = WhisperController();
+  
+  bool _isTranscribing = false;
+  bool _isModelLoaded = false;
+  String _transcriptionText = 'Tell me about your day';
 
   @override
   void initState() {
     super.initState();
+    _initModel();
+  }
+
+  Future<void> _initModel() async {
+    try {
+      final modelPath = await _whisperController.getPath(WhisperModel.tiny);
+      final file = File(modelPath);
+      
+      if (!file.existsSync() || file.lengthSync() < 1000000) {
+        debugPrint('Model not found natively, downloading...');
+        await _whisperController.downloadModel(WhisperModel.tiny);
+      } else {
+        debugPrint('Model already exists at: $modelPath');
+      }
+
+      if (mounted) {
+        setState(() {
+          _isModelLoaded = true;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading model: $e');
+    }
   }
 
   @override
@@ -30,16 +57,29 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> {
   }
 
   Future<void> _startRecording() async {
+    if (!_isModelLoaded) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Model is still loading...')),
+      );
+      return;
+    }
+
     try {
       if (await Permission.microphone.request().isGranted) {
-        final directory = await getApplicationDocumentsDirectory();
-        final path =
-            '${directory.path}/recording_${DateTime.now().millisecondsSinceEpoch}.m4a';
+        final directory = await getTemporaryDirectory();
+        final path = '${directory.path}/temp_record.wav';
 
-        await _audioRecorder.start(const RecordConfig(), path: path);
+        await _audioRecorder.start(
+          const RecordConfig(
+            encoder: AudioEncoder.wav,
+            sampleRate: 16000,
+            numChannels: 1,
+          ),
+          path: path,
+        );
         setState(() {
           _isRecording = true;
-          _recordedFilePath = null;
+          _transcriptionText = 'Listening...';
         });
       } else {
         if (mounted) {
@@ -58,11 +98,63 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> {
       final path = await _audioRecorder.stop();
       setState(() {
         _isRecording = false;
-        _recordedFilePath = path;
+        _isTranscribing = true;
+        _transcriptionText = 'Transcribing...';
       });
-      debugPrint('Recording saved to: $path');
+
+      if (path != null) {
+        final audioFile = File(path);
+        if (audioFile.existsSync() && audioFile.lengthSync() > 0) {
+          debugPrint('Audio file exists, size: ${audioFile.lengthSync()} bytes');
+          
+          try {
+            final result = await _whisperController.transcribe(
+              model: WhisperModel.tiny,
+              audioPath: path,
+              lang: 'de', // Explicit language prevents auto-detect crashes
+              // threads: 4, // Maximize CPU usage for faster transcription
+            );
+
+            if (mounted) {
+              setState(() {
+                _isTranscribing = false;
+                if (result?.transcription.text != null && result!.transcription.text.trim().isNotEmpty) {
+                  _transcriptionText = result.transcription.text;
+                } else {
+                  _transcriptionText = 'No speech detected.';
+                }
+              });
+            }
+          } catch (e) {
+            debugPrint('Transcribe error: $e');
+            if (mounted) {
+              setState(() {
+                _isTranscribing = false;
+                _transcriptionText = 'Error during transcription.';
+              });
+            }
+          } finally {
+            // Delete the temporary file safely
+            try {
+              if (audioFile.existsSync()) {
+                audioFile.deleteSync();
+              }
+            } catch (_) {}
+          }
+        } else {
+          if (mounted) {
+            setState(() {
+              _isTranscribing = false;
+              _transcriptionText = 'Error: Audio file is empty.';
+            });
+          }
+        }
+      }
     } catch (e) {
       debugPrint('Error stopping record: $e');
+      setState(() {
+        _isTranscribing = false;
+      });
     }
   }
 
@@ -109,12 +201,16 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> {
               const Spacer(flex: 3),
 
               // Subtitle
-              Text(
-                'Tell me about your day',
-                style: TextStyle(
-                  fontSize: 23,
-                  fontWeight: FontWeight.w200,
-                  color: colorScheme.onSurface.withOpacity(0.8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  _transcriptionText,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 23,
+                    fontWeight: FontWeight.w200,
+                    color: colorScheme.onSurface.withOpacity(0.8),
+                  ),
                 ),
               ),
 
@@ -209,22 +305,32 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> {
                               child: child,
                             );
                           },
-                      child: _isRecording
-                          ? Container(
-                              key: const ValueKey('stop'),
-                              width: 21,
-                              height: 21,
-                              decoration: BoxDecoration(
-                                color: colorScheme.error,
-                                borderRadius: BorderRadius.circular(6),
+                      child: _isTranscribing
+                          ? SizedBox(
+                              key: const ValueKey('loading'),
+                              width: 30,
+                              height: 30,
+                              child: CircularProgressIndicator(
+                                color: colorScheme.primary,
+                                strokeWidth: 2,
                               ),
                             )
-                          : Icon(
-                              Icons.mic_none,
-                              key: const ValueKey('mic'),
-                              color: colorScheme.onSurface.withOpacity(0.4),
-                              size: 30,
-                            ),
+                          : _isRecording
+                              ? Container(
+                                  key: const ValueKey('stop'),
+                                  width: 21,
+                                  height: 21,
+                                  decoration: BoxDecoration(
+                                    color: colorScheme.error,
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                )
+                              : Icon(
+                                  Icons.mic_none,
+                                  key: const ValueKey('mic'),
+                                  color: colorScheme.onSurface.withOpacity(0.4),
+                                  size: 30,
+                                ),
                     ),
                   ),
                 ),
