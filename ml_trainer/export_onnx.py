@@ -35,7 +35,7 @@ def export_to_onnx():
             "mood": {0: "batch_size"},
             "emotions": {0: "batch_size"},
         },
-        opset_version=14,
+        opset_version=18,
     )
     print(f"ONNX model exported to {output_path}")
 
