@@ -8,6 +8,7 @@ dependencies = [
     "accelerate>=1.14.0",
     "datasets>=5.0.0",
     "evaluate>=0.4.6",
+    "onnx>=1.17.0",
     "onnxruntime>=1.27.0",
     "onnxscript>=0.7.0",
     "optimum>=2.2.0",
