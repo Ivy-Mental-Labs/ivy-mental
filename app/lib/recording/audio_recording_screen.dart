@@ -1,14 +1,18 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:whisper_ggml_plus/whisper_ggml_plus.dart';
+
 import '../core/ml/services/text_analyzer.dart';
 import '../data/models/session.dart';
 import '../data/notifiers/session_notifier.dart';
+import '../features/overview/overview_pager_screen.dart';
+import '../shared/widgets/ivy_visuals.dart';
+import '../theme.dart';
 
 class AudioRecordingScreen extends StatefulWidget {
   final TextAnalyzer analyzer;
@@ -23,7 +27,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> {
   bool _isRecording = false;
   final AudioRecorder _audioRecorder = AudioRecorder();
   final WhisperController _whisperController = WhisperController();
-  
+
   bool _isTranscribing = false;
   bool _isModelLoaded = false;
   String _transcriptionText = 'Tell me about your day';
@@ -38,7 +42,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> {
     try {
       final modelPath = await _whisperController.getPath(WhisperModel.tiny);
       final file = File(modelPath);
-      
+
       if (!file.existsSync() || file.lengthSync() < 1000000) {
         debugPrint('Model not found natively, downloading...');
         await _whisperController.downloadModel(WhisperModel.tiny);
@@ -111,26 +115,29 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> {
       if (path != null) {
         final audioFile = File(path);
         if (audioFile.existsSync() && audioFile.lengthSync() > 0) {
-          debugPrint('Audio file exists, size: ${audioFile.lengthSync()} bytes');
-          
+          debugPrint(
+            'Audio file exists, size: ${audioFile.lengthSync()} bytes',
+          );
+
           try {
             final result = await _whisperController.transcribe(
               model: WhisperModel.tiny,
               audioPath: path,
-              lang: 'de', // Explicit language prevents auto-detect crashes
-              // threads: 4, // Maximize CPU usage for faster transcription
+              lang: 'de',
             );
 
             if (mounted) {
               setState(() {
                 _isTranscribing = false;
-                if (result?.transcription.text != null && result!.transcription.text.trim().isNotEmpty) {
+                if (result?.transcription.text != null &&
+                    result!.transcription.text.trim().isNotEmpty) {
                   _transcriptionText = result.transcription.text;
                 } else {
                   _transcriptionText = 'No speech detected.';
                 }
               });
-              if (result?.transcription.text != null && result!.transcription.text.trim().isNotEmpty) {
+              if (result?.transcription.text != null &&
+                  result!.transcription.text.trim().isNotEmpty) {
                 await _analyzeAndSave(result.transcription.text);
               }
             }
@@ -143,7 +150,6 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> {
               });
             }
           } finally {
-            // Delete the temporary file safely
             try {
               if (audioFile.existsSync()) {
                 audioFile.deleteSync();
@@ -183,16 +189,12 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> {
       );
       if (mounted) {
         await notifier.upsert(session);
-        messenger.showSnackBar(
-          const SnackBar(content: Text('Entry saved')),
-        );
+        messenger.showSnackBar(const SnackBar(content: Text('Entry saved')));
       }
     } catch (e) {
       debugPrint('Analysis error: $e');
       if (mounted) {
-        messenger.showSnackBar(
-          SnackBar(content: Text('Analysis failed: $e')),
-        );
+        messenger.showSnackBar(SnackBar(content: Text('Analysis failed: $e')));
       }
     }
   }
@@ -205,220 +207,163 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Scaffold(
-      backgroundColor: colorScheme.surface,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Top Bar
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'IvyMental',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w200,
-                      color: colorScheme.onSurface.withOpacity(0.8),
-                    ),
-                  ),
-                  Icon(
-                    Icons.arrow_forward,
-                    color: colorScheme.onSurface,
-                    size: 22,
-                  ),
-                ],
-              ),
-
-              const Spacer(flex: 3),
-
-              // Subtitle
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Text(
-                  _transcriptionText,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 23,
-                    fontWeight: FontWeight.w200,
-                    color: colorScheme.onSurface.withOpacity(0.8),
-                  ),
-                ),
-              ),
-
-              const Spacer(flex: 2),
-
-              // Magic Sphere Placeholder
-              Container(
-                width: 200,
-                height: 200,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      colorScheme.surface,
-                      colorScheme.secondary,
-                      colorScheme.primary,
-                    ],
-                    stops: const [0.1, 0.6, 1.0],
-                    center: const Alignment(-0.2, -0.3),
-                    radius: 0.8,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
-                      blurRadius: 40,
-                      offset: const Offset(0, 20),
-                    ),
-                    BoxShadow(
-                      color: Colors.white.withOpacity(0.9),
-                      blurRadius: 40,
-                      offset: const Offset(0, -20),
-                    ),
-                  ],
-                ),
-                child: Stack(
-                  children: [
-                    // Subtle inner glow
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.white.withOpacity(0.6),
-                            Colors.transparent,
-                            Colors.black.withOpacity(0.3),
-                          ],
-                        ),
-                      ),
-                    ),
-                    // Adding a few placeholder stars/dots like in the design
-                    Positioned(top: 40, left: 60, child: _buildStar(3)),
-                    Positioned(top: 80, right: 50, child: _buildStar(2)),
-                    Positioned(bottom: 60, left: 80, child: _buildStar(4)),
-                    Positioned(bottom: 90, right: 70, child: _buildStar(2)),
-                  ],
-                ),
-              ),
-
-              Spacer(flex: 3),
-
-              // Record Button
-              GestureDetector(
-                onTap: _toggleRecording,
-                child: Container(
-                  width: 70,
-                  height: 70,
-                  decoration: BoxDecoration(
-                    color: colorScheme.surface,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
-                        blurRadius: 3,
-                        spreadRadius: 1,
-                        offset: const Offset(0, 1.5),
-                      ),
-                    ],
-                    border: Border.all(
-                      color: Colors.grey.withOpacity(0.1),
-                      width: 1,
-                    ),
-                  ),
-                  child: Center(
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      transitionBuilder:
-                          (Widget child, Animation<double> animation) {
-                            return ScaleTransition(
-                              scale: animation,
-                              child: child,
-                            );
-                          },
-                      child: _isTranscribing
-                          ? SizedBox(
-                              key: const ValueKey('loading'),
-                              width: 30,
-                              height: 30,
-                              child: CircularProgressIndicator(
-                                color: colorScheme.primary,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : _isRecording
-                              ? Container(
-                                  key: const ValueKey('stop'),
-                                  width: 21,
-                                  height: 21,
-                                  decoration: BoxDecoration(
-                                    color: colorScheme.error,
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                )
-                              : Icon(
-                                  Icons.mic_none,
-                                  key: const ValueKey('mic'),
-                                  color: colorScheme.onSurface.withOpacity(0.4),
-                                  size: 30,
-                                ),
-                    ),
-                  ),
-                ),
-              ),
-
-              Spacer(flex: 1),
-
-              // Bottom text
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.lock_outline,
-                    size: 16,
-                    color: colorScheme.onSurface.withOpacity(0.3),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Processed locally on your Phone',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: colorScheme.onSurface.withOpacity(0.3),
-                      fontWeight: FontWeight.w300,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-            ],
-          ),
-        ),
+  void _openOverview() {
+    Navigator.of(context).push(
+      PageRouteBuilder<void>(
+        transitionDuration: const Duration(milliseconds: 450),
+        reverseTransitionDuration: const Duration(milliseconds: 350),
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return const OverviewPagerScreen();
+        },
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          final curved = CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+            reverseCurve: Curves.easeOutCubic,
+          );
+          return SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(1, 0),
+              end: Offset.zero,
+            ).animate(curved),
+            child: child,
+          );
+        },
       ),
     );
   }
 
-  Widget _buildStar(double size) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.8),
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.white,
-            blurRadius: size * 2,
-            spreadRadius: size,
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+
+    return Scaffold(
+      backgroundColor: colors.backgroundPrimary,
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final compact = constraints.maxHeight < 690;
+            final orbSize = compact ? 188.0 : 218.0;
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(22, 20, 22, 18),
+              child: Column(
+                children: [
+                  IvyHeader(
+                    trailing: IconButton(
+                      onPressed: _openOverview,
+                      splashRadius: 22,
+                      icon: Icon(
+                        Icons.arrow_forward,
+                        size: 20,
+                        color: colors.accentDeep,
+                      ),
+                    ),
+                  ),
+                  const Spacer(flex: 2),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: Text(
+                      _transcriptionText,
+                      key: ValueKey(_transcriptionText),
+                      textAlign: TextAlign.center,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: colors.textSecondary,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w200,
+                        height: 1.35,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: compact ? 34 : 58),
+                  MoodOrb(size: orbSize),
+                  const Spacer(flex: 3),
+                  _RecordButton(
+                    isRecording: _isRecording,
+                    isTranscribing: _isTranscribing,
+                    onPressed: _toggleRecording,
+                  ),
+                  const Spacer(),
+                  const PrivacyHint(),
+                  const SizedBox(height: AppSpacing.sm),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _RecordButton extends StatelessWidget {
+  final bool isRecording;
+  final bool isTranscribing;
+  final VoidCallback onPressed;
+
+  const _RecordButton({
+    required this.isRecording,
+    required this.isTranscribing,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return GestureDetector(
+      onTap: onPressed,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 260),
+        curve: Curves.easeOutCubic,
+        width: 58,
+        height: 58,
+        decoration: BoxDecoration(
+          color: colors.backgroundGlass,
+          shape: BoxShape.circle,
+          border: Border.all(color: colors.borderSubtle),
+          boxShadow: [
+            BoxShadow(
+              color: colors.shadowSoft,
+              blurRadius: isRecording ? 30 : 18,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Center(
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            transitionBuilder: (child, animation) {
+              return ScaleTransition(scale: animation, child: child);
+            },
+            child: isTranscribing
+                ? SizedBox(
+                    key: const ValueKey('loading'),
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      color: colors.accentMint,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : isRecording
+                ? Container(
+                    key: const ValueKey('stop'),
+                    width: 18,
+                    height: 18,
+                    decoration: BoxDecoration(
+                      color: colors.accentPeach,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  )
+                : Icon(
+                    Icons.mic_none,
+                    key: const ValueKey('mic'),
+                    color: colors.textSecondary,
+                    size: 28,
+                  ),
           ),
-        ],
+        ),
       ),
     );
   }
