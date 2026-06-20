@@ -20,6 +20,7 @@ dependencies:
   whisper_ggml_plus: ^1.5.2
   video_player: ^2.8.6
   flutter_local_notifications: ^22.0.1
+  timezone: ^0.11.0
 
 dev_dependencies:
   flutter_test:

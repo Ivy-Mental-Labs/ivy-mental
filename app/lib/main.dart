@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:app/recording/audio_recording_screen.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -10,7 +10,6 @@ import 'package:timezone/timezone.dart' as tz;
 import 'theme.dart';
 import 'core/ml/services/text_analyzer.dart';
 import 'core/ml/services/onnx_text_analyzer.dart';
-import 'core/ml/services/text_analyzer.dart';
 import 'data/notifiers/session_notifier.dart';
 import 'data/repositories/session_repository.dart';
 import 'features/main_navigation_screen.dart';
@@ -27,7 +26,7 @@ Future<void> initNotifications() async {
   tz.setLocalLocation(tz.getLocation('Europe/Berlin'));
 
   const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
+      AndroidInitializationSettings('@mipmap/launcher_icon');
 
   const DarwinInitializationSettings initializationSettingsIOS =
       DarwinInitializationSettings(
@@ -41,7 +40,7 @@ Future<void> initNotifications() async {
     iOS: initializationSettingsIOS,
   );
 
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  await flutterLocalNotificationsPlugin.initialize(settings: initializationSettings);
 }
 
 Future<void> requestNotificationPermissions() async {
@@ -64,11 +63,11 @@ Future<void> requestNotificationPermissions() async {
 Future<void> scheduleDailyEveningNotification() async {
   // Set the time to 20:00 (8 PM)
   await flutterLocalNotificationsPlugin.zonedSchedule(
-    0,
-    notificationTitle,
-    notificationBody,
-    _nextInstanceOfTime(20, 0),
-    const NotificationDetails(
+    id: 0,
+    title: notificationTitle,
+    body: notificationBody,
+    scheduledDate: _nextInstanceOfTime(20, 0),
+    notificationDetails: const NotificationDetails(
       android: AndroidNotificationDetails(
         'daily_diary_reminder',
         'Daily Diary Reminder',
@@ -79,8 +78,6 @@ Future<void> scheduleDailyEveningNotification() async {
       iOS: DarwinNotificationDetails(),
     ),
     androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-    uiLocalNotificationDateInterpretation:
-        UILocalNotificationDateInterpretation.absoluteTime,
     matchDateTimeComponents: DateTimeComponents.time,
   );
 }
@@ -115,10 +112,10 @@ Future<void> triggerTestNotification() async {
     iOS: DarwinNotificationDetails(),
   );
   await flutterLocalNotificationsPlugin.show(
-    1,
-    'Test Notification',
-    'This is a test! Notifications are working.',
-    notificationDetails,
+    id: 1,
+    title: 'Test Notification',
+    body: 'This is a test! Notifications are working.',
+    notificationDetails: notificationDetails,
   );
 }
 
