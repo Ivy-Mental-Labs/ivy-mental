@@ -1,6 +1,7 @@
 import 'package:app/recording/audio_recording_screen.dart';
 import 'package:flutter/material.dart';
 import 'history/history_screen.dart';
+import 'plan/plan_screen.dart';
 import '../core/ml/services/text_analyzer.dart';
 
 class MainNavigationScreen extends StatefulWidget {
@@ -23,6 +24,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         children: [
           AudioRecordingScreen(analyzer: widget.analyzer),
           const HistoryScreen(),
+          const PlanScreen(),
         ],
       ),
       bottomNavigationBar: NavigationBar(
@@ -38,6 +40,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             icon: Icon(Icons.history_outlined),
             selectedIcon: Icon(Icons.history),
             label: 'History',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.card_membership_outlined),
+            selectedIcon: Icon(Icons.card_membership),
+            label: 'Plan',
           ),
         ],
       ),
