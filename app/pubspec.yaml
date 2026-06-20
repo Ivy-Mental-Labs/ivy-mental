@@ -30,3 +30,4 @@ flutter:
   assets:
     - assets/ml/model.onnx
     - assets/ml/vocab.txt
+    - assets/ml/model.onnx.data
