@@ -28,6 +28,7 @@ class MainApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => SessionNotifier(SessionRepository()),
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         theme: appTheme,
         home: MainNavigationScreen(analyzer: analyzer),
       ),
