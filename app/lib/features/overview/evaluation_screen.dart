@@ -1,15 +1,44 @@
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../data/models/session.dart';
 import '../../data/notifiers/session_notifier.dart';
 import '../../shared/widgets/ivy_visuals.dart';
 import '../../theme.dart';
 
-class EvaluationScreen extends StatelessWidget {
+class EvaluationScreen extends StatefulWidget {
   const EvaluationScreen({super.key});
+
+  @override
+  State<EvaluationScreen> createState() => _EvaluationScreenState();
+}
+
+class _EvaluationScreenState extends State<EvaluationScreen> {
+  late VideoPlayerController _videoController;
+
+  @override
+  void initState() {
+    super.initState();
+    _videoController =
+        VideoPlayerController.asset('assets/media/sentiment_animation.mp4')
+          ..setLooping(true)
+          ..initialize().then((_) {
+            if (mounted) {
+              setState(() {});
+              _videoController.play();
+            }
+          });
+  }
+
+  @override
+  void dispose() {
+    _videoController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +71,107 @@ class EvaluationScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: compact ? 18 : 28),
-              ScoreOrb(score: score),
+              SizedBox(
+                width: 214,
+                height: 214,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // 1. Looping Video Background with Radial Fade-Out
+                    ShaderMask(
+                      shaderCallback: (bounds) {
+                        return const RadialGradient(
+                          center: Alignment.center,
+                          radius: 0.5,
+                          colors: [
+                            Colors.white,
+                            Colors.white,
+                            Colors.transparent,
+                          ],
+                          stops: [0.0, 0.7, 1.0],
+                        ).createShader(bounds);
+                      },
+                      blendMode: BlendMode.dstIn,
+                      child: ClipOval(
+                        child: SizedBox(
+                          width: 214,
+                          height: 200,
+                          child: _videoController.value.isInitialized
+                              ? FittedBox(
+                                  fit: BoxFit.cover,
+                                  child: SizedBox(
+                                    width: _videoController.value.size.width,
+                                    height: _videoController.value.size.height,
+                                    child: VideoPlayer(_videoController),
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
+                        ),
+                      ),
+                    ),
+                    // 2. Light Blur Disk that Fades Out to the Edges
+                    ShaderMask(
+                      shaderCallback: (bounds) {
+                        return const RadialGradient(
+                          center: Alignment.center,
+                          radius: 0.5,
+                          colors: [Colors.white, Colors.transparent],
+                          stops: [0.6, 1.0],
+                        ).createShader(bounds);
+                      },
+                      blendMode: BlendMode.dstIn,
+                      child: ClipOval(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 10),
+                          child: Container(
+                            width: 140,
+                            height: 140,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: colors.backgroundPrimary.withOpacity(0.75),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    // 3. Sharp Text on Top with Count-Up Animation
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TweenAnimationBuilder<double>(
+                          duration: const Duration(milliseconds: 1500),
+                          curve: Curves.easeOutCubic,
+                          tween: Tween<double>(
+                            begin: 0.0,
+                            end: score.toDouble(),
+                          ),
+                          builder: (context, value, child) {
+                            return Text(
+                              '${value.round()}',
+                              style: Theme.of(context).textTheme.displaySmall
+                                  ?.copyWith(
+                                    color: colors.textPrimary,
+                                    fontSize: 38,
+                                    fontWeight: FontWeight.w300,
+                                    height: 1,
+                                  ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 7),
+                        Text(
+                          'Overall',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: colors.textSecondary,
+                                fontSize: 11,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(height: AppSpacing.md),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
