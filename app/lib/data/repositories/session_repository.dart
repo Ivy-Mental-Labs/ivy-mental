@@ -11,15 +11,28 @@ class SessionRepository {
   }
 
   List<Session> getAll() {
-    return _box.values
-        .map((v) => Session.fromJsonString(v as String))
-        .toList()
+    return _box.values.map((v) => Session.fromJsonString(v as String)).toList()
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 
   Session? getForDate(DateTime date) {
     final raw = _box.get(Session.dateKey(date));
-    return raw != null ? Session.fromJsonString(raw as String) : null;
+    if (raw != null) {
+      return Session.fromJsonString(raw as String);
+    }
+
+    for (final rawValue in _box.values) {
+      if (rawValue is String) {
+        final session = Session.fromJsonString(rawValue);
+        if (session.createdAt.year == date.year &&
+            session.createdAt.month == date.month &&
+            session.createdAt.day == date.day) {
+          return session;
+        }
+      }
+    }
+
+    return null;
   }
 
   Future<void> upsert(Session session) async {

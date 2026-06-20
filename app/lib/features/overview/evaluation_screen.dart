@@ -27,11 +27,7 @@ class EvaluationScreen extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(22, 20, 22, 0),
           child: Column(
             children: [
-              IvyHeader(
-                trailing: _OverviewOrbButton(
-                  onTap: () => Navigator.of(context).pop(),
-                ),
-              ),
+              IvyHeader(trailing: _OverviewOrbButton(onTap: () => Navigator.of(context).pop())),
               SizedBox(height: compact ? 38 : 60),
               Text(
                 "Your week's evaluation",
@@ -47,25 +43,13 @@ class EvaluationScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  MetricItem(
-                    label: 'Calm',
-                    value: calm,
-                    color: colors.accentDeep,
-                  ),
-                  MetricItem(
-                    label: 'Energy',
-                    value: energy,
-                    color: colors.accentMint,
-                  ),
-                  MetricItem(
-                    label: 'Stress',
-                    value: stress,
-                    color: colors.accentPeach,
-                  ),
+                  MetricItem(label: 'Calm', value: calm, color: colors.accentDeep),
+                  MetricItem(label: 'Energy', value: energy, color: colors.accentMint),
+                  MetricItem(label: 'Stress', value: stress, color: colors.accentPeach),
                 ],
               ),
               SizedBox(height: compact ? 24 : 50),
-              const MoodTrendCard(),
+              MoodTrendCard(sessions: sessions),
             ],
           ),
         );
@@ -84,11 +68,7 @@ class EvaluationScreen extends StatelessWidget {
     return (((average + 1) / 2) * 100).clamp(0, 100).round();
   }
 
-  int _emotionScore(
-    List<Session> sessions,
-    String key, {
-    required int fallback,
-  }) {
+  int _emotionScore(List<Session> sessions, String key, {required int fallback}) {
     final values = <double>[];
     for (final session in sessions) {
       final emotions = session.evaluation?['emotions'];
