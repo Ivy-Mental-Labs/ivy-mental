@@ -138,18 +138,53 @@ class EmotionalLayerViewData {
   }
 }
 
-class HistoryEntryScreen extends StatelessWidget {
+class HistoryEntryScreen extends StatefulWidget {
   final Session? session;
   final HistoryEntryViewData? data;
 
   const HistoryEntryScreen({super.key, this.session, this.data});
 
   @override
+  State<HistoryEntryScreen> createState() => _HistoryEntryScreenState();
+}
+
+class _HistoryEntryScreenState extends State<HistoryEntryScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _orbScale;
+  late Animation<double> _scoreCounter;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(duration: const Duration(milliseconds: 1400), vsync: this);
+
+    // Breathing orb animation
+    _orbScale = Tween<double>(
+      begin: 1.0,
+      end: 1.08,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+
+    // Counter animation for score and slider (full duration)
+    _scoreCounter = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final viewData =
-        data ?? (session == null ? HistoryEntryViewData.fallback() : HistoryEntryViewData.fromSession(session!));
-
-    final headerLabel = _relativeDate(session?.createdAt ?? DateTime.now());
+        widget.data ??
+        (widget.session == null ? HistoryEntryViewData.fallback() : HistoryEntryViewData.fromSession(widget.session!));
+    final headerLabel = _relativeDate(widget.session?.createdAt ?? DateTime.now());
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F1EC),
@@ -190,13 +225,24 @@ class HistoryEntryScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 55),
-            Center(child: _MoodOrb(score: viewData.moodScore)),
+            Center(
+              child: AnimatedBuilder(
+                animation: _orbScale,
+                builder: (context, child) {
+                  return Transform.scale(scale: _orbScale.value, child: child);
+                },
+                child: _MoodOrb(score: viewData.moodScore),
+              ),
+            ),
             const SizedBox(height: 56),
             const _SectionLabel('Mood'),
             const SizedBox(height: 11),
-            _MoodCard(score: viewData.moodScore),
+            _MoodCard(score: viewData.moodScore, animationValue: _scoreCounter),
             const SizedBox(height: 14),
-            _AnalysisCard(text: viewData.analysisText),
+            FadeTransition(
+              opacity: _scoreCounter,
+              child: _AnalysisCard(text: viewData.analysisText),
+            ),
             const SizedBox(height: 25),
             const _SectionLabel('Pattern Recognition'),
             const SizedBox(height: 11),
@@ -325,28 +371,37 @@ class _MoodOrb extends StatelessWidget {
 
 class _MoodCard extends StatelessWidget {
   final double score;
+  final Animation<double> animationValue;
 
-  const _MoodCard({required this.score});
+  const _MoodCard({required this.score, required this.animationValue});
 
   @override
   Widget build(BuildContext context) {
-    return _SoftCard(
-      padding: const EdgeInsets.fromLTRB(28, 30, 28, 23),
-      child: Column(
-        children: [
-          Text(
-            score.toStringAsFixed(2),
-            style: Theme.of(context).textTheme.displaySmall?.copyWith(
-              color: const Color(0xFF124B5F),
-              fontSize: 36,
-              fontWeight: FontWeight.w300,
-              height: 1,
-            ),
+    return ListenableBuilder(
+      listenable: animationValue,
+      builder: (context, child) {
+        final progress = animationValue.value;
+        final animatedScore = score * progress;
+        final sliderValue = Tween<double>(begin: -1.0, end: score).transform(progress);
+        return _SoftCard(
+          padding: const EdgeInsets.fromLTRB(28, 30, 28, 23),
+          child: Column(
+            children: [
+              Text(
+                animatedScore.toStringAsFixed(2),
+                style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                  color: const Color(0xFF124B5F),
+                  fontSize: 36,
+                  fontWeight: FontWeight.w300,
+                  height: 1,
+                ),
+              ),
+              const SizedBox(height: 23),
+              _MoodScale(value: sliderValue),
+            ],
           ),
-          const SizedBox(height: 23),
-          _MoodScale(value: score),
-        ],
-      ),
+        );
+      },
     );
   }
 }
