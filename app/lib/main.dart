@@ -9,6 +9,8 @@ import 'features/evaluation/evaluation_screen.dart';
 import 'features/history/history_screen.dart';
 import 'data/repositories/session_repository.dart';
 import 'data/notifiers/session_notifier.dart';
+import 'features/main_navigation_screen.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,6 +32,7 @@ class MainApp extends StatelessWidget {
       create: (_) => SessionNotifier(SessionRepository()),
       child: MaterialApp(
         theme: appTheme,
+        home: MainNavigationScreen(analyzer: analyzer),
         initialRoute: AudioRecordingScreen.routeName,
         routes: {
           AudioRecordingScreen.routeName: (_) => const AudioRecordingScreen(),
