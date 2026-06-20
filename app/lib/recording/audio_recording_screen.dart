@@ -173,7 +173,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> {
     try {
       final analysisResult = await widget.analyzer.analyze(text);
       final session = Session(
-        id: Session.dateKey(DateTime.now()),
+        id: DateTime.now().toIso8601String(),
         createdAt: DateTime.now(),
         transcript: text,
         evaluation: {
