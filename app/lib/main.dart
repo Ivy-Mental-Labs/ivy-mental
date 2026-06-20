@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'theme.dart';
 import 'core/ml/services/text_analyzer.dart';
 import 'core/ml/services/onnx_text_analyzer.dart';
-import 'features/audio_recording/audio_recording_screen.dart';
-import 'features/evaluation/evaluation_screen.dart';
-import 'features/history/history_screen.dart';
+import 'features/main_navigation_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,12 +22,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: appTheme,
-      initialRoute: AudioRecordingScreen.routeName,
-      routes: {
-        AudioRecordingScreen.routeName: (_) => const AudioRecordingScreen(),
-        EvaluationScreen.routeName: (_) => EvaluationScreen(analyzer: analyzer),
-        HistoryScreen.routeName: (_) => const HistoryScreen(),
-      },
+      home: MainNavigationScreen(analyzer: analyzer),
     );
   }
 }
