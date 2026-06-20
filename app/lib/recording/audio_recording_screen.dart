@@ -2,12 +2,18 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:whisper_ggml_plus/whisper_ggml_plus.dart';
+import '../core/ml/services/text_analyzer.dart';
+import '../data/models/session.dart';
+import '../data/notifiers/session_notifier.dart';
 
 class AudioRecordingScreen extends StatefulWidget {
-  const AudioRecordingScreen({super.key});
+  final TextAnalyzer analyzer;
+
+  const AudioRecordingScreen({required this.analyzer, super.key});
 
   @override
   State<AudioRecordingScreen> createState() => _AudioRecordingScreenState();
@@ -124,6 +130,9 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> {
                   _transcriptionText = 'No speech detected.';
                 }
               });
+              if (result?.transcription.text != null && result!.transcription.text.trim().isNotEmpty) {
+                await _analyzeAndSave(result.transcription.text);
+              }
             }
           } catch (e) {
             debugPrint('Transcribe error: $e');
@@ -155,6 +164,36 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> {
       setState(() {
         _isTranscribing = false;
       });
+    }
+  }
+
+  Future<void> _analyzeAndSave(String text) async {
+    final notifier = context.read<SessionNotifier>();
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final analysisResult = await widget.analyzer.analyze(text);
+      final session = Session(
+        id: DateTime.now().toIso8601String(),
+        createdAt: DateTime.now(),
+        transcript: text,
+        evaluation: {
+          'mood': analysisResult.mood,
+          'emotions': analysisResult.emotions,
+        },
+      );
+      if (mounted) {
+        await notifier.upsert(session);
+        messenger.showSnackBar(
+          const SnackBar(content: Text('Entry saved')),
+        );
+      }
+    } catch (e) {
+      debugPrint('Analysis error: $e');
+      if (mounted) {
+        messenger.showSnackBar(
+          SnackBar(content: Text('Analysis failed: $e')),
+        );
+      }
     }
   }
 
