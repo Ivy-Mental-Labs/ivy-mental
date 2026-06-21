@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'core/ml/services/onnx_text_analyzer.dart';
 import 'core/ml/services/text_analyzer.dart';
+import 'data/mock_data_seeder.dart';
 import 'data/notifiers/session_notifier.dart';
 import 'data/notifiers/score_reminder_notifier.dart';
 import 'data/repositories/session_repository.dart';
@@ -14,6 +15,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   await SessionRepository.init();
+  await MockDataSeeder.seedIfEmpty(SessionRepository());
   final analyzer = OnnxTextAnalyzer();
   await analyzer.load();
   runApp(MainApp(analyzer: analyzer));
