@@ -313,7 +313,9 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
                   const Spacer(flex: 2),
 
                   // Magic Sphere Video with Audio-Reactive and Breathing Scale
-                  AnimatedBuilder(
+                  GestureDetector(
+                    onTap: _toggleRecording,
+                    child: AnimatedBuilder(
                     animation: _breathingAnimation,
                     builder: (context, child) {
                       final currentScale = _isRecording ? _audioScale : _breathingAnimation.value;
@@ -370,6 +372,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
                         ),
                       ],
                     ),
+                  ),
                   ),
 
                   Spacer(flex: 3),
