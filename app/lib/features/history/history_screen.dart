@@ -16,27 +16,19 @@ class HistoryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final sessions = context.watch<SessionNotifier>().sessions;
-    final items = sessions.isEmpty
-        ? _fallbackItems()
-        : _itemsFromSessions(sessions);
+    final items = sessions.isEmpty ? _fallbackItems() : _itemsFromSessions(sessions);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(22, 20, 22, 0),
       child: Column(
         children: [
-          IvyHeader(
-            trailing: _OverviewOrbButton(
-              onTap: () => Navigator.of(context).pop(),
-            ),
-          ),
+          IvyHeader(trailing: _OverviewOrbButton(onTap: () => Navigator.of(context).pop())),
           const SizedBox(height: 52),
           Text(
             'Your experiences',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: colors.textSecondary,
-              fontSize: 18,
-              fontWeight: FontWeight.w200,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(color: colors.textSecondary, fontSize: 18, fontWeight: FontWeight.w200),
           ),
           const SizedBox(height: 42),
           Expanded(
@@ -51,12 +43,9 @@ class HistoryScreen extends StatelessWidget {
                   item: item,
                   onTap: item.session == null
                       ? null
-                      : () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                HistoryEntryScreen(session: item.session!),
-                          ),
-                        ),
+                      : () => Navigator.of(
+                          context,
+                        ).push(MaterialPageRoute(builder: (_) => HistoryEntryScreen(session: item.session!))),
                 );
               },
             ),
@@ -70,8 +59,7 @@ class HistoryScreen extends StatelessWidget {
     return sessions.take(8).map((session) {
       final mood = (session.evaluation?['mood'] as num?)?.toDouble() ?? 0;
       return ExperienceItem(
-        meta:
-            '${_relativeDate(session.createdAt)} - ${_durationFor(session)} min',
+        meta: '${_relativeDate(session.createdAt)} - ${_durationFor(session)} min',
         title: _snippet(session.transcript),
         variant: mood >= 0.2
             ? MoodOrbVariant.mint
@@ -85,31 +73,11 @@ class HistoryScreen extends StatelessWidget {
 
   List<ExperienceItem> _fallbackItems() {
     return const [
-      ExperienceItem(
-        meta: 'Today - 7 min',
-        title: 'A little tired from a hard day...',
-        variant: MoodOrbVariant.peach,
-      ),
-      ExperienceItem(
-        meta: 'Yesterday - 3 min',
-        title: 'Awesome day, awesome we...',
-        variant: MoodOrbVariant.mint,
-      ),
-      ExperienceItem(
-        meta: 'Yesterday - 3 min',
-        title: 'Awesome day, awesome we...',
-        variant: MoodOrbVariant.peach,
-      ),
-      ExperienceItem(
-        meta: 'Yesterday - 3 min',
-        title: 'Awesome day, awesome we...',
-        variant: MoodOrbVariant.peach,
-      ),
-      ExperienceItem(
-        meta: 'Yesterday - 3 min',
-        title: 'Awesome day, awesome we...',
-        variant: MoodOrbVariant.peach,
-      ),
+      ExperienceItem(meta: 'Today - 7 min', title: 'A little tired from a hard day...', variant: MoodOrbVariant.peach),
+      ExperienceItem(meta: 'Yesterday - 3 min', title: 'Awesome day, awesome we...', variant: MoodOrbVariant.mint),
+      ExperienceItem(meta: 'Yesterday - 3 min', title: 'Awesome day, awesome we...', variant: MoodOrbVariant.peach),
+      ExperienceItem(meta: 'Yesterday - 3 min', title: 'Awesome day, awesome we...', variant: MoodOrbVariant.peach),
+      ExperienceItem(meta: 'Yesterday - 3 min', title: 'Awesome day, awesome we...', variant: MoodOrbVariant.peach),
     ];
   }
 
@@ -131,7 +99,7 @@ class HistoryScreen extends StatelessWidget {
   String _snippet(String? transcript) {
     final text = transcript?.trim();
     if (text == null || text.isEmpty) {
-      return 'A quiet check-in with IvyMental...';
+      return 'Your check-in is being processed...';
     }
     if (text.length <= 30) {
       return text;
@@ -165,12 +133,7 @@ class ExperienceItem {
   final MoodOrbVariant variant;
   final Session? session;
 
-  const ExperienceItem({
-    required this.meta,
-    required this.title,
-    required this.variant,
-    this.session,
-  });
+  const ExperienceItem({required this.meta, required this.title, required this.variant, this.session});
 }
 
 class ExperienceCard extends StatelessWidget {
@@ -194,13 +157,7 @@ class ExperienceCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppRadius.md),
             border: Border.all(color: colors.borderSubtle),
-            boxShadow: [
-              BoxShadow(
-                color: colors.shadowSoft,
-                blurRadius: 22,
-                offset: const Offset(0, 12),
-              ),
-            ],
+            boxShadow: [BoxShadow(color: colors.shadowSoft, blurRadius: 22, offset: const Offset(0, 12))],
           ),
           child: Row(
             children: [
