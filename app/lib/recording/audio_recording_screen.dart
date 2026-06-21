@@ -33,6 +33,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
   bool _isTranscribing = false;
   bool _isModelLoaded = false;
   String _transcriptionText = 'Tell me about your day';
+  bool _showTranscriptionText = true;
 
   late VideoPlayerController _videoController;
   StreamSubscription<Amplitude>? _amplitudeSub;
@@ -41,10 +42,15 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
   late AnimationController _breathingController;
   late Animation<double> _breathingAnimation;
 
+  late Stopwatch _recordingStopwatch;
+  Timer? _recordingTimer;
+  String _recordingDuration = '0:00';
+
   @override
   void initState() {
     super.initState();
     _initModel();
+    _recordingStopwatch = Stopwatch();
 
     _breathingController = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200));
     _breathingAnimation = Tween<double>(
@@ -89,6 +95,8 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
   void dispose() {
     _breathingController.dispose();
     _amplitudeSub?.cancel();
+    _recordingTimer?.cancel();
+    _recordingStopwatch.stop();
     _videoController.dispose();
     _audioRecorder.dispose();
     super.dispose();
@@ -110,6 +118,18 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
           path: path,
         );
 
+        _recordingStopwatch.start();
+        _recordingTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+          if (mounted) {
+            final seconds = _recordingStopwatch.elapsed.inSeconds;
+            final minutes = seconds ~/ 60;
+            final secs = seconds % 60;
+            setState(() {
+              _recordingDuration = '$minutes:${secs.toString().padLeft(2, '0')}';
+            });
+          }
+        });
+
         _amplitudeSub = _audioRecorder.onAmplitudeChanged(const Duration(milliseconds: 100)).listen((amp) {
           if (mounted) {
             // Map amplitude from -40..0 to scale 1.0..1.4
@@ -122,6 +142,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
 
         setState(() {
           _isRecording = true;
+          _showTranscriptionText = true;
           _transcriptionText = 'Listening...';
         });
       } else {
@@ -138,12 +159,17 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
     try {
       final path = await _audioRecorder.stop();
       _amplitudeSub?.cancel();
+      _recordingTimer?.cancel();
+      _recordingStopwatch.stop();
+      _recordingStopwatch.reset();
 
       setState(() {
         _isRecording = false;
         _isTranscribing = true;
+        _showTranscriptionText = true;
         _transcriptionText = 'Transcribing...';
         _audioScale = 1.0;
+        _recordingDuration = '0:00';
       });
 
       if (path != null) {
@@ -170,7 +196,14 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
               });
               _videoController.play();
               if (result?.transcription.text != null && result!.transcription.text.trim().isNotEmpty) {
-                await _analyzeAndSave(result.transcription.text);
+                final saved = await _analyzeAndSave(result.transcription.text);
+                if (saved && mounted) {
+                  setState(() {
+                    _showTranscriptionText = false;
+                  });
+                  await Future.delayed(const Duration(milliseconds: 600));
+                  _openOverview(initialPage: 0);
+                }
               }
             }
           } catch (e) {
@@ -205,7 +238,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
     }
   }
 
-  Future<void> _analyzeAndSave(String text) async {
+  Future<bool> _analyzeAndSave(String text) async {
     final notifier = context.read<SessionNotifier>();
     final reminderNotifier = context.read<ScoreReminderNotifier>();
     final messenger = ScaffoldMessenger.of(context);
@@ -233,11 +266,13 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
           );
         }
       }
+      return true;
     } catch (e) {
       debugPrint('Analysis error: $e');
       if (mounted) {
         messenger.showSnackBar(SnackBar(content: Text('Analysis failed: $e')));
       }
+      return false;
     }
   }
 
@@ -249,13 +284,13 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
     }
   }
 
-  void _openOverview() {
+  void _openOverview({int initialPage = 0}) {
     Navigator.of(context).push(
       PageRouteBuilder<void>(
         transitionDuration: const Duration(milliseconds: 450),
         reverseTransitionDuration: const Duration(milliseconds: 350),
         pageBuilder: (context, animation, secondaryAnimation) {
-          return const OverviewPagerScreen();
+          return OverviewPagerScreen(initialPage: initialPage);
         },
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           final curved = CurvedAnimation(
@@ -299,14 +334,15 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
                   const Spacer(flex: 3),
 
                   // Subtitle
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text(
-                      _transcriptionText,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 23, fontWeight: FontWeight.w200, color: colors.textPrimary),
+                  if (_showTranscriptionText)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Text(
+                        _transcriptionText,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 23, fontWeight: FontWeight.w200, color: colors.textPrimary),
+                      ),
                     ),
-                  ),
 
                   const Spacer(flex: 2),
 
@@ -428,6 +464,17 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
                     ),
                   ),
 
+                  // Recording Duration
+                  if (_isRecording)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 25.0),
+                      child: Text(
+                        _recordingDuration,
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: colors.textMuted),
+                      ),
+                    )
+                  else
+                    const SizedBox(height: 20),
                   Spacer(flex: 1),
 
                   // Bottom text
