@@ -27,12 +27,17 @@ class PlanScreen extends StatelessWidget {
                       color: colorScheme.onSurface.withOpacity(0.8),
                     ),
                   ),
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: colorScheme.primary,
+                  GestureDetector(
+                    onTap: () => Navigator.of(context).pop(),
+                    child: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: const BoxDecoration(shape: BoxShape.circle),
+                      child: Icon(
+                        Icons.arrow_back,
+                        color: colorScheme.onSurface.withOpacity(0.5),
+                        size: 20,
+                      ),
                     ),
                   ),
                 ],
@@ -127,6 +132,11 @@ class PlanScreen extends StatelessWidget {
                       label: 'Score notifications',
                       color: colorScheme.onSurface,
                     ),
+                    const SizedBox(height: 6),
+                    _FeatureBullet(
+                      label: 'Weekly mood report',
+                      color: colorScheme.onSurface,
+                    ),
                     const SizedBox(height: 20),
                     SizedBox(
                       width: double.infinity,
@@ -196,13 +206,8 @@ class PlanScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 14),
                     _FeatureBullet(
-                      label: 'Unlimited recordings',
+                      label: 'Same features as Premium',
                       color: colorScheme.onSurface,
-                    ),
-                    const SizedBox(height: 6),
-                    _FeatureBullet(
-                      label: 'Score notifications',
-                      color: colorScheme.onSurface.withOpacity(0.3),
                     ),
                     const SizedBox(height: 20),
                     SizedBox(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../data/notifiers/score_reminder_notifier.dart';
+import '../plan/plan_screen.dart';
 
 class ScoreReminderSettingsScreen extends StatelessWidget {
   const ScoreReminderSettingsScreen({super.key});
@@ -37,7 +38,11 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
                           width: 36,
                           height: 36,
                           decoration: BoxDecoration(shape: BoxShape.circle),
-                          child: Icon(Icons.close, color: colorScheme.onSurface.withOpacity(0.5), size: 20),
+                          child: Icon(
+                            Icons.close,
+                            color: colorScheme.onSurface.withOpacity(0.5),
+                            size: 20,
+                          ),
                         ),
                       ),
                     ],
@@ -65,7 +70,11 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
                       children: [
                         Text(
                           'Notify below',
-                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400, color: colorScheme.onSurface),
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w400,
+                            color: colorScheme.onSurface,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         Row(
@@ -96,11 +105,16 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
                         SliderTheme(
                           data: SliderThemeData(
                             activeTrackColor: colorScheme.onSurface,
-                            inactiveTrackColor: colorScheme.onSurface.withOpacity(0.15),
+                            inactiveTrackColor: colorScheme.onSurface
+                                .withOpacity(0.15),
                             thumbColor: colorScheme.onSurface,
-                            overlayColor: colorScheme.onSurface.withOpacity(0.08),
+                            overlayColor: colorScheme.onSurface.withOpacity(
+                              0.08,
+                            ),
                             trackHeight: 2,
-                            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+                            thumbShape: const RoundSliderThumbShape(
+                              enabledThumbRadius: 8,
+                            ),
                           ),
                           child: Slider(
                             value: notifier.threshold.toDouble(),
@@ -115,11 +129,26 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('0', style: TextStyle(fontSize: 12, color: colorScheme.onSurface.withOpacity(0.4))),
-                              Text('50', style: TextStyle(fontSize: 12, color: colorScheme.onSurface.withOpacity(0.4))),
+                              Text(
+                                '0',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: colorScheme.onSurface.withOpacity(0.4),
+                                ),
+                              ),
+                              Text(
+                                '50',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: colorScheme.onSurface.withOpacity(0.4),
+                                ),
+                              ),
                               Text(
                                 '100',
-                                style: TextStyle(fontSize: 12, color: colorScheme.onSurface.withOpacity(0.4)),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: colorScheme.onSurface.withOpacity(0.4),
+                                ),
                               ),
                             ],
                           ),
@@ -137,15 +166,25 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
                       children: [
                         Text(
                           'Active',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: colorScheme.onSurface),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                            color: colorScheme.onSurface,
+                          ),
                         ),
                         Switch(
                           value: notifier.isActive,
                           onChanged: notifier.setActive,
                           activeThumbColor: colorScheme.secondary,
-                          activeTrackColor: colorScheme.secondary.withOpacity(0.5),
-                          inactiveThumbColor: colorScheme.onSurface.withOpacity(0.3),
-                          inactiveTrackColor: colorScheme.onSurface.withOpacity(0.1),
+                          activeTrackColor: colorScheme.secondary.withOpacity(
+                            0.5,
+                          ),
+                          inactiveThumbColor: colorScheme.onSurface.withOpacity(
+                            0.3,
+                          ),
+                          inactiveTrackColor: colorScheme.onSurface.withOpacity(
+                            0.1,
+                          ),
                         ),
                       ],
                     ),
@@ -167,19 +206,61 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
                           text: 'Be aware of your overall mental score',
                           style: TextStyle(color: colorScheme.primary),
                         ),
-                        const TextSpan(text: ' — check your evaluation and take better care of yourself.'),
+                        const TextSpan(
+                          text:
+                              ' — check your evaluation and take better care of yourself.',
+                        ),
                       ],
                     ),
                   ),
 
                   const Spacer(),
 
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const PlanScreen()),
+                        );
+                      },
+                      style: FilledButton.styleFrom(
+                        backgroundColor: colorScheme.tertiary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.workspace_premium, size: 18),
+                          SizedBox(width: 8),
+                          Text(
+                            'View Plans',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
                   // Footer
                   Center(
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.lock_outline, size: 14, color: colorScheme.onSurface.withOpacity(0.3)),
+                        Icon(
+                          Icons.lock_outline,
+                          size: 14,
+                          color: colorScheme.onSurface.withOpacity(0.3),
+                        ),
                         const SizedBox(width: 6),
                         Text(
                           'On-device analysis',
@@ -216,7 +297,13 @@ class _Card extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: child,
     );
