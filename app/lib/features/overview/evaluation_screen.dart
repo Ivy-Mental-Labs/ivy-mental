@@ -1,5 +1,9 @@
+import 'dart:math' as math;
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../data/models/session.dart';
 import '../../data/notifiers/session_notifier.dart';
@@ -13,41 +17,37 @@ class EvaluationScreen extends StatefulWidget {
   State<EvaluationScreen> createState() => _EvaluationScreenState();
 }
 
-class _EvaluationScreenState extends State<EvaluationScreen> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<double> _animation;
-  List<Session>? _lastSessions;
+class _EvaluationScreenState extends State<EvaluationScreen> {
+  late VideoPlayerController _videoController;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(duration: const Duration(milliseconds: 1400), vsync: this);
-    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeOutQuart);
-    _controller.forward();
+    _videoController =
+        VideoPlayerController.asset('assets/media/sentiment_animation.mp4')
+          ..setLooping(true)
+          ..initialize().then((_) {
+            if (mounted) {
+              setState(() {});
+              _videoController.play();
+            }
+          });
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _videoController.dispose();
     super.dispose();
-  }
-
-  void _restartAnimationIfNeeded(List<Session> sessions) {
-    if (!identical(_lastSessions, sessions)) {
-      _lastSessions = sessions;
-      _controller
-        ..reset()
-        ..forward();
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final sessions = context.watch<SessionNotifier>().sessions;
-    _restartAnimationIfNeeded(sessions);
     final score = _overallScore(sessions);
-    final topEmotions = _topEmotionScores(sessions);
+    final calm = _emotionScore(sessions, 'satisfied', fallback: 72);
+    final energy = _emotionScore(sessions, 'happy', fallback: 61);
+    final stress = _emotionScore(sessions, 'anxious', fallback: 34);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -56,7 +56,11 @@ class _EvaluationScreenState extends State<EvaluationScreen> with SingleTickerPr
           padding: const EdgeInsets.fromLTRB(22, 20, 22, 0),
           child: Column(
             children: [
-              IvyHeader(trailing: _OverviewOrbButton(onTap: () => Navigator.of(context).pop())),
+              IvyHeader(
+                trailing: _OverviewOrbButton(
+                  onTap: () => Navigator.of(context).pop(),
+                ),
+              ),
               SizedBox(height: compact ? 38 : 60),
               Text(
                 "Your week's evaluation",
@@ -67,24 +71,130 @@ class _EvaluationScreenState extends State<EvaluationScreen> with SingleTickerPr
                 ),
               ),
               SizedBox(height: compact ? 18 : 28),
-              ScoreOrb(score: score),
+              SizedBox(
+                width: 214,
+                height: 214,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // 1. Looping Video Background with Radial Fade-Out
+                    ShaderMask(
+                      shaderCallback: (bounds) {
+                        return const RadialGradient(
+                          center: Alignment.center,
+                          radius: 0.5,
+                          colors: [
+                            Colors.white,
+                            Colors.white,
+                            Colors.transparent,
+                          ],
+                          stops: [0.0, 0.7, 1.0],
+                        ).createShader(bounds);
+                      },
+                      blendMode: BlendMode.dstIn,
+                      child: ClipOval(
+                        child: SizedBox(
+                          width: 214,
+                          height: 200,
+                          child: _videoController.value.isInitialized
+                              ? FittedBox(
+                                  fit: BoxFit.cover,
+                                  child: SizedBox(
+                                    width: _videoController.value.size.width,
+                                    height: _videoController.value.size.height,
+                                    child: VideoPlayer(_videoController),
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
+                        ),
+                      ),
+                    ),
+                    // 2. Light Blur Disk that Fades Out to the Edges
+                    ShaderMask(
+                      shaderCallback: (bounds) {
+                        return const RadialGradient(
+                          center: Alignment.center,
+                          radius: 0.5,
+                          colors: [Colors.white, Colors.transparent],
+                          stops: [0.6, 1.0],
+                        ).createShader(bounds);
+                      },
+                      blendMode: BlendMode.dstIn,
+                      child: ClipOval(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 10),
+                          child: Container(
+                            width: 140,
+                            height: 140,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: colors.backgroundPrimary.withOpacity(0.75),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    // 3. Sharp Text on Top with Count-Up Animation
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TweenAnimationBuilder<double>(
+                          duration: const Duration(milliseconds: 5000),
+                          curve: Curves.easeOutCubic,
+                          tween: Tween<double>(
+                            begin: 0.0,
+                            end: score.toDouble(),
+                          ),
+                          builder: (context, value, child) {
+                            return Text(
+                              '${value.round()}',
+                              style: Theme.of(context).textTheme.displaySmall
+                                  ?.copyWith(
+                                    color: colors.textPrimary,
+                                    fontSize: 38,
+                                    fontWeight: FontWeight.w300,
+                                    height: 1,
+                                  ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 7),
+                        Text(
+                          'Overall',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: colors.textSecondary,
+                                fontSize: 11,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(height: AppSpacing.md),
-              AnimatedBuilder(
-                animation: _animation,
-                builder: (context, child) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: List.generate(3, (index) {
-                      final emotion = topEmotions[index];
-                      final animatedValue = (emotion.value * _animation.value).round();
-                      final color = [colors.accentDeep, colors.accentMint, colors.accentPeach][index];
-                      return MetricItem(label: emotion.key, value: animatedValue, color: color);
-                    }),
-                  );
-                },
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  MetricItem(
+                    label: 'Calm',
+                    value: calm,
+                    color: colors.accentDeep,
+                  ),
+                  MetricItem(
+                    label: 'Energy',
+                    value: energy,
+                    color: colors.accentMint,
+                  ),
+                  MetricItem(
+                    label: 'Stress',
+                    value: stress,
+                    color: colors.accentPeach,
+                  ),
+                ],
               ),
               SizedBox(height: compact ? 24 : 50),
-              MoodTrendCard(sessions: sessions),
+              const MoodTrendCard(),
             ],
           ),
         );
@@ -103,50 +213,21 @@ class _EvaluationScreenState extends State<EvaluationScreen> with SingleTickerPr
     return (((average + 1) / 2) * 100).clamp(0, 100).round();
   }
 
-  List<MapEntry<String, int>> _topEmotionScores(List<Session> sessions) {
-    final totals = <String, double>{};
-    final counts = <String, int>{};
-
+  int _emotionScore(
+    List<Session> sessions,
+    String key, {
+    required int fallback,
+  }) {
+    final values = <double>[];
     for (final session in sessions) {
       final emotions = session.evaluation?['emotions'];
-      if (emotions is Map) {
-        for (final entry in emotions.entries) {
-          final label = entry.key.toString();
-          final value = entry.value;
-          if (value is num) {
-            totals[label] = (totals[label] ?? 0.0) + value.toDouble();
-            counts[label] = (counts[label] ?? 0) + 1;
-          }
-        }
+      if (emotions is Map && emotions[key] is num) {
+        values.add((emotions[key] as num).toDouble());
       }
     }
-
-    final averages = totals.entries.map((entry) {
-      final count = counts[entry.key] ?? 1;
-      return MapEntry(entry.key, (entry.value / count).clamp(0.0, 1.0));
-    }).toList();
-
-    if (averages.isEmpty) {
-      return const [MapEntry('Satisfied', 72), MapEntry('Happy', 61), MapEntry('Anxious', 34)];
-    }
-
-    averages.sort((a, b) => b.value.compareTo(a.value));
-    final top = averages.take(3).map((entry) {
-      return MapEntry(_titleCase(entry.key), (entry.value * 100).round());
-    }).toList();
-
-    while (top.length < 3) {
-      final fallback = ['Satisfied', 'Happy', 'Anxious'][top.length];
-      final values = {'Satisfied': 72, 'Happy': 61, 'Anxious': 34};
-      top.add(MapEntry(fallback, values[fallback]!));
-    }
-
-    return top;
-  }
-
-  String _titleCase(String value) {
-    if (value.isEmpty) return value;
-    return '${value[0].toUpperCase()}${value.substring(1).toLowerCase()}';
+    if (values.isEmpty) return fallback;
+    final average = values.reduce((a, b) => a + b) / math.max(values.length, 1);
+    return (average * 100).clamp(0, 100).round();
   }
 }
 
