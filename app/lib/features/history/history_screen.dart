@@ -7,10 +7,42 @@ import '../../shared/widgets/ivy_visuals.dart';
 import '../../theme.dart';
 import 'presentation/screens/history_entry_screen.dart';
 
-class HistoryScreen extends StatelessWidget {
+class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
 
   static const String routeName = '/history';
+
+  @override
+  State<HistoryScreen> createState() => _HistoryScreenState();
+}
+
+class _HistoryScreenState extends State<HistoryScreen> {
+  static const _pageSize = 20;
+
+  int _visibleCount = _pageSize;
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    final position = _scrollController.position;
+    if (position.pixels >= position.maxScrollExtent - 200) {
+      final total = context.read<SessionNotifier>().sessions.length;
+      if (_visibleCount < total) {
+        setState(() => _visibleCount = (_visibleCount + _pageSize).clamp(0, total));
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +65,7 @@ class HistoryScreen extends StatelessWidget {
           const SizedBox(height: 42),
           Expanded(
             child: ListView.separated(
+              controller: _scrollController,
               physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.only(bottom: 24),
               itemCount: items.length,
@@ -56,7 +89,7 @@ class HistoryScreen extends StatelessWidget {
   }
 
   List<ExperienceItem> _itemsFromSessions(List<Session> sessions) {
-    return sessions.take(8).map((session) {
+    return sessions.take(_visibleCount).map((session) {
       final mood = (session.evaluation?['mood'] as num?)?.toDouble() ?? 0;
       return ExperienceItem(
         meta: '${_relativeDate(session.createdAt)} - ${_durationFor(session)} min',

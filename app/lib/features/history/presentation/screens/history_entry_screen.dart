@@ -619,7 +619,7 @@ class _EmotionalLayerTile extends StatelessWidget {
           ),
           const SizedBox(width: 13),
           SizedBox(
-            width: 40,
+            width: 68,
             child: Text(
               layer.label,
               maxLines: 1,
