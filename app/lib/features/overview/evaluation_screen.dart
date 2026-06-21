@@ -139,7 +139,7 @@ class _EvaluationScreenState extends State<EvaluationScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         TweenAnimationBuilder<double>(
-                          duration: const Duration(milliseconds: 1500),
+                          duration: const Duration(milliseconds: 5000),
                           curve: Curves.easeOutCubic,
                           tween: Tween<double>(
                             begin: 0.0,
