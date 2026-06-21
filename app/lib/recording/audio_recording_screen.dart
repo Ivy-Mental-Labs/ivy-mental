@@ -9,9 +9,7 @@ import 'package:whisper_ggml_plus/whisper_ggml_plus.dart';
 import 'package:video_player/video_player.dart';
 import '../core/ml/services/text_analyzer.dart';
 import '../data/models/session.dart';
-import '../data/notifiers/score_reminder_notifier.dart';
 import '../data/notifiers/session_notifier.dart';
-import '../features/score_reminder/score_reminder_settings_screen.dart';
 import '../features/overview/overview_pager_screen.dart';
 import '../shared/widgets/ivy_visuals.dart';
 import '../theme.dart';
@@ -156,6 +154,8 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
   }
 
   Future<void> _stopRecording() async {
+    final notifier = context.read<SessionNotifier>();
+
     try {
       final path = await _audioRecorder.stop();
       _amplitudeSub?.cancel();
@@ -167,7 +167,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
         _isRecording = false;
         _isTranscribing = true;
         _showTranscriptionText = true;
-        _transcriptionText = 'Transcribing...';
+        _transcriptionText = 'Saving your check-in...';
         _audioScale = 1.0;
         _recordingDuration = '0:00';
       });
@@ -177,50 +177,19 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
         if (audioFile.existsSync() && audioFile.lengthSync() > 0) {
           debugPrint('Audio file exists, size: ${audioFile.lengthSync()} bytes');
 
-          try {
-            final result = await _whisperController.transcribe(
-              model: WhisperModel.tiny,
-              audioPath: path,
-              lang: 'en', // Explicit language prevents auto-detect crashes
-              // threads: 4, // Maximize CPU usage for faster transcription
-            );
+          final placeholderSession = Session(id: DateTime.now().toIso8601String(), createdAt: DateTime.now());
+          await notifier.upsert(placeholderSession);
 
-            if (mounted) {
-              setState(() {
-                _isTranscribing = false;
-                if (result?.transcription.text != null && result!.transcription.text.trim().isNotEmpty) {
-                  _transcriptionText = result.transcription.text;
-                } else {
-                  _transcriptionText = 'No speech detected.';
-                }
-              });
-              _videoController.play();
-              if (result?.transcription.text != null && result!.transcription.text.trim().isNotEmpty) {
-                final saved = await _analyzeAndSave(result.transcription.text);
-                if (saved && mounted) {
-                  setState(() {
-                    _showTranscriptionText = false;
-                  });
-                  await Future.delayed(const Duration(milliseconds: 600));
-                  _openOverview(initialPage: 0);
-                }
-              }
-            }
-          } catch (e) {
-            debugPrint('Transcribe error: $e');
-            if (mounted) {
-              setState(() {
-                _isTranscribing = false;
-                _transcriptionText = 'Error during transcription.';
-              });
-            }
-          } finally {
-            try {
-              if (audioFile.existsSync()) {
-                audioFile.deleteSync();
-              }
-            } catch (_) {}
+          if (mounted) {
+            await Future.delayed(const Duration(milliseconds: 600));
+            _openOverview(initialPage: 0);
+            setState(() {
+              _isTranscribing = false;
+              _showTranscriptionText = false;
+            });
           }
+
+          _processRecordingInBackground(path, placeholderSession);
         } else {
           if (mounted) {
             setState(() {
@@ -238,41 +207,40 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
     }
   }
 
-  Future<bool> _analyzeAndSave(String text) async {
+  Future<bool> _analyzeAndSave(String sessionId, String text) async {
     final notifier = context.read<SessionNotifier>();
-    final reminderNotifier = context.read<ScoreReminderNotifier>();
-    final messenger = ScaffoldMessenger.of(context);
     try {
       final analysisResult = await widget.analyzer.analyze(text);
-      final session = Session(
-        id: DateTime.now().toIso8601String(),
-        createdAt: DateTime.now(),
-        transcript: text,
-        evaluation: {'mood': analysisResult.mood, 'emotions': analysisResult.emotions},
-      );
-      if (mounted) {
-        await notifier.upsert(session);
-        messenger.showSnackBar(const SnackBar(content: Text('Entry saved')));
-
-        final overallScore = ((analysisResult.mood + 1) / 2 * 100).clamp(0.0, 100.0);
-        if (reminderNotifier.isActive && overallScore < reminderNotifier.threshold) {
-          messenger.showSnackBar(
-            SnackBar(
-              content: Text(
-                'Your score (${overallScore.round()}) dropped below ${reminderNotifier.threshold} — check your evaluation.',
-              ),
-              duration: const Duration(seconds: 5),
-            ),
-          );
-        }
-      }
+      await notifier.updateEvaluation(sessionId, {'mood': analysisResult.mood, 'emotions': analysisResult.emotions});
       return true;
     } catch (e) {
       debugPrint('Analysis error: $e');
-      if (mounted) {
-        messenger.showSnackBar(SnackBar(content: Text('Analysis failed: $e')));
-      }
       return false;
+    }
+  }
+
+  Future<void> _processRecordingInBackground(String path, Session session) async {
+    final audioFile = File(path);
+    final notifier = context.read<SessionNotifier>();
+
+    try {
+      final result = await _whisperController.transcribe(model: WhisperModel.tiny, audioPath: path, lang: 'en');
+
+      final transcriptText = result?.transcription.text.trim();
+      if (transcriptText != null && transcriptText.isNotEmpty) {
+        await notifier.updateTranscript(session.id, transcriptText);
+        await _analyzeAndSave(session.id, transcriptText);
+      } else {
+        await notifier.updateTranscript(session.id, 'No speech detected.');
+      }
+    } catch (e) {
+      debugPrint('Background transcribe error: $e');
+    } finally {
+      try {
+        if (audioFile.existsSync()) {
+          audioFile.deleteSync();
+        }
+      } catch (_) {}
     }
   }
 
@@ -316,8 +284,6 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final compact = constraints.maxHeight < 690;
-            final orbSize = compact ? 188.0 : 218.0;
             return Padding(
               padding: const EdgeInsets.fromLTRB(22, 20, 22, 18),
               child: Column(
@@ -392,8 +358,8 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
                                 shape: BoxShape.circle,
                                 gradient: RadialGradient(
                                   colors: [
-                                    Colors.red.withOpacity(0.6),
-                                    Colors.red.withOpacity(0.2),
+                                    Colors.red.withValues(alpha: 0.6),
+                                    Colors.red.withValues(alpha: 0.2),
                                     Colors.transparent,
                                   ],
                                   stops: const [0.2, 0.6, 0.9],
@@ -419,13 +385,13 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.2),
+                            color: Colors.grey.withValues(alpha: 0.2),
                             blurRadius: 3,
                             spreadRadius: 1,
                             offset: const Offset(0, 1.5),
                           ),
                         ],
-                        border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1),
+                        border: Border.all(color: Colors.grey.withValues(alpha: 0.1), width: 1),
                       ),
                       child: Center(
                         child: AnimatedSwitcher(
@@ -456,7 +422,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
                               : Icon(
                                   Icons.mic_none,
                                   key: const ValueKey('mic'),
-                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                                   size: 30,
                                 ),
                         ),
@@ -489,59 +455,6 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
               ),
             );
           },
-        ),
-      ),
-    );
-  }
-}
-
-class _RecordButton extends StatelessWidget {
-  final bool isRecording;
-  final bool isTranscribing;
-  final VoidCallback onPressed;
-
-  const _RecordButton({required this.isRecording, required this.isTranscribing, required this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.appColors;
-    return GestureDetector(
-      onTap: onPressed,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 260),
-        curve: Curves.easeOutCubic,
-        width: 58,
-        height: 58,
-        decoration: BoxDecoration(
-          color: colors.backgroundGlass,
-          shape: BoxShape.circle,
-          border: Border.all(color: colors.borderSubtle),
-          boxShadow: [
-            BoxShadow(color: colors.shadowSoft, blurRadius: isRecording ? 30 : 18, offset: const Offset(0, 10)),
-          ],
-        ),
-        child: Center(
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            transitionBuilder: (child, animation) {
-              return ScaleTransition(scale: animation, child: child);
-            },
-            child: isTranscribing
-                ? SizedBox(
-                    key: const ValueKey('loading'),
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(color: colors.accentMint, strokeWidth: 2),
-                  )
-                : isRecording
-                ? Container(
-                    key: const ValueKey('stop'),
-                    width: 18,
-                    height: 18,
-                    decoration: BoxDecoration(color: colors.accentPeach, borderRadius: BorderRadius.circular(5)),
-                  )
-                : Icon(Icons.mic_none, key: const ValueKey('mic'), color: colors.textSecondary, size: 28),
-          ),
         ),
       ),
     );

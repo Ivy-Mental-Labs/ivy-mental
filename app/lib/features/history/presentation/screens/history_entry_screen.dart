@@ -181,9 +181,13 @@ class _HistoryEntryScreenState extends State<HistoryEntryScreen> with SingleTick
 
   @override
   Widget build(BuildContext context) {
-    final viewData =
-        widget.data ??
-        (widget.session == null ? HistoryEntryViewData.fallback() : HistoryEntryViewData.fromSession(widget.session!));
+    final isPending = widget.session?.status == SessionStatus.transcribing;
+    final viewData = isPending
+        ? null
+        : widget.data ??
+              (widget.session == null
+                  ? HistoryEntryViewData.fallback()
+                  : HistoryEntryViewData.fromSession(widget.session!));
     final headerLabel = _relativeDate(widget.session?.createdAt ?? DateTime.now());
 
     return Scaffold(
@@ -216,7 +220,7 @@ class _HistoryEntryScreenState extends State<HistoryEntryScreen> with SingleTick
             ),
             const SizedBox(height: 3),
             Text(
-              headerLabel + "'s Analysis",
+              "$headerLabel's Analysis",
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 color: const Color(0xFFB4B6B4),
@@ -225,45 +229,79 @@ class _HistoryEntryScreenState extends State<HistoryEntryScreen> with SingleTick
               ),
             ),
             const SizedBox(height: 55),
-            Center(
-              child: AnimatedBuilder(
-                animation: _orbScale,
-                builder: (context, child) {
-                  return Transform.scale(scale: _orbScale.value, child: child);
-                },
-                child: _MoodOrb(score: viewData.moodScore),
+            if (isPending) ...[
+              const SizedBox(height: 24),
+              Center(
+                child: SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: CircularProgressIndicator(color: const Color(0xFF6EA4A0), strokeWidth: 3),
+                ),
               ),
-            ),
-            const SizedBox(height: 56),
-            const _SectionLabel('Mood'),
-            const SizedBox(height: 11),
-            _MoodCard(score: viewData.moodScore, animationValue: _scoreCounter),
-            const SizedBox(height: 14),
-            FadeTransition(
-              opacity: _scoreCounter,
-              child: _AnalysisCard(text: viewData.analysisText),
-            ),
-            const SizedBox(height: 25),
-            const _SectionLabel('Pattern Recognition'),
-            const SizedBox(height: 11),
-            _PatternCard(text: viewData.patternText, frequency: viewData.patternFrequency),
-            const SizedBox(height: 24),
-            const _SectionLabel('Emotional Layers'),
-            const SizedBox(height: 11),
-            ...viewData.emotionalLayers.map(
-              (layer) => Padding(
-                padding: const EdgeInsets.only(bottom: 9),
-                child: _EmotionalLayerTile(layer: layer),
+              const SizedBox(height: 24),
+              Text(
+                'We’re transcribing your check-in...',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: const Color(0xFF5F665F),
+                  fontSize: 18,
+                  fontWeight: FontWeight.w300,
+                ),
               ),
-            ),
-            if (viewData.transcript?.trim().isNotEmpty ?? false) ...[
+              const SizedBox(height: 16),
+              _SoftCard(
+                padding: const EdgeInsets.all(18),
+                child: Text(
+                  'Your voice entry is being processed in the background. Come back in a moment to see the full transcript and analysis.',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: const Color(0xFF737A76), fontSize: 14, height: 1.5),
+                ),
+              ),
+              const SizedBox(height: 39),
+              const PrivacyHint(),
+            ] else ...[
+              Center(
+                child: AnimatedBuilder(
+                  animation: _orbScale,
+                  builder: (context, child) {
+                    return Transform.scale(scale: _orbScale.value, child: child);
+                  },
+                  child: _MoodOrb(score: viewData!.moodScore),
+                ),
+              ),
+              const SizedBox(height: 56),
+              const _SectionLabel('Mood'),
               const SizedBox(height: 11),
-              const _SectionLabel('Transcript'),
+              _MoodCard(score: viewData.moodScore, animationValue: _scoreCounter),
+              const SizedBox(height: 14),
+              FadeTransition(
+                opacity: _scoreCounter,
+                child: _AnalysisCard(text: viewData.analysisText),
+              ),
+              const SizedBox(height: 25),
+              const _SectionLabel('Pattern Recognition'),
               const SizedBox(height: 11),
-              _TranscriptCard(text: viewData.transcript!.trim()),
+              _PatternCard(text: viewData.patternText, frequency: viewData.patternFrequency),
+              const SizedBox(height: 24),
+              const _SectionLabel('Emotional Layers'),
+              const SizedBox(height: 11),
+              ...viewData.emotionalLayers.map(
+                (layer) => Padding(
+                  padding: const EdgeInsets.only(bottom: 9),
+                  child: _EmotionalLayerTile(layer: layer),
+                ),
+              ),
+              if (viewData.transcript?.trim().isNotEmpty ?? false) ...[
+                const SizedBox(height: 11),
+                const _SectionLabel('Transcript'),
+                const SizedBox(height: 11),
+                _TranscriptCard(text: viewData.transcript!.trim()),
+              ],
+              const SizedBox(height: 39),
+              const PrivacyHint(),
             ],
-            const SizedBox(height: 39),
-            const PrivacyHint(),
           ],
         ),
       ),
