@@ -194,7 +194,7 @@ class _EvaluationScreenState extends State<EvaluationScreen> {
                 ],
               ),
               SizedBox(height: compact ? 24 : 50),
-              const MoodTrendCard(),
+              MoodTrendCard(sessions: sessions),
             ],
           ),
         );
