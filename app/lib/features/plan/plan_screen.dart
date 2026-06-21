@@ -27,12 +27,17 @@ class PlanScreen extends StatelessWidget {
                       color: colorScheme.onSurface.withOpacity(0.8),
                     ),
                   ),
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: colorScheme.primary,
+                  GestureDetector(
+                    onTap: () => Navigator.of(context).pop(),
+                    child: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: const BoxDecoration(shape: BoxShape.circle),
+                      child: Icon(
+                        Icons.arrow_back,
+                        color: colorScheme.onSurface.withOpacity(0.5),
+                        size: 20,
+                      ),
                     ),
                   ),
                 ],

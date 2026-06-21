@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../data/notifiers/score_reminder_notifier.dart';
+import '../plan/plan_screen.dart';
 
 class ScoreReminderSettingsScreen extends StatelessWidget {
   const ScoreReminderSettingsScreen({super.key});
@@ -173,6 +174,31 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
                   ),
 
                   const Spacer(),
+
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const PlanScreen()),
+                        );
+                      },
+                      style: FilledButton.styleFrom(
+                        backgroundColor: colorScheme.tertiary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'View Plans',
+                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
 
                   // Footer
                   Center(
