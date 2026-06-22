@@ -74,7 +74,7 @@ class ScoreReminderNotifier extends ChangeNotifier {
         weeklyAverageScore: score,
       );
     } catch (_) {
-      // Safe fallback
+
     }
   }
 }

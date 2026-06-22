@@ -25,8 +25,8 @@ class MockDataSeeder {
       'Difficult day. An unexpected problem came up and threw everything off course. I handled it as best I could but felt stressed and reactive rather than calm and thoughtful like I would have liked.',
     ];
 
-    // Seed current week (last 7 days) with an intentional visible trend.
-    // Pattern: starts low, dips further mid-week, then rises strongly toward end.
+
+
     const weekTrend = [-0.35, -0.55, -0.2, 0.15, 0.5, 0.3, 0.65];
     for (int i = 0; i < 7; i++) {
       final date = today.subtract(Duration(days: 6 - i));
@@ -34,9 +34,9 @@ class MockDataSeeder {
       await repo.upsert(_buildSession(date, mood, transcripts, random));
     }
 
-    // Seed ~8 previous weeks (2 months) of historical data (older than current week).
+
     for (int daysAgo = 7; daysAgo <= 56; daysAgo++) {
-      // ~45% chance to create an entry, yielding about 3 entries per week.
+
       if (random.nextDouble() > 0.45) continue;
 
       final date = today.subtract(Duration(days: daysAgo));
@@ -53,7 +53,7 @@ class MockDataSeeder {
     List<String> transcripts,
     Random random,
   ) {
-    final positivity = (mood + 1) / 2; // 0.0 → 1.0
+    final positivity = (mood + 1) / 2;
 
     return Session(
       id: Session.dateKey(date),
@@ -62,13 +62,13 @@ class MockDataSeeder {
       evaluation: {
         'mood': mood,
         'emotions': {
-          // Calm group (teal)
+
           'satisfied': (positivity * 0.8 + random.nextDouble() * 0.2).clamp(0.0, 1.0),
           'calm': (positivity * 0.75 + random.nextDouble() * 0.25).clamp(0.0, 1.0),
-          // Positive group (mint)
+
           'happy': (positivity * 0.7 + random.nextDouble() * 0.3).clamp(0.0, 1.0),
           'proud': (positivity * 0.65 + random.nextDouble() * 0.35).clamp(0.0, 1.0),
-          // Stress group (peach)
+
           'anxious': ((1 - positivity) * 0.65 + random.nextDouble() * 0.2).clamp(0.0, 1.0),
           'angry': ((1 - positivity) * 0.45 + random.nextDouble() * 0.2).clamp(0.0, 1.0),
           'sad': ((1 - positivity) * 0.5 + random.nextDouble() * 0.25).clamp(0.0, 1.0),

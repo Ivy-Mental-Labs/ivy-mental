@@ -130,7 +130,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
 
         _amplitudeSub = _audioRecorder.onAmplitudeChanged(const Duration(milliseconds: 100)).listen((amp) {
           if (mounted) {
-            // Map amplitude from -40..0 to scale 1.0..1.4
+
             final double normalized = (amp.current.clamp(-40.0, 0.0) + 40.0) / 40.0;
             setState(() {
               _audioScale = 1.0 + (normalized * 0.4);
@@ -299,7 +299,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
 
                   const Spacer(flex: 3),
 
-                  // Subtitle
+
                   if (_showTranscriptionText)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -312,7 +312,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
 
                   const Spacer(flex: 2),
 
-                  // Magic Sphere Video with Audio-Reactive and Breathing Scale
+
                   GestureDetector(
                     onTap: _toggleRecording,
                     child: AnimatedBuilder(
@@ -377,7 +377,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
 
                   Spacer(flex: 3),
 
-                  // Record Button
+
                   GestureDetector(
                     onTap: _toggleRecording,
                     child: Container(
@@ -433,7 +433,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
                     ),
                   ),
 
-                  // Recording Duration
+
                   if (_isRecording)
                     Padding(
                       padding: const EdgeInsets.only(top: 25.0),
@@ -446,7 +446,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
                     const SizedBox(height: 20),
                   Spacer(flex: 1),
 
-                  // Bottom text
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

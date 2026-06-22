@@ -63,7 +63,7 @@ class SessionNotifier extends ChangeNotifier {
         weeklyAverageScore: weeklyAverageScore,
       );
     } catch (_) {
-      // Safe fallback
+
     }
   }
 }

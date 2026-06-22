@@ -77,7 +77,7 @@ class _EvaluationScreenState extends State<EvaluationScreen> {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    // 1. Looping Video Background with Radial Fade-Out
+
                     ShaderMask(
                       shaderCallback: (bounds) {
                         return const RadialGradient(
@@ -109,7 +109,7 @@ class _EvaluationScreenState extends State<EvaluationScreen> {
                         ),
                       ),
                     ),
-                    // 2. Light Blur Disk that Fades Out to the Edges
+
                     ShaderMask(
                       shaderCallback: (bounds) {
                         return const RadialGradient(
@@ -134,7 +134,7 @@ class _EvaluationScreenState extends State<EvaluationScreen> {
                         ),
                       ),
                     ),
-                    // 3. Sharp Text on Top with Count-Up Animation
+
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

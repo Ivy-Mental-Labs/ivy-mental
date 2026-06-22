@@ -19,7 +19,7 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
             builder: (context, notifier, _) {
               return ListView(
                 children: [
-                  // Top Bar
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -49,9 +49,9 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
 
                   const SizedBox(height: 32),
 
-                  // Section label: DAILY REMINDER
 
-                  // Section label: SCORE REMINDER
+
+
                   Text(
                     'SCORE REMINDER',
                     style: TextStyle(
@@ -64,7 +64,7 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
 
                   const SizedBox(height: 12),
 
-                  // Card 3: Score Reminder Active toggle
+
                   _Card(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -97,7 +97,7 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
 
                   const SizedBox(height: 12),
 
-                  // Card 4: Threshold slider (Notify below)
+
                   Opacity(
                     opacity: notifier.isScoreActive ? 1.0 : 0.4,
                     child: IgnorePointer(
@@ -223,7 +223,7 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
 
                   const SizedBox(height: 12),
 
-                  // Card 1: Daily Reminder Active toggle
+
                   _Card(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -256,7 +256,7 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
 
                   const SizedBox(height: 12),
 
-                  // Card 2: Notification Time Picker
+
                   Opacity(
                     opacity: notifier.isActive ? 1.0 : 0.4,
                     child: _Card(
@@ -337,7 +337,7 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  // Developer Tools Section
+
                   Text(
                     'DEVELOPER TOOLS',
                     style: TextStyle(
@@ -350,7 +350,7 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
 
                   const SizedBox(height: 12),
 
-                  // Card 4: Trigger Test Notification Button
+
                   _Card(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -411,7 +411,7 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
 
                   const SizedBox(height: 20),
 
-                  // Description text
+
                   RichText(
                     text: TextSpan(
                       style: TextStyle(
@@ -435,7 +435,7 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
 
                   const SizedBox(height: 20),
 
-                  // Footer
+
                   Center(
                     child: Row(
                       mainAxisSize: MainAxisSize.min,

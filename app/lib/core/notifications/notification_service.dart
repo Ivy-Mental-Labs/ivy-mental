@@ -21,7 +21,7 @@ class NotificationService {
     try {
       tz.setLocalLocation(tz.getLocation('Europe/Berlin'));
     } catch (_) {
-      // Fallback
+
     }
 
     const AndroidInitializationSettings initializationSettingsAndroid =
@@ -91,7 +91,7 @@ class NotificationService {
     required int threshold,
     required double? weeklyAverageScore,
   }) async {
-    // Always cancel existing schedule first to prevent duplicates
+
     await _notificationsPlugin.cancel(id: 0);
 
     if (!isActive) {
@@ -153,7 +153,7 @@ class NotificationService {
     final isScoreActive = box.get('isScoreActive', defaultValue: true) as bool;
     final threshold = box.get('threshold', defaultValue: 45) as int;
 
-    // Load sessions to calculate average weekly score
+
     final sessions = SessionRepository().getAll();
     final weeklyAverageScore = calculateWeeklyAverageScore(sessions);
 

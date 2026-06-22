@@ -125,7 +125,7 @@ class HistoryEntryViewData {
         frequency = "$count check-in${count != 1 ? "s" : ""} at this high level this week";
       }
     } catch (e) {
-      // Fallback in case of database errors
+
       if (moodScore <= -0.7) {
         text = "Your mood has been very low. Please take a step back, prioritize rest, and consider talking to someone you trust.";
         frequency = "1 check-in at this level this week";
@@ -186,7 +186,7 @@ class EmotionalLayerViewData {
 
   static Color _colorFor(String label) {
     switch (label.toLowerCase()) {
-      // Negative / high-arousal
+
       case 'stress':
       case 'anxious':
       case 'angry':
@@ -197,19 +197,19 @@ class EmotionalLayerViewData {
       case 'jealous':
         return const Color(0xFFEABDB5);
 
-      // Positive / upbeat
+
       case 'joy':
       case 'happy':
       case 'hope':
       case 'proud':
         return const Color(0xFFD7DED4);
 
-      // Calm / satisfied
+
       case 'satisfied':
       case 'calm':
         return const Color(0xFF8DA6AE);
 
-      // Fallback
+
       default:
         return const Color(0xFF8DA6AE);
     }
@@ -236,13 +236,13 @@ class _HistoryEntryScreenState extends State<HistoryEntryScreen> with SingleTick
     super.initState();
     _controller = AnimationController(duration: const Duration(milliseconds: 1400), vsync: this);
 
-    // Breathing orb animation
+
     _orbScale = Tween<double>(
       begin: 1.0,
       end: 1.08,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
-    // Counter animation for score and slider (full duration)
+
     _scoreCounter = Tween<double>(
       begin: 0.0,
       end: 1.0,

@@ -561,7 +561,7 @@ DateTime? _sessionDate(Session session) {
 
 class MoodTrendPainter extends CustomPainter {
   final AppThemeColors colors;
-  final List<double?> values; // 7 values, oldest -> newest
+  final List<double?> values;
   final double progress;
 
   MoodTrendPainter({required this.colors, required this.values, this.progress = 1.0})
@@ -580,7 +580,7 @@ class MoodTrendPainter extends CustomPainter {
       final mood = values[i];
       final y = mood == null
           ? size.height * 0.50
-          : ((1 - mood) / 2) * (bottom - top) + top; // map mood -1..1 -> bottom..top
+          : ((1 - mood) / 2) * (bottom - top) + top;
       points.add(Offset(x, y));
     }
 

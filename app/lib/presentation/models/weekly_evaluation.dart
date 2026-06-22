@@ -1,6 +1,6 @@
 class WeeklyEvaluation {
   final DateTime weekStart;
-  final double overallScore; // 0–100
+  final double overallScore;
   final double calmScore;
   final double energyScore;
   final double stressScore;

@@ -3,7 +3,7 @@ import 'dart:convert';
 enum SessionStatus { transcribing, transcribed, complete }
 
 class Session {
-  final String id; // "yyyy-MM-dd"
+  final String id;
   final DateTime createdAt;
   final String? transcript;
   final Map<String, dynamic>? evaluation;

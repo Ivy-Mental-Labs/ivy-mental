@@ -2,7 +2,7 @@ class HistoryEntry {
   final String sessionId;
   final DateTime date;
   final String title;
-  final int iconIndex; // 0–7
+  final int iconIndex;
 
   const HistoryEntry({
     required this.sessionId,

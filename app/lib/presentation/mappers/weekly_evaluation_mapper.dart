@@ -30,7 +30,7 @@ class WeeklyEvaluationMapper {
       ..sort((a, b) => a.weekStart.compareTo(b.weekStart));
   }
 
-  /// Gibt den Montag der Woche zurück, zu der [date] gehört (ISO).
+
   DateTime weekStart(DateTime date) =>
       DateTime(date.year, date.month, date.day - (date.weekday - 1));
 
