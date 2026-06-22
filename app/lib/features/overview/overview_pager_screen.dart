@@ -6,7 +6,9 @@ import '../history/history_screen.dart';
 import 'evaluation_screen.dart';
 
 class OverviewPagerScreen extends StatefulWidget {
-  const OverviewPagerScreen({super.key});
+  final int initialPage;
+
+  const OverviewPagerScreen({this.initialPage = 0, super.key});
 
   @override
   State<OverviewPagerScreen> createState() => _OverviewPagerScreenState();
@@ -14,12 +16,13 @@ class OverviewPagerScreen extends StatefulWidget {
 
 class _OverviewPagerScreenState extends State<OverviewPagerScreen> {
   late final PageController _pageController;
-  int _currentPage = 0;
+  late int _currentPage;
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController();
+    _currentPage = widget.initialPage;
+    _pageController = PageController(initialPage: widget.initialPage);
   }
 
   @override

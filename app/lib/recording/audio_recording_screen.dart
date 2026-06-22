@@ -31,6 +31,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
   bool _isTranscribing = false;
   bool _isModelLoaded = false;
   String _transcriptionText = 'Tell me about your day';
+  bool _showTranscriptionText = true;
 
   late VideoPlayerController _videoController;
   StreamSubscription<Amplitude>? _amplitudeSub;
@@ -39,10 +40,15 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
   late AnimationController _breathingController;
   late Animation<double> _breathingAnimation;
 
+  late Stopwatch _recordingStopwatch;
+  Timer? _recordingTimer;
+  String _recordingDuration = '0:00';
+
   @override
   void initState() {
     super.initState();
     _initModel();
+    _recordingStopwatch = Stopwatch();
 
     _breathingController = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200));
     _breathingAnimation = Tween<double>(
@@ -87,6 +93,8 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
   void dispose() {
     _breathingController.dispose();
     _amplitudeSub?.cancel();
+    _recordingTimer?.cancel();
+    _recordingStopwatch.stop();
     _videoController.dispose();
     _audioRecorder.dispose();
     super.dispose();
@@ -108,6 +116,18 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
           path: path,
         );
 
+        _recordingStopwatch.start();
+        _recordingTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+          if (mounted) {
+            final seconds = _recordingStopwatch.elapsed.inSeconds;
+            final minutes = seconds ~/ 60;
+            final secs = seconds % 60;
+            setState(() {
+              _recordingDuration = '$minutes:${secs.toString().padLeft(2, '0')}';
+            });
+          }
+        });
+
         _amplitudeSub = _audioRecorder.onAmplitudeChanged(const Duration(milliseconds: 100)).listen((amp) {
           if (mounted) {
             // Map amplitude from -40..0 to scale 1.0..1.4
@@ -120,6 +140,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
 
         setState(() {
           _isRecording = true;
+          _showTranscriptionText = true;
           _transcriptionText = 'Listening...';
         });
       } else {
@@ -133,15 +154,22 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
   }
 
   Future<void> _stopRecording() async {
+    final notifier = context.read<SessionNotifier>();
+
     try {
       final path = await _audioRecorder.stop();
       _amplitudeSub?.cancel();
+      _recordingTimer?.cancel();
+      _recordingStopwatch.stop();
+      _recordingStopwatch.reset();
 
       setState(() {
         _isRecording = false;
         _isTranscribing = true;
-        _transcriptionText = 'Transcribing...';
+        _showTranscriptionText = true;
+        _transcriptionText = 'Saving your check-in...';
         _audioScale = 1.0;
+        _recordingDuration = '0:00';
       });
 
       if (path != null) {
@@ -149,43 +177,19 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
         if (audioFile.existsSync() && audioFile.lengthSync() > 0) {
           debugPrint('Audio file exists, size: ${audioFile.lengthSync()} bytes');
 
-          try {
-            final result = await _whisperController.transcribe(
-              model: WhisperModel.tiny,
-              audioPath: path,
-              lang: 'en', // Explicit language prevents auto-detect crashes
-              // threads: 4, // Maximize CPU usage for faster transcription
-            );
+          final placeholderSession = Session(id: DateTime.now().toIso8601String(), createdAt: DateTime.now());
+          await notifier.upsert(placeholderSession);
 
-            if (mounted) {
-              setState(() {
-                _isTranscribing = false;
-                if (result?.transcription.text != null && result!.transcription.text.trim().isNotEmpty) {
-                  _transcriptionText = result.transcription.text;
-                } else {
-                  _transcriptionText = 'No speech detected.';
-                }
-              });
-              _videoController.play();
-              if (result?.transcription.text != null && result!.transcription.text.trim().isNotEmpty) {
-                await _analyzeAndSave(result.transcription.text);
-              }
-            }
-          } catch (e) {
-            debugPrint('Transcribe error: $e');
-            if (mounted) {
-              setState(() {
-                _isTranscribing = false;
-                _transcriptionText = 'Error during transcription.';
-              });
-            }
-          } finally {
-            try {
-              if (audioFile.existsSync()) {
-                audioFile.deleteSync();
-              }
-            } catch (_) {}
+          if (mounted) {
+            await Future.delayed(const Duration(milliseconds: 600));
+            _openOverview(initialPage: 0);
+            setState(() {
+              _isTranscribing = false;
+              _showTranscriptionText = false;
+            });
           }
+
+          _processRecordingInBackground(path, placeholderSession);
         } else {
           if (mounted) {
             setState(() {
@@ -203,26 +207,40 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
     }
   }
 
-  Future<void> _analyzeAndSave(String text) async {
+  Future<bool> _analyzeAndSave(String sessionId, String text) async {
     final notifier = context.read<SessionNotifier>();
-    final messenger = ScaffoldMessenger.of(context);
     try {
       final analysisResult = await widget.analyzer.analyze(text);
-      final session = Session(
-        id: DateTime.now().toIso8601String(),
-        createdAt: DateTime.now(),
-        transcript: text,
-        evaluation: {'mood': analysisResult.mood, 'emotions': analysisResult.emotions},
-      );
-      if (mounted) {
-        await notifier.upsert(session);
-        messenger.showSnackBar(const SnackBar(content: Text('Entry saved')));
-      }
+      await notifier.updateEvaluation(sessionId, {'mood': analysisResult.mood, 'emotions': analysisResult.emotions});
+      return true;
     } catch (e) {
       debugPrint('Analysis error: $e');
-      if (mounted) {
-        messenger.showSnackBar(SnackBar(content: Text('Analysis failed: $e')));
+      return false;
+    }
+  }
+
+  Future<void> _processRecordingInBackground(String path, Session session) async {
+    final audioFile = File(path);
+    final notifier = context.read<SessionNotifier>();
+
+    try {
+      final result = await _whisperController.transcribe(model: WhisperModel.tiny, audioPath: path, lang: 'en');
+
+      final transcriptText = result?.transcription.text.trim();
+      if (transcriptText != null && transcriptText.isNotEmpty) {
+        await notifier.updateTranscript(session.id, transcriptText);
+        await _analyzeAndSave(session.id, transcriptText);
+      } else {
+        await notifier.updateTranscript(session.id, 'No speech detected.');
       }
+    } catch (e) {
+      debugPrint('Background transcribe error: $e');
+    } finally {
+      try {
+        if (audioFile.existsSync()) {
+          audioFile.deleteSync();
+        }
+      } catch (_) {}
     }
   }
 
@@ -234,13 +252,13 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
     }
   }
 
-  void _openOverview() {
+  void _openOverview({int initialPage = 0}) {
     Navigator.of(context).push(
       PageRouteBuilder<void>(
         transitionDuration: const Duration(milliseconds: 450),
         reverseTransitionDuration: const Duration(milliseconds: 350),
         pageBuilder: (context, animation, secondaryAnimation) {
-          return const OverviewPagerScreen();
+          return OverviewPagerScreen(initialPage: initialPage);
         },
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           final curved = CurvedAnimation(
@@ -266,13 +284,12 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final compact = constraints.maxHeight < 690;
-            final orbSize = compact ? 188.0 : 218.0;
             return Padding(
               padding: const EdgeInsets.fromLTRB(22, 20, 22, 18),
               child: Column(
                 children: [
                   IvyHeader(
+                    showSettings: false,
                     trailing: IconButton(
                       onPressed: _openOverview,
                       splashRadius: 22,
@@ -283,19 +300,22 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
                   const Spacer(flex: 3),
 
                   // Subtitle
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text(
-                      _transcriptionText,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 23, fontWeight: FontWeight.w200, color: colors.textPrimary),
+                  if (_showTranscriptionText)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Text(
+                        _transcriptionText,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 23, fontWeight: FontWeight.w200, color: colors.textPrimary),
+                      ),
                     ),
-                  ),
 
                   const Spacer(flex: 2),
 
                   // Magic Sphere Video with Audio-Reactive and Breathing Scale
-                  AnimatedBuilder(
+                  GestureDetector(
+                    onTap: _toggleRecording,
+                    child: AnimatedBuilder(
                     animation: _breathingAnimation,
                     builder: (context, child) {
                       final currentScale = _isRecording ? _audioScale : _breathingAnimation.value;
@@ -340,8 +360,8 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
                                 shape: BoxShape.circle,
                                 gradient: RadialGradient(
                                   colors: [
-                                    Colors.red.withOpacity(0.6),
-                                    Colors.red.withOpacity(0.2),
+                                    Colors.red.withValues(alpha: 0.6),
+                                    Colors.red.withValues(alpha: 0.2),
                                     Colors.transparent,
                                   ],
                                   stops: const [0.2, 0.6, 0.9],
@@ -352,6 +372,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
                         ),
                       ],
                     ),
+                  ),
                   ),
 
                   Spacer(flex: 3),
@@ -367,13 +388,13 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.2),
+                            color: Colors.grey.withValues(alpha: 0.2),
                             blurRadius: 3,
                             spreadRadius: 1,
                             offset: const Offset(0, 1.5),
                           ),
                         ],
-                        border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1),
+                        border: Border.all(color: Colors.grey.withValues(alpha: 0.1), width: 1),
                       ),
                       child: Center(
                         child: AnimatedSwitcher(
@@ -404,7 +425,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
                               : Icon(
                                   Icons.mic_none,
                                   key: const ValueKey('mic'),
-                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                                   size: 30,
                                 ),
                         ),
@@ -412,6 +433,17 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
                     ),
                   ),
 
+                  // Recording Duration
+                  if (_isRecording)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 25.0),
+                      child: Text(
+                        _recordingDuration,
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: colors.textMuted),
+                      ),
+                    )
+                  else
+                    const SizedBox(height: 20),
                   Spacer(flex: 1),
 
                   // Bottom text
@@ -426,59 +458,6 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
               ),
             );
           },
-        ),
-      ),
-    );
-  }
-}
-
-class _RecordButton extends StatelessWidget {
-  final bool isRecording;
-  final bool isTranscribing;
-  final VoidCallback onPressed;
-
-  const _RecordButton({required this.isRecording, required this.isTranscribing, required this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.appColors;
-    return GestureDetector(
-      onTap: onPressed,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 260),
-        curve: Curves.easeOutCubic,
-        width: 58,
-        height: 58,
-        decoration: BoxDecoration(
-          color: colors.backgroundGlass,
-          shape: BoxShape.circle,
-          border: Border.all(color: colors.borderSubtle),
-          boxShadow: [
-            BoxShadow(color: colors.shadowSoft, blurRadius: isRecording ? 30 : 18, offset: const Offset(0, 10)),
-          ],
-        ),
-        child: Center(
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            transitionBuilder: (child, animation) {
-              return ScaleTransition(scale: animation, child: child);
-            },
-            child: isTranscribing
-                ? SizedBox(
-                    key: const ValueKey('loading'),
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(color: colors.accentMint, strokeWidth: 2),
-                  )
-                : isRecording
-                ? Container(
-                    key: const ValueKey('stop'),
-                    width: 18,
-                    height: 18,
-                    decoration: BoxDecoration(color: colors.accentPeach, borderRadius: BorderRadius.circular(5)),
-                  )
-                : Icon(Icons.mic_none, key: const ValueKey('mic'), color: colors.textSecondary, size: 28),
-          ),
         ),
       ),
     );

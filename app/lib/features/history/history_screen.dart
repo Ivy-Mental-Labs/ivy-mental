@@ -7,59 +7,117 @@ import '../../shared/widgets/ivy_visuals.dart';
 import '../../theme.dart';
 import 'presentation/screens/history_entry_screen.dart';
 
-class HistoryScreen extends StatelessWidget {
+class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
 
   static const String routeName = '/history';
 
   @override
+  State<HistoryScreen> createState() => _HistoryScreenState();
+}
+
+class _HistoryScreenState extends State<HistoryScreen> {
+  static const _pageSize = 20;
+
+  int _visibleCount = _pageSize;
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    final position = _scrollController.position;
+    if (position.pixels >= position.maxScrollExtent - 200) {
+      final total = context.read<SessionNotifier>().sessions.length;
+      if (_visibleCount < total) {
+        setState(() => _visibleCount = (_visibleCount + _pageSize).clamp(0, total));
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final sessions = context.watch<SessionNotifier>().sessions;
-    final items = sessions.isEmpty
-        ? _fallbackItems()
-        : _itemsFromSessions(sessions);
+    final items = _itemsFromSessions(sessions);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(22, 20, 22, 0),
       child: Column(
         children: [
-          IvyHeader(
-            trailing: _OverviewOrbButton(
-              onTap: () => Navigator.of(context).pop(),
-            ),
-          ),
+          IvyHeader(trailing: _OverviewOrbButton(onTap: () => Navigator.of(context).pop())),
           const SizedBox(height: 52),
           Text(
             'Your experiences',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: colors.textSecondary,
-              fontSize: 18,
-              fontWeight: FontWeight.w200,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(color: colors.textSecondary, fontSize: 18, fontWeight: FontWeight.w200),
           ),
           const SizedBox(height: 42),
           Expanded(
-            child: ListView.separated(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.only(bottom: 24),
-              itemCount: items.length,
-              separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
-              itemBuilder: (context, index) {
-                final item = items[index];
-                return ExperienceCard(
-                  item: item,
-                  onTap: item.session == null
-                      ? null
-                      : () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                HistoryEntryScreen(session: item.session!),
+            child: sessions.isEmpty
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 32),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.history,
+                            size: 48,
+                            color: colors.textMuted.withOpacity(0.5),
                           ),
-                        ),
-                );
-              },
-            ),
+                          const SizedBox(height: AppSpacing.md),
+                          Text(
+                            'No entries yet',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: colors.textPrimary,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(
+                            'Hold the microphone button on the home screen to record your first check-in.',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: colors.textSecondary,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w300,
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : ListView.separated(
+                    controller: _scrollController,
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.only(bottom: 24),
+                    itemCount: items.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
+                    itemBuilder: (context, index) {
+                      final item = items[index];
+                      return ExperienceCard(
+                        item: item,
+                        onTap: item.session == null
+                            ? null
+                            : () => Navigator.of(
+                                context,
+                              ).push(MaterialPageRoute(builder: (_) => HistoryEntryScreen(session: item.session!))),
+                      );
+                    },
+                  ),
           ),
         ],
       ),
@@ -67,11 +125,10 @@ class HistoryScreen extends StatelessWidget {
   }
 
   List<ExperienceItem> _itemsFromSessions(List<Session> sessions) {
-    return sessions.take(8).map((session) {
+    return sessions.take(_visibleCount).map((session) {
       final mood = (session.evaluation?['mood'] as num?)?.toDouble() ?? 0;
       return ExperienceItem(
-        meta:
-            '${_relativeDate(session.createdAt)} - ${_durationFor(session)} min',
+        meta: '${_relativeDate(session.createdAt)} - ${_durationFor(session)} min',
         title: _snippet(session.transcript),
         variant: mood >= 0.2
             ? MoodOrbVariant.mint
@@ -81,36 +138,6 @@ class HistoryScreen extends StatelessWidget {
         session: session,
       );
     }).toList();
-  }
-
-  List<ExperienceItem> _fallbackItems() {
-    return const [
-      ExperienceItem(
-        meta: 'Today - 7 min',
-        title: 'A little tired from a hard day...',
-        variant: MoodOrbVariant.peach,
-      ),
-      ExperienceItem(
-        meta: 'Yesterday - 3 min',
-        title: 'Awesome day, awesome we...',
-        variant: MoodOrbVariant.mint,
-      ),
-      ExperienceItem(
-        meta: 'Yesterday - 3 min',
-        title: 'Awesome day, awesome we...',
-        variant: MoodOrbVariant.peach,
-      ),
-      ExperienceItem(
-        meta: 'Yesterday - 3 min',
-        title: 'Awesome day, awesome we...',
-        variant: MoodOrbVariant.peach,
-      ),
-      ExperienceItem(
-        meta: 'Yesterday - 3 min',
-        title: 'Awesome day, awesome we...',
-        variant: MoodOrbVariant.peach,
-      ),
-    ];
   }
 
   String _relativeDate(DateTime date) {
@@ -131,7 +158,7 @@ class HistoryScreen extends StatelessWidget {
   String _snippet(String? transcript) {
     final text = transcript?.trim();
     if (text == null || text.isEmpty) {
-      return 'A quiet check-in with IvyMental...';
+      return 'Your check-in is being processed...';
     }
     if (text.length <= 30) {
       return text;
@@ -165,12 +192,7 @@ class ExperienceItem {
   final MoodOrbVariant variant;
   final Session? session;
 
-  const ExperienceItem({
-    required this.meta,
-    required this.title,
-    required this.variant,
-    this.session,
-  });
+  const ExperienceItem({required this.meta, required this.title, required this.variant, this.session});
 }
 
 class ExperienceCard extends StatelessWidget {
@@ -194,13 +216,7 @@ class ExperienceCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppRadius.md),
             border: Border.all(color: colors.borderSubtle),
-            boxShadow: [
-              BoxShadow(
-                color: colors.shadowSoft,
-                blurRadius: 22,
-                offset: const Offset(0, 12),
-              ),
-            ],
+            boxShadow: [BoxShadow(color: colors.shadowSoft, blurRadius: 22, offset: const Offset(0, 12))],
           ),
           child: Row(
             children: [
