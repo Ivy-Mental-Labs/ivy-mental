@@ -26,10 +26,19 @@ void main() async {
   final isActive = box.get('isActive', defaultValue: true) as bool;
   final hour = box.get('notificationHour', defaultValue: 20) as int;
   final minute = box.get('notificationMinute', defaultValue: 0) as int;
+  final isScoreActive = box.get('isScoreActive', defaultValue: true) as bool;
+  final threshold = box.get('threshold', defaultValue: 45) as int;
+
+  final sessions = SessionRepository().getAll();
+  final weeklyAverageScore = NotificationService.calculateWeeklyAverageScore(sessions);
+
   await NotificationService.updateSchedule(
     isActive: isActive,
     hour: hour,
     minute: minute,
+    isScoreActive: isScoreActive,
+    threshold: threshold,
+    weeklyAverageScore: weeklyAverageScore,
   );
 
   final analyzer = OnnxTextAnalyzer();

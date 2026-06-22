@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../core/notifications/notification_service.dart';
 import '../../data/notifiers/score_reminder_notifier.dart';
 import '../plan/plan_screen.dart';
 
@@ -17,8 +18,7 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(22, 27, 22, 18),
           child: Consumer<ScoreReminderNotifier>(
             builder: (context, notifier, _) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              return ListView(
                 children: [
                   // Top Bar
                   Row(
@@ -50,7 +50,9 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
 
                   const SizedBox(height: 32),
 
-                  // Section label
+                  // Section label: DAILY REMINDER
+
+                  // Section label: SCORE REMINDER
                   Text(
                     'SCORE REMINDER',
                     style: TextStyle(
@@ -63,94 +65,31 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
 
                   const SizedBox(height: 12),
 
-                  // Card 1: Threshold slider
+                  // Card 3: Score Reminder Active toggle
                   _Card(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Notify below',
+                          'Active',
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 16,
                             fontWeight: FontWeight.w400,
                             color: colorScheme.onSurface,
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.baseline,
-                          textBaseline: TextBaseline.alphabetic,
-                          children: [
-                            Text(
-                              '${notifier.threshold}',
-                              style: TextStyle(
-                                fontSize: 48,
-                                fontWeight: FontWeight.w300,
-                                color: colorScheme.onSurface,
-                                height: 1,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '/ 100',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w300,
-                                color: colorScheme.onSurface.withOpacity(0.5),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        SliderTheme(
-                          data: SliderThemeData(
-                            activeTrackColor: colorScheme.onSurface,
-                            inactiveTrackColor: colorScheme.onSurface
-                                .withOpacity(0.15),
-                            thumbColor: colorScheme.onSurface,
-                            overlayColor: colorScheme.onSurface.withOpacity(
-                              0.08,
-                            ),
-                            trackHeight: 2,
-                            thumbShape: const RoundSliderThumbShape(
-                              enabledThumbRadius: 8,
-                            ),
+                        Switch(
+                          value: notifier.isScoreActive,
+                          onChanged: notifier.setScoreActive,
+                          activeThumbColor: colorScheme.secondary,
+                          activeTrackColor: colorScheme.secondary.withOpacity(
+                            0.5,
                           ),
-                          child: Slider(
-                            value: notifier.threshold.toDouble(),
-                            min: 0,
-                            max: 100,
-                            divisions: 100,
-                            onChanged: (v) => notifier.setThreshold(v.round()),
+                          inactiveThumbColor: colorScheme.onSurface.withOpacity(
+                            0.3,
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                '0',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: colorScheme.onSurface.withOpacity(0.4),
-                                ),
-                              ),
-                              Text(
-                                '50',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: colorScheme.onSurface.withOpacity(0.4),
-                                ),
-                              ),
-                              Text(
-                                '100',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: colorScheme.onSurface.withOpacity(0.4),
-                                ),
-                              ),
-                            ],
+                          inactiveTrackColor: colorScheme.onSurface.withOpacity(
+                            0.1,
                           ),
                         ),
                       ],
@@ -159,7 +98,133 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
 
                   const SizedBox(height: 12),
 
-                  // Card 2: Active toggle
+                  // Card 4: Threshold slider (Notify below)
+                  Opacity(
+                    opacity: notifier.isScoreActive ? 1.0 : 0.4,
+                    child: IgnorePointer(
+                      ignoring: !notifier.isScoreActive,
+                      child: _Card(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Notify below',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w400,
+                                color: colorScheme.onSurface,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.baseline,
+                              textBaseline: TextBaseline.alphabetic,
+                              children: [
+                                Text(
+                                  '${notifier.threshold}',
+                                  style: TextStyle(
+                                    fontSize: 48,
+                                    fontWeight: FontWeight.w300,
+                                    color: colorScheme.onSurface,
+                                    height: 1,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '/ 100',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w300,
+                                    color: colorScheme.onSurface.withOpacity(
+                                      0.5,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            SliderTheme(
+                              data: SliderThemeData(
+                                activeTrackColor: colorScheme.onSurface,
+                                inactiveTrackColor: colorScheme.onSurface
+                                    .withOpacity(0.15),
+                                thumbColor: colorScheme.onSurface,
+                                overlayColor: colorScheme.onSurface.withOpacity(
+                                  0.08,
+                                ),
+                                trackHeight: 2,
+                                thumbShape: const RoundSliderThumbShape(
+                                  enabledThumbRadius: 8,
+                                ),
+                              ),
+                              child: Slider(
+                                value: notifier.threshold.toDouble(),
+                                min: 0,
+                                max: 100,
+                                divisions: 100,
+                                onChanged: (v) =>
+                                    notifier.setThreshold(v.round()),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4.0,
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    '0',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: colorScheme.onSurface.withOpacity(
+                                        0.4,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    '50',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: colorScheme.onSurface.withOpacity(
+                                        0.4,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    '100',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: colorScheme.onSurface.withOpacity(
+                                        0.4,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  Text(
+                    'DAILY REMINDER',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 1.2,
+                      color: colorScheme.onSurface.withOpacity(0.4),
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Card 1: Daily Reminder Active toggle
                   _Card(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -190,25 +255,156 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 12),
 
-                  // Description text
-                  RichText(
-                    text: TextSpan(
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w300,
-                        color: colorScheme.onSurface.withOpacity(0.6),
-                        height: 1.5,
+                  // Card 2: Notification Time Picker
+                  Opacity(
+                    opacity: notifier.isActive ? 1.0 : 0.4,
+                    child: _Card(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Notification Time',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                    color: colorScheme.onSurface,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Set when to receive your daily check-in reminder',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w300,
+                                    color: colorScheme.onSurface.withOpacity(
+                                      0.5,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          GestureDetector(
+                            onTap: notifier.isActive
+                                ? () async {
+                                    final TimeOfDay? picked =
+                                        await showTimePicker(
+                                          context: context,
+                                          initialTime: TimeOfDay(
+                                            hour: notifier.notificationHour,
+                                            minute: notifier.notificationMinute,
+                                          ),
+                                        );
+                                    if (picked != null) {
+                                      await notifier.setNotificationTime(
+                                        picked.hour,
+                                        picked.minute,
+                                      );
+                                    }
+                                  }
+                                : null,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: colorScheme.onSurface.withOpacity(0.05),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                '${notifier.notificationHour.toString().padLeft(2, '0')}:${notifier.notificationMinute.toString().padLeft(2, '0')}',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: notifier.isActive
+                                      ? colorScheme.primary
+                                      : colorScheme.onSurface.withOpacity(0.4),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Developer Tools Section
+                  Text(
+                    'DEVELOPER TOOLS',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 1.2,
+                      color: colorScheme.onSurface.withOpacity(0.4),
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Card 4: Trigger Test Notification Button
+                  _Card(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        TextSpan(
-                          text: 'Be aware of your overall mental score',
-                          style: TextStyle(color: colorScheme.primary),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Test Notification',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
+                                  color: colorScheme.onSurface,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Send an immediate reminder notification',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w300,
+                                  color: colorScheme.onSurface.withOpacity(0.5),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        const TextSpan(
-                          text:
-                              ' — check your evaluation and take better care of yourself.',
+                        const SizedBox(width: 12),
+                        TextButton(
+                          onPressed: () async {
+                            await NotificationService.triggerTestNotification();
+                          },
+                          style: TextButton.styleFrom(
+                            foregroundColor: colorScheme.secondary,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            backgroundColor: colorScheme.secondary.withOpacity(
+                              0.1,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text(
+                            'Trigger',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -249,7 +445,32 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+
+                  const SizedBox(height: 20),
+
+                  // Description text
+                  RichText(
+                    text: TextSpan(
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w300,
+                        color: colorScheme.onSurface.withOpacity(0.6),
+                        height: 1.5,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: 'Be aware of your overall mental score',
+                          style: TextStyle(color: colorScheme.primary),
+                        ),
+                        const TextSpan(
+                          text:
+                              ' — check your evaluation and take better care of yourself.',
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
 
                   // Footer
                   Center(
