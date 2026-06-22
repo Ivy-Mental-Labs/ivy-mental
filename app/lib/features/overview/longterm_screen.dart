@@ -113,7 +113,7 @@ class _LongtermScreenState extends State<LongtermScreen> {
     final int weeksToDraw = math.max(totalWeeks, 4);
 
     const double weekHeight = 100.0;
-    const double topPadding = 40.0;
+    const double topPadding = 12.0;
     const double bottomPadding = 40.0;
     final double chartHeight =
         topPadding + weeksToDraw * weekHeight + bottomPadding;
@@ -133,39 +133,39 @@ class _LongtermScreenState extends State<LongtermScreen> {
                 ),
               ),
             ),
-            SizedBox(height: 30),
+            SizedBox(height: 4),
             SizedBox(height: 20, child: _buildHeaderLabels(context)),
 
             Expanded(
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onLongPressStart: (details) {
-                  setState(() => _isScrubbing = true);
-                  _updateScrubbingPosition(
-                    details.localPosition.dy,
-                    topPadding,
-                    weekHeight,
-                  );
-                },
-                onLongPressMoveUpdate: (details) {
-                  _updateScrubbingPosition(
-                    details.localPosition.dy,
-                    topPadding,
-                    weekHeight,
-                  );
-                },
-                onLongPressEnd: (_) => setState(() => _isScrubbing = false),
-                onTapDown: (details) {
-                  _updateScrubbingPosition(
-                    details.localPosition.dy,
-                    topPadding,
-                    weekHeight,
-                  );
-                },
-                child: SingleChildScrollView(
-                  physics: _isScrubbing
-                      ? const NeverScrollableScrollPhysics()
-                      : const BouncingScrollPhysics(),
+              child: SingleChildScrollView(
+                physics: _isScrubbing
+                    ? const NeverScrollableScrollPhysics()
+                    : const BouncingScrollPhysics(),
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onLongPressStart: (details) {
+                    setState(() => _isScrubbing = true);
+                    _updateScrubbingPosition(
+                      details.localPosition.dy,
+                      topPadding,
+                      weekHeight,
+                    );
+                  },
+                  onLongPressMoveUpdate: (details) {
+                    _updateScrubbingPosition(
+                      details.localPosition.dy,
+                      topPadding,
+                      weekHeight,
+                    );
+                  },
+                  onLongPressEnd: (_) => setState(() => _isScrubbing = false),
+                  onTapDown: (details) {
+                    _updateScrubbingPosition(
+                      details.localPosition.dy,
+                      topPadding,
+                      weekHeight,
+                    );
+                  },
                   child: CustomPaint(
                     size: Size(double.infinity, chartHeight),
                     painter: LongtermChartPainter(
