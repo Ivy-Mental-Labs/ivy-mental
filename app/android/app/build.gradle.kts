@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.app"
+    namespace = "com.lennartk.ivyMental"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -17,12 +17,23 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+        // Kotlin JVM target
+        jvmTarget = "17"
+    }
+
+    signingConfigs {
+        create("release") {
+            // Path relative to this file
+            storeFile = file("keystore/release-keystore.jks")
+            storePassword = project.findProperty("RELEASE_KEYSTORE_PASSWORD") as String
+            keyAlias = "ivymental_key"
+            keyPassword = project.findProperty("RELEASE_KEY_PASSWORD") as String
+        }
     }
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.app"
+        applicationId = "com.lennartk.ivyMental"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
@@ -33,8 +44,13 @@ android {
 
     buildTypes {
         release {
+            // Use the release signing config defined above
+            signingConfig = signingConfigs.getByName("release")
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
+            // signingConfig = signingConfigs.getByName("debug")
+        }
+        debug {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
