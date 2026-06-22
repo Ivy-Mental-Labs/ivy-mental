@@ -1,9 +1,10 @@
-﻿import 'dart:ui';
+import 'dart:ui';
 
 import 'package:app/theme.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../data/models/session.dart';
+import '../../../../data/repositories/session_repository.dart';
 import '../../../../shared/widgets/ivy_visuals.dart';
 
 class HistoryEntryViewData {
@@ -39,11 +40,13 @@ class HistoryEntryViewData {
               .toList()
         : <EmotionalLayerViewData>[];
 
+    final pattern = _patternFor(moodScore);
+
     return HistoryEntryViewData(
       moodScore: moodScore.clamp(-1.0, 1.0),
       analysisText: _analysisTextFor(moodScore),
-      patternText: "Your stress levels rise after you don't get enough sleep",
-      patternFrequency: '3x this week',
+      patternText: pattern.key,
+      patternFrequency: pattern.value,
       emotionalLayers: emotionalLayers.isEmpty ? HistoryEntryViewData.fallback().emotionalLayers : emotionalLayers,
       transcript: session.transcript,
     );
@@ -54,8 +57,8 @@ class HistoryEntryViewData {
       moodScore: 0.24,
       analysisText:
           'You sounded mentally tired but still grounded. Work pressure was present, yet moments of optimism and self-awareness came through.',
-      patternText: "Your stress levels rise after you don't get enough sleep",
-      patternFrequency: '3x this week',
+      patternText: "Increased feelings of gratitude after social interactions.",
+      patternFrequency: '2x this week',
       emotionalLayers: [
         EmotionalLayerViewData(label: 'Calm', value: 63, color: Color(0xFF8DA6AE)),
         EmotionalLayerViewData(label: 'Joy', value: 42, color: Color(0xFFD7DED4)),
@@ -67,6 +70,81 @@ class HistoryEntryViewData {
         EmotionalLayerViewData(label: 'Joy', value: 42, color: Color(0xFFD7DED4)),
       ],
     );
+  }
+
+  static MapEntry<String, String> _patternFor(double moodScore) {
+    int count = 0;
+    String text = "";
+    String frequency = "";
+
+    try {
+      final allSessions = SessionRepository().getAll();
+      final now = DateTime.now();
+      final startOf7DaysAgo = DateTime(now.year, now.month, now.day).subtract(const Duration(days: 6));
+
+      final recentSessions = allSessions.where((s) {
+        if (s.evaluation == null || s.evaluation!['mood'] is! num) return false;
+        DateTime sessionDate;
+        try {
+          sessionDate = DateTime.parse(s.id);
+        } catch (_) {
+          sessionDate = s.createdAt;
+        }
+        final dateOnly = DateTime(sessionDate.year, sessionDate.month, sessionDate.day);
+        return !dateOnly.isBefore(startOf7DaysAgo);
+      }).toList();
+
+      if (moodScore <= -0.7) {
+        text = "Your mood has been very low. Please take a step back, prioritize rest, and consider talking to someone you trust.";
+        count = recentSessions.where((s) => (s.evaluation!['mood'] as num).toDouble() <= -0.7).length;
+        frequency = "$count check-in${count != 1 ? "s" : ""} at this level this week";
+      } else if (moodScore <= -0.2) {
+        text = "Your mood was not good at all. Try next week to bring it back up with some sports and time for yourself.";
+        count = recentSessions.where((s) {
+          final m = (s.evaluation!['mood'] as num).toDouble();
+          return m > -0.7 && m <= -0.2;
+        }).length;
+        frequency = "$count check-in${count != 1 ? "s" : ""} at this level this week";
+      } else if (moodScore < 0.2) {
+        text = "Your week was very balanced, cool! Try to maintain this stable energy.";
+        count = recentSessions.where((s) {
+          final m = (s.evaluation!['mood'] as num).toDouble();
+          return m > -0.2 && m < 0.2;
+        }).length;
+        frequency = "$count balanced day${count != 1 ? "s" : ""} this week";
+      } else if (moodScore < 0.7) {
+        text = "You had a positive day! Sharing these good moments can further boost your energy.";
+        count = recentSessions.where((s) {
+          final m = (s.evaluation!['mood'] as num).toDouble();
+          return m >= 0.2 && m < 0.7;
+        }).length;
+        frequency = "$count positive day${count != 1 ? "s" : ""} this week";
+      } else {
+        text = "That was a super day, keep it up! Maintain this positive momentum.";
+        count = recentSessions.where((s) => (s.evaluation!['mood'] as num).toDouble() >= 0.7).length;
+        frequency = "$count check-in${count != 1 ? "s" : ""} at this high level this week";
+      }
+    } catch (e) {
+      // Fallback in case of database errors
+      if (moodScore <= -0.7) {
+        text = "Your mood has been very low. Please take a step back, prioritize rest, and consider talking to someone you trust.";
+        frequency = "1 check-in at this level this week";
+      } else if (moodScore <= -0.2) {
+        text = "Your mood was not good at all. Try next week to bring it back up with some sports and time for yourself.";
+        frequency = "1 check-in at this level this week";
+      } else if (moodScore < 0.2) {
+        text = "Your week was very balanced, cool! Try to maintain this stable energy.";
+        frequency = "1 balanced day this week";
+      } else if (moodScore < 0.7) {
+        text = "You had a positive day! Sharing these good moments can further boost your energy.";
+        frequency = "1 positive day this week";
+      } else {
+        text = "That was a super day, keep it up! Maintain this positive momentum.";
+        frequency = "1 check-in at this high level this week";
+      }
+    }
+
+    return MapEntry(text, frequency);
   }
 
   static String _analysisTextFor(double moodScore) {

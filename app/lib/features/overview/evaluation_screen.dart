@@ -45,9 +45,9 @@ class _EvaluationScreenState extends State<EvaluationScreen> {
     final colors = context.appColors;
     final sessions = context.watch<SessionNotifier>().sessions;
     final score = _overallScore(sessions);
-    final calm = _emotionScore(sessions, 'satisfied', fallback: 72);
-    final energy = _emotionScore(sessions, 'happy', fallback: 61);
-    final stress = _emotionScore(sessions, 'anxious', fallback: 34);
+    final calm = _emotionScore(sessions, 'satisfied');
+    final energy = _emotionScore(sessions, 'happy');
+    final stress = _emotionScore(sessions, 'anxious');
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -138,26 +138,38 @@ class _EvaluationScreenState extends State<EvaluationScreen> {
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        TweenAnimationBuilder<double>(
-                          duration: const Duration(milliseconds: 5000),
-                          curve: Curves.easeOutCubic,
-                          tween: Tween<double>(
-                            begin: 0.0,
-                            end: score.toDouble(),
+                        if (score == null)
+                          Text(
+                            '--',
+                            style: Theme.of(context).textTheme.displaySmall
+                                ?.copyWith(
+                                  color: colors.textPrimary,
+                                  fontSize: 38,
+                                  fontWeight: FontWeight.w300,
+                                  height: 1,
+                                ),
+                          )
+                        else
+                          TweenAnimationBuilder<double>(
+                            duration: const Duration(milliseconds: 5000),
+                            curve: Curves.easeOutCubic,
+                            tween: Tween<double>(
+                              begin: 0.0,
+                              end: score.toDouble(),
+                            ),
+                            builder: (context, value, child) {
+                              return Text(
+                                '${value.round()}',
+                                style: Theme.of(context).textTheme.displaySmall
+                                    ?.copyWith(
+                                      color: colors.textPrimary,
+                                      fontSize: 38,
+                                      fontWeight: FontWeight.w300,
+                                      height: 1,
+                                    ),
+                              );
+                            },
                           ),
-                          builder: (context, value, child) {
-                            return Text(
-                              '${value.round()}',
-                              style: Theme.of(context).textTheme.displaySmall
-                                  ?.copyWith(
-                                    color: colors.textPrimary,
-                                    fontSize: 38,
-                                    fontWeight: FontWeight.w300,
-                                    height: 1,
-                                  ),
-                            );
-                          },
-                        ),
                         const SizedBox(height: 7),
                         Text(
                           'Overall',
@@ -178,17 +190,17 @@ class _EvaluationScreenState extends State<EvaluationScreen> {
                 children: [
                   MetricItem(
                     label: 'Calm',
-                    value: calm,
+                    value: calm != null ? '$calm' : '--',
                     color: colors.accentDeep,
                   ),
                   MetricItem(
                     label: 'Energy',
-                    value: energy,
+                    value: energy != null ? '$energy' : '--',
                     color: colors.accentMint,
                   ),
                   MetricItem(
                     label: 'Stress',
-                    value: stress,
+                    value: stress != null ? '$stress' : '--',
                     color: colors.accentPeach,
                   ),
                 ],
@@ -202,22 +214,21 @@ class _EvaluationScreenState extends State<EvaluationScreen> {
     );
   }
 
-  int _overallScore(List<Session> sessions) {
+  int? _overallScore(List<Session> sessions) {
     final moods = sessions
         .map((session) => session.evaluation?['mood'])
         .whereType<num>()
         .map((value) => value.toDouble())
         .toList();
-    if (moods.isEmpty) return 58;
+    if (moods.isEmpty) return null;
     final average = moods.reduce((a, b) => a + b) / moods.length;
     return (((average + 1) / 2) * 100).clamp(0, 100).round();
   }
 
-  int _emotionScore(
+  int? _emotionScore(
     List<Session> sessions,
-    String key, {
-    required int fallback,
-  }) {
+    String key,
+  ) {
     final values = <double>[];
     for (final session in sessions) {
       final emotions = session.evaluation?['emotions'];
@@ -225,7 +236,7 @@ class _EvaluationScreenState extends State<EvaluationScreen> {
         values.add((emotions[key] as num).toDouble());
       }
     }
-    if (values.isEmpty) return fallback;
+    if (values.isEmpty) return null;
     final average = values.reduce((a, b) => a + b) / math.max(values.length, 1);
     return (average * 100).clamp(0, 100).round();
   }

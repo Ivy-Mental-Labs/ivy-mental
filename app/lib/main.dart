@@ -15,7 +15,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   await SessionRepository.init();
-  await MockDataSeeder.seedIfEmpty(SessionRepository());
+  //await MockDataSeeder.seedIfEmpty(SessionRepository());
   final analyzer = OnnxTextAnalyzer();
   await analyzer.load();
   runApp(MainApp(analyzer: analyzer));
@@ -30,7 +30,9 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => SessionNotifier(SessionRepository())),
+        ChangeNotifierProvider(
+          create: (_) => SessionNotifier(SessionRepository()),
+        ),
         ChangeNotifierProvider(create: (_) => ScoreReminderNotifier()),
       ],
       child: MaterialApp(

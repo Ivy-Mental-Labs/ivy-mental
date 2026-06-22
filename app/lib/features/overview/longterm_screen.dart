@@ -137,49 +137,85 @@ class _LongtermScreenState extends State<LongtermScreen> {
             SizedBox(height: 20, child: _buildHeaderLabels(context)),
 
             Expanded(
-              child: SingleChildScrollView(
-                physics: _isScrubbing
-                    ? const NeverScrollableScrollPhysics()
-                    : const BouncingScrollPhysics(),
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onLongPressStart: (details) {
-                    setState(() => _isScrubbing = true);
-                    _updateScrubbingPosition(
-                      details.localPosition.dy,
-                      topPadding,
-                      weekHeight,
-                    );
-                  },
-                  onLongPressMoveUpdate: (details) {
-                    _updateScrubbingPosition(
-                      details.localPosition.dy,
-                      topPadding,
-                      weekHeight,
-                    );
-                  },
-                  onLongPressEnd: (_) => setState(() => _isScrubbing = false),
-                  onTapDown: (details) {
-                    _updateScrubbingPosition(
-                      details.localPosition.dy,
-                      topPadding,
-                      weekHeight,
-                    );
-                  },
-                  child: CustomPaint(
-                    size: Size(double.infinity, chartHeight),
-                    painter: LongtermChartPainter(
-                      colors: colors,
-                      sessions: _evaluationSessions,
-                      latestDate: _latestDate,
-                      weekHeight: weekHeight,
-                      topPadding: topPadding,
-                      selectedSession: _selectedSession,
-                      formatDate: _formatDate,
+              child: _evaluationSessions.isEmpty
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 40),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.trending_up,
+                              size: 48,
+                              color: colors.textMuted.withOpacity(0.5),
+                            ),
+                            const SizedBox(height: AppSpacing.md),
+                            Text(
+                              'No trends available yet',
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                color: colors.textPrimary,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.sm),
+                            Text(
+                              'Record your mental state regularly to see your long-term mood and emotion analysis charts here.',
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: colors.textSecondary,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w300,
+                                height: 1.4,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : SingleChildScrollView(
+                      physics: _isScrubbing
+                          ? const NeverScrollableScrollPhysics()
+                          : const BouncingScrollPhysics(),
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onLongPressStart: (details) {
+                          setState(() => _isScrubbing = true);
+                          _updateScrubbingPosition(
+                            details.localPosition.dy,
+                            topPadding,
+                            weekHeight,
+                          );
+                        },
+                        onLongPressMoveUpdate: (details) {
+                          _updateScrubbingPosition(
+                            details.localPosition.dy,
+                            topPadding,
+                            weekHeight,
+                          );
+                        },
+                        onLongPressEnd: (_) => setState(() => _isScrubbing = false),
+                        onTapDown: (details) {
+                          _updateScrubbingPosition(
+                            details.localPosition.dy,
+                            topPadding,
+                            weekHeight,
+                          );
+                        },
+                        child: CustomPaint(
+                          size: Size(double.infinity, chartHeight),
+                          painter: LongtermChartPainter(
+                            colors: colors,
+                            sessions: _evaluationSessions,
+                            latestDate: _latestDate,
+                            weekHeight: weekHeight,
+                            topPadding: topPadding,
+                            selectedSession: _selectedSession,
+                            formatDate: _formatDate,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
             ),
 
             const Padding(

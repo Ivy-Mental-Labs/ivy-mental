@@ -344,7 +344,7 @@ class ScoreOrbPainter extends CustomPainter {
 
 class MetricItem extends StatelessWidget {
   final String label;
-  final int value;
+  final String value;
   final Color color;
 
   const MetricItem({required this.label, required this.value, required this.color, super.key});
@@ -362,7 +362,7 @@ class MetricItem extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.xs),
         Text(
-          '$value',
+          value,
           style: Theme.of(
             context,
           ).textTheme.titleMedium?.copyWith(color: colors.accentDeep, fontSize: 18, fontWeight: FontWeight.w500),
@@ -502,7 +502,7 @@ List<double?> _weekMoodValues(List<Session> sessions, DateTime start) {
 
   return List.generate(7, (index) {
     final session = latestByDay[index];
-    if (session == null) return null;
+    if (session == null) return 0.0;
     return (session.evaluation!['mood'] as num).toDouble();
   });
 }
