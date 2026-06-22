@@ -69,12 +69,19 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen> with Single
 
   Future<void> _initModel() async {
     try {
+      final assetBundle = DefaultAssetBundle.of(context);
       final modelPath = await _whisperController.getPath(WhisperModel.tiny);
       final file = File(modelPath);
 
-      if (!file.existsSync() || file.lengthSync() < 1000000) {
-        debugPrint('Model not found natively, downloading...');
-        await _whisperController.downloadModel(WhisperModel.tiny);
+      if (!file.existsSync() || file.lengthSync() < 50000000) {
+        debugPrint('Model not found natively, copying from assets...');
+        final byteData = await assetBundle.load('assets/models/ggml-tiny.bin');
+        await file.parent.create(recursive: true);
+        await file.writeAsBytes(
+          byteData.buffer.asUint8List(byteData.offsetInBytes, byteData.lengthInBytes),
+          flush: true,
+        );
+        debugPrint('Model successfully copied to $modelPath');
       } else {
         debugPrint('Model already exists at: $modelPath');
       }
