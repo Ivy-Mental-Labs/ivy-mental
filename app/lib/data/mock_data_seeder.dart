@@ -34,9 +34,10 @@ class MockDataSeeder {
       await repo.upsert(_buildSession(date, mood, transcripts, random));
     }
 
-    // Seed 30 weeks of historical data (older than current week).
-    for (int daysAgo = 8; daysAgo <= 210; daysAgo++) {
-      if (random.nextInt(10) >= 4) continue;
+    // Seed ~8 previous weeks (2 months) of historical data (older than current week).
+    for (int daysAgo = 7; daysAgo <= 56; daysAgo++) {
+      // ~45% chance to create an entry, yielding about 3 entries per week.
+      if (random.nextDouble() > 0.45) continue;
 
       final date = today.subtract(Duration(days: daysAgo));
       final weekNum = daysAgo ~/ 7;

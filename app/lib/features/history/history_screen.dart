@@ -48,7 +48,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final sessions = context.watch<SessionNotifier>().sessions;
-    final items = sessions.isEmpty ? _fallbackItems() : _itemsFromSessions(sessions);
+    final items = _itemsFromSessions(sessions);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(22, 20, 22, 0),
@@ -64,24 +64,60 @@ class _HistoryScreenState extends State<HistoryScreen> {
           ),
           const SizedBox(height: 42),
           Expanded(
-            child: ListView.separated(
-              controller: _scrollController,
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.only(bottom: 24),
-              itemCount: items.length,
-              separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
-              itemBuilder: (context, index) {
-                final item = items[index];
-                return ExperienceCard(
-                  item: item,
-                  onTap: item.session == null
-                      ? null
-                      : () => Navigator.of(
-                          context,
-                        ).push(MaterialPageRoute(builder: (_) => HistoryEntryScreen(session: item.session!))),
-                );
-              },
-            ),
+            child: sessions.isEmpty
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 32),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.history,
+                            size: 48,
+                            color: colors.textMuted.withOpacity(0.5),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          Text(
+                            'No entries yet',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: colors.textPrimary,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(
+                            'Hold the microphone button on the home screen to record your first check-in.',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: colors.textSecondary,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w300,
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : ListView.separated(
+                    controller: _scrollController,
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.only(bottom: 24),
+                    itemCount: items.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
+                    itemBuilder: (context, index) {
+                      final item = items[index];
+                      return ExperienceCard(
+                        item: item,
+                        onTap: item.session == null
+                            ? null
+                            : () => Navigator.of(
+                                context,
+                              ).push(MaterialPageRoute(builder: (_) => HistoryEntryScreen(session: item.session!))),
+                      );
+                    },
+                  ),
           ),
         ],
       ),
@@ -102,16 +138,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
         session: session,
       );
     }).toList();
-  }
-
-  List<ExperienceItem> _fallbackItems() {
-    return const [
-      ExperienceItem(meta: 'Today - 7 min', title: 'A little tired from a hard day...', variant: MoodOrbVariant.peach),
-      ExperienceItem(meta: 'Yesterday - 3 min', title: 'Awesome day, awesome we...', variant: MoodOrbVariant.mint),
-      ExperienceItem(meta: 'Yesterday - 3 min', title: 'Awesome day, awesome we...', variant: MoodOrbVariant.peach),
-      ExperienceItem(meta: 'Yesterday - 3 min', title: 'Awesome day, awesome we...', variant: MoodOrbVariant.peach),
-      ExperienceItem(meta: 'Yesterday - 3 min', title: 'Awesome day, awesome we...', variant: MoodOrbVariant.peach),
-    ];
   }
 
   String _relativeDate(DateTime date) {

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../theme.dart';
 import '../../data/models/session.dart';
 import '../../features/score_reminder/score_reminder_settings_screen.dart';
+import '../../features/overview/longterm_screen.dart';
 
 class IvyHeader extends StatelessWidget {
   final Widget trailing;
@@ -343,7 +344,7 @@ class ScoreOrbPainter extends CustomPainter {
 
 class MetricItem extends StatelessWidget {
   final String label;
-  final int value;
+  final String value;
   final Color color;
 
   const MetricItem({required this.label, required this.value, required this.color, super.key});
@@ -361,7 +362,7 @@ class MetricItem extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.xs),
         Text(
-          '$value',
+          value,
           style: Theme.of(
             context,
           ).textTheme.titleMedium?.copyWith(color: colors.accentDeep, fontSize: 18, fontWeight: FontWeight.w500),
@@ -417,7 +418,11 @@ class _MoodTrendCardState extends State<MoodTrendCard> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    return Container(
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LongtermScreen()));
+      },
+      child: Container(
       padding: const EdgeInsets.fromLTRB(20, 18, 20, 14),
       decoration: BoxDecoration(
         color: colors.backgroundGlass,
@@ -472,6 +477,7 @@ class _MoodTrendCardState extends State<MoodTrendCard> with SingleTickerProvider
           ),
         ],
       ),
+      ),
     );
   }
 }
@@ -496,7 +502,7 @@ List<double?> _weekMoodValues(List<Session> sessions, DateTime start) {
 
   return List.generate(7, (index) {
     final session = latestByDay[index];
-    if (session == null) return null;
+    if (session == null) return 0.0;
     return (session.evaluation!['mood'] as num).toDouble();
   });
 }
