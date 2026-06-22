@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'core/ml/services/onnx_text_analyzer.dart';
 import 'core/ml/services/text_analyzer.dart';
-import 'data/mock_data_seeder.dart';
+import 'core/notifications/notification_service.dart';
 import 'data/notifiers/session_notifier.dart';
 import 'data/notifiers/score_reminder_notifier.dart';
 import 'data/repositories/session_repository.dart';
@@ -15,7 +15,32 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   await SessionRepository.init();
-  //await MockDataSeeder.seedIfEmpty(SessionRepository());
+  await Hive.openBox('settings');
+
+  // Notification Setup
+  await NotificationService.init();
+  await NotificationService.requestPermissions();
+
+  // Load current settings and schedule initial notification
+  final box = Hive.box('settings');
+  final isActive = box.get('isActive', defaultValue: true) as bool;
+  final hour = box.get('notificationHour', defaultValue: 20) as int;
+  final minute = box.get('notificationMinute', defaultValue: 0) as int;
+  final isScoreActive = box.get('isScoreActive', defaultValue: true) as bool;
+  final threshold = box.get('threshold', defaultValue: 45) as int;
+
+  final sessions = SessionRepository().getAll();
+  final weeklyAverageScore = NotificationService.calculateWeeklyAverageScore(sessions);
+
+  await NotificationService.updateSchedule(
+    isActive: isActive,
+    hour: hour,
+    minute: minute,
+    isScoreActive: isScoreActive,
+    threshold: threshold,
+    weeklyAverageScore: weeklyAverageScore,
+  );
+
   final analyzer = OnnxTextAnalyzer();
   await analyzer.load();
   runApp(MainApp(analyzer: analyzer));
