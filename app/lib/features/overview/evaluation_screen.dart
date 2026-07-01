@@ -61,152 +61,177 @@ class _EvaluationScreenState extends State<EvaluationScreen> {
                   onTap: () => Navigator.of(context).pop(),
                 ),
               ),
-              SizedBox(height: compact ? 38 : 60),
-              Text(
-                "Your week's evaluation",
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: colors.textSecondary,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w200,
-                ),
-              ),
-              SizedBox(height: compact ? 18 : 28),
-              SizedBox(
-                width: 214,
-                height: 214,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-
-                    ShaderMask(
-                      shaderCallback: (bounds) {
-                        return const RadialGradient(
-                          center: Alignment.center,
-                          radius: 0.5,
-                          colors: [
-                            Colors.white,
-                            Colors.white,
-                            Colors.transparent,
-                          ],
-                          stops: [0.0, 0.7, 1.0],
-                        ).createShader(bounds);
-                      },
-                      blendMode: BlendMode.dstIn,
-                      child: ClipOval(
-                        child: SizedBox(
-                          width: 214,
-                          height: 200,
-                          child: _videoController.value.isInitialized
-                              ? FittedBox(
-                                  fit: BoxFit.cover,
-                                  child: SizedBox(
-                                    width: _videoController.value.size.width,
-                                    height: _videoController.value.size.height,
-                                    child: VideoPlayer(_videoController),
-                                  ),
-                                )
-                              : const SizedBox.shrink(),
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.only(bottom: AppSpacing.xl),
+                  child: Column(
+                    children: [
+                      SizedBox(height: compact ? 28 : 52),
+                      Text(
+                        "Your week's evaluation",
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: colors.textSecondary,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w200,
                         ),
                       ),
-                    ),
-
-                    ShaderMask(
-                      shaderCallback: (bounds) {
-                        return const RadialGradient(
-                          center: Alignment.center,
-                          radius: 0.5,
-                          colors: [Colors.white, Colors.transparent],
-                          stops: [0.6, 1.0],
-                        ).createShader(bounds);
-                      },
-                      blendMode: BlendMode.dstIn,
-                      child: ClipOval(
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 10),
-                          child: Container(
-                            width: 140,
-                            height: 140,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: colors.backgroundPrimary.withOpacity(0.75),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (score == null)
-                          Text(
-                            '--',
-                            style: Theme.of(context).textTheme.displaySmall
-                                ?.copyWith(
-                                  color: colors.textPrimary,
-                                  fontSize: 38,
-                                  fontWeight: FontWeight.w300,
-                                  height: 1,
+                      SizedBox(height: compact ? 18 : 28),
+                      SizedBox(
+                        width: 214,
+                        height: 214,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            ShaderMask(
+                              shaderCallback: (bounds) {
+                                return const RadialGradient(
+                                  center: Alignment.center,
+                                  radius: 0.5,
+                                  colors: [
+                                    Colors.white,
+                                    Colors.white,
+                                    Colors.transparent,
+                                  ],
+                                  stops: [0.0, 0.7, 1.0],
+                                ).createShader(bounds);
+                              },
+                              blendMode: BlendMode.dstIn,
+                              child: ClipOval(
+                                child: SizedBox(
+                                  width: 214,
+                                  height: 200,
+                                  child: _videoController.value.isInitialized
+                                      ? FittedBox(
+                                          fit: BoxFit.cover,
+                                          child: SizedBox(
+                                            width: _videoController
+                                                .value
+                                                .size
+                                                .width,
+                                            height: _videoController
+                                                .value
+                                                .size
+                                                .height,
+                                            child: VideoPlayer(
+                                              _videoController,
+                                            ),
+                                          ),
+                                        )
+                                      : const SizedBox.shrink(),
                                 ),
-                          )
-                        else
-                          TweenAnimationBuilder<double>(
-                            duration: const Duration(milliseconds: 5000),
-                            curve: Curves.easeOutCubic,
-                            tween: Tween<double>(
-                              begin: 0.0,
-                              end: score.toDouble(),
-                            ),
-                            builder: (context, value, child) {
-                              return Text(
-                                '${value.round()}',
-                                style: Theme.of(context).textTheme.displaySmall
-                                    ?.copyWith(
-                                      color: colors.textPrimary,
-                                      fontSize: 38,
-                                      fontWeight: FontWeight.w300,
-                                      height: 1,
-                                    ),
-                              );
-                            },
-                          ),
-                        const SizedBox(height: 7),
-                        Text(
-                          'Overall',
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                color: colors.textSecondary,
-                                fontSize: 11,
                               ),
+                            ),
+                            ShaderMask(
+                              shaderCallback: (bounds) {
+                                return const RadialGradient(
+                                  center: Alignment.center,
+                                  radius: 0.5,
+                                  colors: [Colors.white, Colors.transparent],
+                                  stops: [0.6, 1.0],
+                                ).createShader(bounds);
+                              },
+                              blendMode: BlendMode.dstIn,
+                              child: ClipOval(
+                                child: BackdropFilter(
+                                  filter: ImageFilter.blur(
+                                    sigmaX: 8,
+                                    sigmaY: 10,
+                                  ),
+                                  child: Container(
+                                    width: 140,
+                                    height: 140,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: colors.backgroundPrimary
+                                          .withValues(alpha: 0.75),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                if (score == null)
+                                  Text(
+                                    '--',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .displaySmall
+                                        ?.copyWith(
+                                          color: colors.textPrimary,
+                                          fontSize: 38,
+                                          fontWeight: FontWeight.w300,
+                                          height: 1,
+                                        ),
+                                  )
+                                else
+                                  TweenAnimationBuilder<double>(
+                                    duration: const Duration(
+                                      milliseconds: 5000,
+                                    ),
+                                    curve: Curves.easeOutCubic,
+                                    tween: Tween<double>(
+                                      begin: 0.0,
+                                      end: score.toDouble(),
+                                    ),
+                                    builder: (context, value, child) {
+                                      return Text(
+                                        '${value.round()}',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .displaySmall
+                                            ?.copyWith(
+                                              color: colors.textPrimary,
+                                              fontSize: 38,
+                                              fontWeight: FontWeight.w300,
+                                              height: 1,
+                                            ),
+                                      );
+                                    },
+                                  ),
+                                const SizedBox(height: 7),
+                                Text(
+                                  'Overall',
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(
+                                        color: colors.textSecondary,
+                                        fontSize: 11,
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          MetricItem(
+                            label: 'Calm',
+                            value: calm != null ? '$calm' : '--',
+                            color: colors.accentDeep,
+                          ),
+                          MetricItem(
+                            label: 'Energy',
+                            value: energy != null ? '$energy' : '--',
+                            color: colors.accentMint,
+                          ),
+                          MetricItem(
+                            label: 'Stress',
+                            value: stress != null ? '$stress' : '--',
+                            color: colors.accentPeach,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: compact ? 24 : 42),
+                      MoodTrendCard(sessions: sessions),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(height: AppSpacing.md),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  MetricItem(
-                    label: 'Calm',
-                    value: calm != null ? '$calm' : '--',
-                    color: colors.accentDeep,
-                  ),
-                  MetricItem(
-                    label: 'Energy',
-                    value: energy != null ? '$energy' : '--',
-                    color: colors.accentMint,
-                  ),
-                  MetricItem(
-                    label: 'Stress',
-                    value: stress != null ? '$stress' : '--',
-                    color: colors.accentPeach,
-                  ),
-                ],
-              ),
-              SizedBox(height: compact ? 24 : 50),
-              MoodTrendCard(sessions: sessions),
             ],
           ),
         );
@@ -225,10 +250,7 @@ class _EvaluationScreenState extends State<EvaluationScreen> {
     return (((average + 1) / 2) * 100).clamp(0, 100).round();
   }
 
-  int? _emotionScore(
-    List<Session> sessions,
-    String key,
-  ) {
+  int? _emotionScore(List<Session> sessions, String key) {
     final values = <double>[];
     for (final session in sessions) {
       final emotions = session.evaluation?['emotions'];
