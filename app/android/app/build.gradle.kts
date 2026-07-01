@@ -25,9 +25,9 @@ android {
         create("release") {
             // Path relative to this file
             storeFile = file("keystore/release-keystore.jks")
-            storePassword = project.findProperty("RELEASE_KEYSTORE_PASSWORD") as String
+            storePassword = project.findProperty("RELEASE_KEYSTORE_PASSWORD") as String?
             keyAlias = "ivymental_key"
-            keyPassword = project.findProperty("RELEASE_KEY_PASSWORD") as String
+            keyPassword = project.findProperty("RELEASE_KEY_PASSWORD") as String?
         }
     }
 

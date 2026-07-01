@@ -19,7 +19,6 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
             builder: (context, notifier, _) {
               return ListView(
                 children: [
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -37,20 +36,13 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
                           width: 36,
                           height: 36,
                           decoration: BoxDecoration(shape: BoxShape.circle),
-                          child: Icon(
-                            Icons.close,
-                            color: colorScheme.onSurface.withOpacity(0.5),
-                            size: 20,
-                          ),
+                          child: Icon(Icons.close, color: colorScheme.onSurface.withOpacity(0.5), size: 20),
                         ),
                       ),
                     ],
                   ),
 
                   const SizedBox(height: 32),
-
-
-
 
                   Text(
                     'SCORE REMINDER',
@@ -64,39 +56,27 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
 
                   const SizedBox(height: 12),
 
-
                   _Card(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           'Active',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                            color: colorScheme.onSurface,
-                          ),
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: colorScheme.onSurface),
                         ),
                         Switch(
                           value: notifier.isScoreActive,
                           onChanged: notifier.setScoreActive,
                           activeThumbColor: colorScheme.secondary,
-                          activeTrackColor: colorScheme.secondary.withOpacity(
-                            0.5,
-                          ),
-                          inactiveThumbColor: colorScheme.onSurface.withOpacity(
-                            0.3,
-                          ),
-                          inactiveTrackColor: colorScheme.onSurface.withOpacity(
-                            0.1,
-                          ),
+                          activeTrackColor: colorScheme.secondary.withOpacity(0.5),
+                          inactiveThumbColor: colorScheme.onSurface.withOpacity(0.3),
+                          inactiveTrackColor: colorScheme.onSurface.withOpacity(0.1),
                         ),
                       ],
                     ),
                   ),
 
                   const SizedBox(height: 12),
-
 
                   Opacity(
                     opacity: notifier.isScoreActive ? 1.0 : 0.4,
@@ -108,11 +88,7 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
                           children: [
                             Text(
                               'Notify below',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w400,
-                                color: colorScheme.onSurface,
-                              ),
+                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400, color: colorScheme.onSurface),
                             ),
                             const SizedBox(height: 8),
                             Row(
@@ -134,9 +110,7 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w300,
-                                    color: colorScheme.onSurface.withOpacity(
-                                      0.5,
-                                    ),
+                                    color: colorScheme.onSurface.withOpacity(0.5),
                                   ),
                                 ),
                               ],
@@ -145,60 +119,36 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
                             SliderTheme(
                               data: SliderThemeData(
                                 activeTrackColor: colorScheme.onSurface,
-                                inactiveTrackColor: colorScheme.onSurface
-                                    .withOpacity(0.15),
+                                inactiveTrackColor: colorScheme.onSurface.withOpacity(0.15),
                                 thumbColor: colorScheme.onSurface,
-                                overlayColor: colorScheme.onSurface.withOpacity(
-                                  0.08,
-                                ),
+                                overlayColor: colorScheme.onSurface.withOpacity(0.08),
                                 trackHeight: 2,
-                                thumbShape: const RoundSliderThumbShape(
-                                  enabledThumbRadius: 8,
-                                ),
+                                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
                               ),
                               child: Slider(
                                 value: notifier.threshold.toDouble(),
                                 min: 0,
                                 max: 100,
                                 divisions: 100,
-                                onChanged: (v) =>
-                                    notifier.setThreshold(v.round()),
+                                onChanged: (v) => notifier.setThreshold(v.round()),
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 4.0,
-                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 4.0),
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     '0',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: colorScheme.onSurface.withOpacity(
-                                        0.4,
-                                      ),
-                                    ),
+                                    style: TextStyle(fontSize: 12, color: colorScheme.onSurface.withOpacity(0.4)),
                                   ),
                                   Text(
                                     '50',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: colorScheme.onSurface.withOpacity(
-                                        0.4,
-                                      ),
-                                    ),
+                                    style: TextStyle(fontSize: 12, color: colorScheme.onSurface.withOpacity(0.4)),
                                   ),
                                   Text(
                                     '100',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: colorScheme.onSurface.withOpacity(
-                                        0.4,
-                                      ),
-                                    ),
+                                    style: TextStyle(fontSize: 12, color: colorScheme.onSurface.withOpacity(0.4)),
                                   ),
                                 ],
                               ),
@@ -223,39 +173,27 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
 
                   const SizedBox(height: 12),
 
-
                   _Card(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           'Active',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                            color: colorScheme.onSurface,
-                          ),
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: colorScheme.onSurface),
                         ),
                         Switch(
                           value: notifier.isActive,
                           onChanged: notifier.setActive,
                           activeThumbColor: colorScheme.secondary,
-                          activeTrackColor: colorScheme.secondary.withOpacity(
-                            0.5,
-                          ),
-                          inactiveThumbColor: colorScheme.onSurface.withOpacity(
-                            0.3,
-                          ),
-                          inactiveTrackColor: colorScheme.onSurface.withOpacity(
-                            0.1,
-                          ),
+                          activeTrackColor: colorScheme.secondary.withOpacity(0.5),
+                          inactiveThumbColor: colorScheme.onSurface.withOpacity(0.3),
+                          inactiveTrackColor: colorScheme.onSurface.withOpacity(0.1),
                         ),
                       ],
                     ),
                   ),
 
                   const SizedBox(height: 12),
-
 
                   Opacity(
                     opacity: notifier.isActive ? 1.0 : 0.4,
@@ -281,9 +219,7 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w300,
-                                    color: colorScheme.onSurface.withOpacity(
-                                      0.5,
-                                    ),
+                                    color: colorScheme.onSurface.withOpacity(0.5),
                                   ),
                                 ),
                               ],
@@ -293,27 +229,20 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
                           GestureDetector(
                             onTap: notifier.isActive
                                 ? () async {
-                                    final TimeOfDay? picked =
-                                        await showTimePicker(
-                                          context: context,
-                                          initialTime: TimeOfDay(
-                                            hour: notifier.notificationHour,
-                                            minute: notifier.notificationMinute,
-                                          ),
-                                        );
+                                    final TimeOfDay? picked = await showTimePicker(
+                                      context: context,
+                                      initialTime: TimeOfDay(
+                                        hour: notifier.notificationHour,
+                                        minute: notifier.notificationMinute,
+                                      ),
+                                    );
                                     if (picked != null) {
-                                      await notifier.setNotificationTime(
-                                        picked.hour,
-                                        picked.minute,
-                                      );
+                                      await notifier.setNotificationTime(picked.hour, picked.minute);
                                     }
                                   }
                                 : null,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 8,
-                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                               decoration: BoxDecoration(
                                 color: colorScheme.onSurface.withOpacity(0.05),
                                 borderRadius: BorderRadius.circular(8),
@@ -337,7 +266,6 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-
                   Text(
                     'DEVELOPER TOOLS',
                     style: TextStyle(
@@ -349,7 +277,6 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 12),
-
 
                   _Card(
                     child: Row(
@@ -386,33 +313,20 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
                           },
                           style: TextButton.styleFrom(
                             foregroundColor: colorScheme.secondary,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
-                            backgroundColor: colorScheme.secondary.withOpacity(
-                              0.1,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            backgroundColor: colorScheme.secondary.withOpacity(0.1),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                           ),
-                          child: const Text(
-                            'Trigger',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                          child: const Text('Trigger', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
                         ),
                       ],
                     ),
                   ),
 
-                  const SizedBox(height: 20),
-
+                  const SizedBox(height: 40),
 
                   RichText(
+                    textAlign: TextAlign.center,
                     text: TextSpan(
                       style: TextStyle(
                         fontSize: 14,
@@ -422,29 +336,21 @@ class ScoreReminderSettingsScreen extends StatelessWidget {
                       ),
                       children: [
                         TextSpan(
-                          text: 'Be aware of your overall mental score',
+                          text: 'Be aware of your overall mental score\n',
                           style: TextStyle(color: colorScheme.primary),
                         ),
-                        const TextSpan(
-                          text:
-                              ' — check your evaluation and take better care of yourself.',
-                        ),
+                        const TextSpan(text: 'Check your evaluation and take care of yourself.'),
                       ],
                     ),
                   ),
 
-                  const SizedBox(height: 20),
-
+                  const SizedBox(height: 40),
 
                   Center(
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          Icons.lock_outline,
-                          size: 14,
-                          color: colorScheme.onSurface.withOpacity(0.3),
-                        ),
+                        Icon(Icons.lock_outline, size: 14, color: colorScheme.onSurface.withOpacity(0.3)),
                         const SizedBox(width: 6),
                         Text(
                           'On-device analysis',
@@ -481,13 +387,7 @@ class _Card extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2))],
       ),
       child: child,
     );

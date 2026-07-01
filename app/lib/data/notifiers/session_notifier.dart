@@ -29,7 +29,10 @@ class SessionNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateEvaluation(String id, Map<String, dynamic> evaluation) async {
+  Future<void> updateEvaluation(
+    String id,
+    Map<String, dynamic> evaluation,
+  ) async {
     final idx = _sessions.indexWhere((s) => s.id == id);
     if (idx == -1) return;
     await _repo.upsert(_sessions[idx].withEvaluation(evaluation));
@@ -50,10 +53,12 @@ class SessionNotifier extends ChangeNotifier {
       final isActive = box.get('isActive', defaultValue: true) as bool;
       final hour = box.get('notificationHour', defaultValue: 20) as int;
       final minute = box.get('notificationMinute', defaultValue: 0) as int;
-      final isScoreActive = box.get('isScoreActive', defaultValue: true) as bool;
+      final isScoreActive =
+          box.get('isScoreActive', defaultValue: true) as bool;
       final threshold = box.get('threshold', defaultValue: 45) as int;
 
-      final weeklyAverageScore = NotificationService.calculateWeeklyAverageScore(_sessions);
+      final weeklyAverageScore =
+          NotificationService.calculateWeeklyAverageScore(_sessions);
       await NotificationService.updateSchedule(
         isActive: isActive,
         hour: hour,
@@ -62,8 +67,9 @@ class SessionNotifier extends ChangeNotifier {
         threshold: threshold,
         weeklyAverageScore: weeklyAverageScore,
       );
-    } catch (_) {
-
+    } catch (error, stackTrace) {
+      debugPrint('Failed to reschedule session reminder: $error');
+      debugPrintStack(stackTrace: stackTrace);
     }
   }
 }
