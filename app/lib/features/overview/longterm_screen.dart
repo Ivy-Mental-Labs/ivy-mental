@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:math' as math;
 
 import '../../data/models/session.dart';
 import '../../data/notifiers/session_notifier.dart';
@@ -15,108 +14,13 @@ class LongtermScreen extends StatefulWidget {
 }
 
 class _LongtermScreenState extends State<LongtermScreen> {
-  bool _isScrubbing = false;
-  Session? _selectedSession;
-  DateTime? _latestDate;
-  List<Session> _evaluationSessions = [];
-
-  String _formatDate(DateTime date) {
-    const months = [
-      'Jan.',
-      'Feb.',
-      'Mar.',
-      'Apr.',
-      'May',
-      'June',
-      'July',
-      'Aug.',
-      'Sep.',
-      'Oct.',
-      'Nov.',
-      'Dec.',
-    ];
-    return '${date.day.toString().padLeft(2, '0')}. ${months[date.month - 1]}';
-  }
-
-  void _updateScrubbingPosition(
-    double dy,
-    double topPadding,
-    double weekHeight,
-  ) {
-    if (_evaluationSessions.isEmpty || _latestDate == null) return;
-
-    final dayHeight = weekHeight / 7.0;
-
-    Session? closest;
-    double minDistance = double.infinity;
-
-    for (final session in _evaluationSessions) {
-      final sessionDate = _sessionDate(session);
-      if (sessionDate == null) continue;
-
-      final d = DateTime(sessionDate.year, sessionDate.month, sessionDate.day);
-      final daysAgo = _latestDate!.difference(d).inDays;
-      final y = topPadding + daysAgo * dayHeight;
-
-      final distance = (y - dy).abs();
-      if (distance < minDistance) {
-        minDistance = distance;
-        closest = session;
-      }
-    }
-
-    setState(() {
-      _selectedSession = closest;
-    });
-  }
-
-  DateTime? _sessionDate(Session session) {
-    try {
-      final parsed = DateTime.parse(session.id);
-      return parsed.toLocal();
-    } catch (_) {
-      return session.createdAt.toLocal();
-    }
-  }
+  TimeRange _selectedRange = TimeRange.sixMonths;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    final allSessions = context.watch<SessionNotifier>().sessions;
-    _evaluationSessions =
-        allSessions.where((s) => s.evaluation != null).toList()..sort((a, b) {
-          final dateA = _sessionDate(a) ?? a.createdAt;
-          final dateB = _sessionDate(b) ?? b.createdAt;
-          return dateB.compareTo(dateA);
-        });
-
-    if (_evaluationSessions.isNotEmpty) {
-      final rawLatest = _sessionDate(_evaluationSessions.first);
-      if (rawLatest != null) {
-        _latestDate = DateTime(rawLatest.year, rawLatest.month, rawLatest.day);
-      }
-    }
-
-    int maxDaysAgo = 0;
-    if (_evaluationSessions.isNotEmpty && _latestDate != null) {
-      final oldestDate = _sessionDate(_evaluationSessions.last);
-      if (oldestDate != null) {
-        maxDaysAgo = _latestDate!
-            .difference(
-              DateTime(oldestDate.year, oldestDate.month, oldestDate.day),
-            )
-            .inDays;
-      }
-    }
-
-    final int totalWeeks = (maxDaysAgo / 7.0).ceil();
-    final int weeksToDraw = math.max(totalWeeks, 4);
-
-    const double weekHeight = 100.0;
-    const double topPadding = 12.0;
-    const double bottomPadding = 40.0;
-    final double chartHeight =
-        topPadding + weeksToDraw * weekHeight + bottomPadding;
+    final sessions = context.watch<SessionNotifier>().sessions;
+    final analysis = LongtermAnalysis.fromSessions(sessions, _selectedRange);
 
     return Scaffold(
       backgroundColor: colors.backgroundPrimary,
@@ -124,221 +28,217 @@ class _LongtermScreenState extends State<LongtermScreen> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(22, 20, 22, 10),
-              child: IvyHeader(
-                showSettings: false,
-                trailing: IconButton(
-                  icon: Icon(Icons.arrow_forward, color: colors.textSecondary),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ),
+              padding: const EdgeInsets.fromLTRB(22, 20, 22, 8),
+              child: IvyHeader(showSettings: false, trailing: const SizedBox(width: 48, height: 48)),
             ),
-            SizedBox(height: 4),
-            SizedBox(height: 20, child: _buildHeaderLabels(context)),
-
-            Expanded(
-              child: _evaluationSessions.isEmpty
-                  ? Center(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 40),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.trending_up,
-                              size: 48,
-                              color: colors.textMuted.withOpacity(0.5),
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            Text(
-                              'No trends available yet',
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: colors.textPrimary,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.sm),
-                            Text(
-                              'Record your mental state regularly to see your long-term mood and emotion analysis charts here.',
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: colors.textSecondary,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w300,
-                                height: 1.4,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
-                  : SingleChildScrollView(
-                      physics: _isScrubbing
-                          ? const NeverScrollableScrollPhysics()
-                          : const BouncingScrollPhysics(),
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onLongPressStart: (details) {
-                          setState(() => _isScrubbing = true);
-                          _updateScrubbingPosition(
-                            details.localPosition.dy,
-                            topPadding,
-                            weekHeight,
-                          );
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 22, 18),
+              child: Row(
+                children: [
+                  IconButton(
+                    tooltip: 'Back',
+                    splashRadius: 22,
+                    icon: Icon(Icons.arrow_back, color: colors.textSecondary, size: 21),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: TimeRangeSelector(
+                        selectedRange: _selectedRange,
+                        onChanged: (range) {
+                          setState(() => _selectedRange = range);
                         },
-                        onLongPressMoveUpdate: (details) {
-                          _updateScrubbingPosition(
-                            details.localPosition.dy,
-                            topPadding,
-                            weekHeight,
-                          );
-                        },
-                        onLongPressEnd: (_) => setState(() => _isScrubbing = false),
-                        onTapDown: (details) {
-                          _updateScrubbingPosition(
-                            details.localPosition.dy,
-                            topPadding,
-                            weekHeight,
-                          );
-                        },
-                        child: CustomPaint(
-                          size: Size(double.infinity, chartHeight),
-                          painter: LongtermChartPainter(
-                            colors: colors,
-                            sessions: _evaluationSessions,
-                            latestDate: _latestDate,
-                            weekHeight: weekHeight,
-                            topPadding: topPadding,
-                            selectedSession: _selectedSession,
-                            formatDate: _formatDate,
-                          ),
-                        ),
                       ),
                     ),
+                  ),
+                  const SizedBox(width: 48),
+                ],
+              ),
             ),
-
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 20),
-              child: PrivacyHint(),
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(24, 8, 24, 26),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    LongtermTrendCard(analysis: analysis),
+                    SizedBox(height: AppSpacing.xxl),
+                    EmotionAverageCard(analysis: analysis),
+                    SizedBox(height: AppSpacing.xxl),
+                    const PrivacyHint(),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildHeaderLabels(BuildContext context) {
-    if (_evaluationSessions.isEmpty) return const SizedBox();
+enum TimeRange {
+  threeMonths('3M', 3),
+  sixMonths('6M', 6),
+  oneYear('1Y', 12);
 
+  final String label;
+  final int months;
+
+  const TimeRange(this.label, this.months);
+}
+
+class TimeRangeSelector extends StatelessWidget {
+  final TimeRange selectedRange;
+  final ValueChanged<TimeRange> onChanged;
+
+  const TimeRangeSelector({required this.selectedRange, required this.onChanged, super.key});
+
+  @override
+  Widget build(BuildContext context) {
     final colors = context.appColors;
-    final latest = _evaluationSessions.first;
 
-    final calmScore =
-        (latest.evaluation?['emotions']?['satisfied'] ?? 0.72) * 100;
-    final overallScore = (((latest.evaluation?['mood'] ?? 0.0) + 1) / 2) * 100;
-    final stressScore =
-        (latest.evaluation?['emotions']?['anxious'] ?? 0.34) * 100;
-    final energyScore =
-        (latest.evaluation?['emotions']?['happy'] ?? 0.61) * 100;
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final w = constraints.maxWidth;
-        const chartLeft = 90.0;
-        final chartRight = w - 20.0;
-        final chartWidth = chartRight - chartLeft;
-
-        double toX(double score) => chartLeft + (score / 100.0) * chartWidth;
-
-        List<double> idealX = [
-          toX(calmScore),
-          toX(overallScore),
-          toX(stressScore),
-          toX(energyScore),
-        ];
-
-        const minGap = 55.0;
-        List<MapEntry<int, double>> items = idealX.asMap().entries.toList();
-        items.sort((a, b) => a.value.compareTo(b.value));
-
-        List<double> adjusted = items.map((e) => e.value).toList();
-        for (int iter = 0; iter < 10; iter++) {
-          for (int i = 0; i < 3; i++) {
-            if (adjusted[i + 1] - adjusted[i] < minGap) {
-              double overlap = minGap - (adjusted[i + 1] - adjusted[i]);
-              adjusted[i] -= overlap / 2;
-              adjusted[i + 1] += overlap / 2;
-            }
-          }
-          if (adjusted[0] < chartLeft - 10) {
-            double shift = (chartLeft - 10) - adjusted[0];
-            for (int i = 0; i < 4; i++) adjusted[i] += shift;
-          }
-          if (adjusted[3] > chartRight + 10) {
-            double shift = adjusted[3] - (chartRight + 10);
-            for (int i = 0; i < 4; i++) adjusted[i] -= shift;
-          }
-        }
-
-        List<double> finalX = List.filled(4, 0.0);
-        for (int i = 0; i < 4; i++) {
-          finalX[items[i].key] = adjusted[i];
-        }
-
-        return Stack(
-          children: [
-            _LabelWidget(text: 'Calm', x: finalX[0], color: colors.accentDeep),
-            _LabelWidget(
-              text: 'overall',
-              x: finalX[1],
-              color: colors.textPrimary,
-              isBold: true,
+    return Container(
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: colors.backgroundCard.withValues(alpha: 0.82),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+        border: Border.all(color: colors.borderSubtle),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: TimeRange.values.map((range) {
+          final selected = selectedRange == range;
+          return GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => onChanged(range),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOutCubic,
+              width: 48,
+              height: 28,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: selected ? colors.accentDeep : Colors.transparent,
+                borderRadius: BorderRadius.circular(AppRadius.pill),
+              ),
+              child: Text(
+                range.label,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: selected ? Colors.white : colors.textPrimary,
+                  fontSize: 12,
+                  fontWeight: selected ? FontWeight.w500 : FontWeight.w400,
+                ),
+              ),
             ),
-            _LabelWidget(
-              text: 'Stress',
-              x: finalX[2],
-              color: colors.accentPeach,
-            ),
-            _LabelWidget(
-              text: 'Energy',
-              x: finalX[3],
-              color: colors.accentMint,
-            ),
-          ],
-        );
-      },
+          );
+        }).toList(),
+      ),
     );
   }
 }
 
-class _LabelWidget extends StatelessWidget {
-  final String text;
-  final double x;
-  final Color color;
-  final bool isBold;
+class LongtermTrendCard extends StatelessWidget {
+  final LongtermAnalysis analysis;
 
-  const _LabelWidget({
-    required this.text,
-    required this.x,
-    required this.color,
-    this.isBold = false,
-  });
+  const LongtermTrendCard({required this.analysis, super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      left: x - 30,
-      top: 0,
-      width: 60,
-      child: Text(
-        text,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          color: color,
-          fontSize: 12,
-          fontWeight: isBold ? FontWeight.w600 : FontWeight.w500,
-        ),
+    final colors = context.appColors;
+    final trend = analysis.stabilityTrendPercent;
+    final hasTrend = trend != null;
+    final trendColor = !hasTrend || trend >= 0 ? colors.accentDeep : colors.accentPeach;
+
+    return Container(
+      constraints: const BoxConstraints(minHeight: 405),
+      padding: const EdgeInsets.fromLTRB(20, 22, 18, 16),
+      decoration: BoxDecoration(
+        color: colors.backgroundCard,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: colors.borderSubtle),
+        boxShadow: [
+          BoxShadow(color: colors.shadowSoft.withValues(alpha: 0.15), blurRadius: 10, offset: const Offset(0, 8)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(height: AppSpacing.md),
+          Text(
+            'Overall trend',
+            textAlign: TextAlign.center,
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: colors.textMuted, fontSize: 11, fontWeight: FontWeight.w400),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            hasTrend ? _formatTrend(trend) : '--',
+            textAlign: TextAlign.center,
+            style: Theme.of(
+              context,
+            ).textTheme.displaySmall?.copyWith(color: trendColor, fontSize: 40, fontWeight: FontWeight.w300, height: 1),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            analysis.trendTitle,
+            textAlign: TextAlign.center,
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(color: trendColor, fontSize: 15, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: 5),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              analysis.trendDescription,
+              textAlign: TextAlign.center,
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: colors.textSecondary, fontSize: 12, height: 1.35),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          LongtermChart(analysis: analysis),
+          const SizedBox(height: AppSpacing.md),
+          const LongtermLegend(),
+          const SizedBox(height: AppSpacing.md),
+        ],
+      ),
+    );
+  }
+
+  String _formatTrend(double value) {
+    final rounded = value.round();
+    if (rounded > 0) return '+$rounded%';
+    return '$rounded%';
+  }
+}
+
+class LongtermChart extends StatelessWidget {
+  final LongtermAnalysis analysis;
+
+  const LongtermChart({required this.analysis, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+
+    return SizedBox(
+      height: 190,
+      width: double.infinity,
+      child: CustomPaint(
+        painter: LongtermChartPainter(colors: colors, points: analysis.points),
+        child: analysis.hasChartData
+            ? const SizedBox.expand()
+            : Center(
+                child: Text(
+                  'No entries yet',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: colors.textMuted, fontSize: 12),
+                ),
+              ),
       ),
     );
   }
@@ -346,225 +246,552 @@ class _LabelWidget extends StatelessWidget {
 
 class LongtermChartPainter extends CustomPainter {
   final AppThemeColors colors;
-  final List<Session> sessions;
-  final DateTime? latestDate;
-  final double weekHeight;
-  final double topPadding;
-  final Session? selectedSession;
-  final String Function(DateTime) formatDate;
+  final List<LongtermMonthPoint> points;
 
-  LongtermChartPainter({
-    required this.colors,
-    required this.sessions,
-    required this.latestDate,
-    required this.weekHeight,
-    required this.topPadding,
-    required this.selectedSession,
-    required this.formatDate,
+  LongtermChartPainter({required this.colors, required this.points});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final chartTop = size.height * 0.08;
+    final chartBottom = size.height * 0.76;
+    final left = 2.0;
+    final right = size.width - 54.0;
+    final width = right - left;
+
+    final gridPaint = Paint()
+      ..color = colors.textMuted.withValues(alpha: 0.12)
+      ..strokeWidth = 1;
+    for (var i = 0; i < points.length; i++) {
+      final x = _xForIndex(i, width, left);
+      canvas.drawLine(Offset(x, chartTop), Offset(x, chartBottom + 8), gridPaint);
+    }
+
+    drawSeries(
+      canvas,
+      size,
+      values: points.map((p) => p.calm).toList(),
+      color: colors.accentDeep,
+      label: 'Calm',
+      left: left,
+      width: width,
+      top: chartTop,
+      bottom: chartBottom,
+    );
+    drawSeries(
+      canvas,
+      size,
+      values: points.map((p) => p.energy).toList(),
+      color: colors.accentMint,
+      label: 'Energy',
+      left: left,
+      width: width,
+      top: chartTop,
+      bottom: chartBottom,
+    );
+    drawSeries(
+      canvas,
+      size,
+      values: points.map((p) => p.stress).toList(),
+      color: colors.accentPeach,
+      label: 'Stress',
+      left: left,
+      width: width,
+      top: chartTop,
+      bottom: chartBottom,
+    );
+
+    for (var i = 0; i < points.length; i++) {
+      final x = _xForIndex(i, width, left);
+      _paintText(canvas, points[i].label, Offset(x - 11, size.height - 19), colors.textMuted, 10, FontWeight.w500);
+    }
+  }
+
+  void drawSeries(
+    Canvas canvas,
+    Size size, {
+    required List<double?> values,
+    required Color color,
+    required String label,
+    required double left,
+    required double width,
+    required double top,
+    required double bottom,
+  }) {
+    final offsets = <Offset>[];
+    for (var i = 0; i < values.length; i++) {
+      final value = values[i];
+      if (value == null) continue;
+      offsets.add(Offset(_xForIndex(i, width, left), bottom - value * (bottom - top)));
+    }
+    if (offsets.isEmpty) return;
+
+    final path = _smoothPath(offsets);
+    canvas.drawPath(
+      path,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.2
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..color = color.withValues(alpha: 0.78),
+    );
+
+    final end = offsets.last;
+    canvas.drawCircle(end, 4.2, Paint()..color = colors.backgroundCard);
+    canvas.drawCircle(end, 3.2, Paint()..color = color);
+    _paintText(canvas, label, Offset(end.dx + 9, end.dy - 7), color, 11, FontWeight.w500);
+  }
+
+  double _xForIndex(int index, double width, double left) {
+    if (points.length <= 1) return left + width;
+    return left + width * (index / (points.length - 1));
+  }
+
+  Path _smoothPath(List<Offset> points) {
+    final path = Path()..moveTo(points.first.dx, points.first.dy);
+    for (var i = 1; i < points.length; i++) {
+      final previous = points[i - 1];
+      final current = points[i];
+      final controlDistance = (current.dx - previous.dx) * 0.45;
+      path.cubicTo(
+        previous.dx + controlDistance,
+        previous.dy,
+        current.dx - controlDistance,
+        current.dy,
+        current.dx,
+        current.dy,
+      );
+    }
+    return path;
+  }
+
+  void _paintText(Canvas canvas, String text, Offset offset, Color color, double fontSize, FontWeight fontWeight) {
+    final painter = TextPainter(
+      text: TextSpan(
+        text: text,
+        style: TextStyle(color: color, fontSize: fontSize, fontWeight: fontWeight),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    painter.paint(canvas, offset);
+  }
+
+  @override
+  bool shouldRepaint(covariant LongtermChartPainter oldDelegate) {
+    return oldDelegate.colors != colors || oldDelegate.points != points;
+  }
+}
+
+class LongtermLegend extends StatelessWidget {
+  const LongtermLegend({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _LegendItem(label: 'Calm', color: colors.accentDeep),
+        const SizedBox(width: AppSpacing.xl),
+        _LegendItem(label: 'Energy', color: colors.accentMint),
+        const SizedBox(width: AppSpacing.xl),
+        _LegendItem(label: 'Stress', color: colors.accentPeach),
+      ],
+    );
+  }
+}
+
+class _LegendItem extends StatelessWidget {
+  final String label;
+  final Color color;
+
+  const _LegendItem({required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 7,
+          height: 7,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          label,
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: colors.textSecondary, fontSize: 10, fontWeight: FontWeight.w400),
+        ),
+      ],
+    );
+  }
+}
+
+class EmotionAverageCard extends StatelessWidget {
+  final LongtermAnalysis analysis;
+
+  const EmotionAverageCard({required this.analysis, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+      decoration: BoxDecoration(
+        color: colors.backgroundCard,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: colors.borderSubtle),
+        boxShadow: [
+          BoxShadow(color: colors.shadowSoft.withValues(alpha: 0.15), blurRadius: 10, offset: const Offset(0, 8)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: AppSpacing.md),
+          RichText(
+            text: TextSpan(
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: colors.textSecondary, fontSize: 12, fontWeight: FontWeight.w400),
+              children: [
+                TextSpan(
+                  text: 'Emotional balance',
+                  style: TextStyle(color: colors.textPrimary, fontWeight: FontWeight.w600),
+                ),
+                TextSpan(text: '  •  ${analysis.range.label} average'),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          for (final emotion in LongtermAnalysis.emotions) ...[
+            EmotionAverageRow(emotion: emotion, value: analysis.emotionAverages[emotion.key]),
+            if (emotion != LongtermAnalysis.emotions.last) const SizedBox(height: AppSpacing.md),
+          ],
+          const SizedBox(height: AppSpacing.md),
+        ],
+      ),
+    );
+  }
+}
+
+class EmotionAverageRow extends StatelessWidget {
+  final EmotionDefinition emotion;
+  final double? value;
+
+  const EmotionAverageRow({required this.emotion, required this.value, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final score = ((value ?? 0) * 100).round();
+    final color = emotion.isPositive ? colors.accentMint : colors.accentPeach;
+    final dotColor = emotion.key == 'satisfied' || emotion.key == 'calm' ? colors.accentDeep : color;
+
+    return Row(
+      children: [
+        Container(
+          width: 9,
+          height: 9,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: dotColor),
+        ),
+        const SizedBox(width: AppSpacing.md),
+        SizedBox(
+          width: 72,
+          child: Text(
+            emotion.label,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: colors.textSecondary, fontSize: 12, fontWeight: FontWeight.w400),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.md),
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(AppRadius.pill),
+            child: Stack(
+              children: [
+                Container(height: 5, color: colors.textMuted.withValues(alpha: 0.14)),
+                FractionallySizedBox(
+                  widthFactor: (value ?? 0).clamp(0.0, 1.0),
+                  alignment: Alignment.centerLeft,
+                  child: Container(height: 5, color: dotColor),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.md),
+        SizedBox(
+          width: 52,
+          child: RichText(
+            textAlign: TextAlign.right,
+            text: TextSpan(
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: colors.textMuted, fontSize: 10, fontWeight: FontWeight.w400),
+              children: [
+                TextSpan(
+                  text: value == null ? '--' : '$score',
+                  style: TextStyle(color: colors.textPrimary, fontSize: 14, fontWeight: FontWeight.w500),
+                ),
+                const TextSpan(text: ' /100'),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+@immutable
+class LongtermAnalysis {
+  final TimeRange range;
+  final List<LongtermMonthPoint> points;
+  final Map<String, double?> emotionAverages;
+  final double? stabilityTrendPercent;
+  final int sessionCount;
+  final bool isEstimatedTrend;
+
+  const LongtermAnalysis({
+    required this.range,
+    required this.points,
+    required this.emotionAverages,
+    required this.stabilityTrendPercent,
+    required this.sessionCount,
+    required this.isEstimatedTrend,
   });
 
-  DateTime? _sessionDate(Session session) {
+  static const emotions = [
+    EmotionDefinition('happy', 'Happy', true),
+    EmotionDefinition('sad', 'Sad', false),
+    EmotionDefinition('satisfied', 'Satisfied', true),
+    EmotionDefinition('proud', 'Proud', true),
+    EmotionDefinition('anxious', 'Anxious', false),
+    EmotionDefinition('angry', 'Angry', false),
+    EmotionDefinition('afraid', 'Afraid', false),
+    EmotionDefinition('jealous', 'Jealous', false),
+  ];
+
+  bool get hasChartData => points.any((point) => point.sessionCount > 0);
+
+  String get trendTitle {
+    final trend = stabilityTrendPercent;
+    if (trend == null) return 'Start your baseline';
+    if (trend > 3) return 'Stability improving';
+    if (trend < -3) return 'Stability softening';
+    return 'Stability steady';
+  }
+
+  String get trendDescription {
+    final label = range.label;
+    final trend = stabilityTrendPercent;
+    if (sessionCount == 0) {
+      return 'Record your first check-in to see your emotional balance over $label.';
+    }
+    if (isEstimatedTrend) {
+      return 'Showing an early estimate from your available check-ins in the selected $label period.';
+    }
+    if (trend == null) {
+      return 'Your latest check-ins are forming a first baseline for the selected $label period.';
+    }
+    if (trend > 3) {
+      return 'Your emotional balance strengthened across the selected $label period.';
+    }
+    if (trend < -3) {
+      return 'Your emotional balance was less steady across the selected $label period.';
+    }
+    return 'Your emotional balance stayed relatively consistent across the selected $label period.';
+  }
+
+  factory LongtermAnalysis.fromSessions(List<Session> sessions, TimeRange range) {
+    final now = DateTime.now();
+    final bucketStarts = List.generate(range.months, (index) {
+      return DateTime(now.year, now.month - range.months + 1 + index);
+    });
+    final rangeStart = bucketStarts.first;
+    final rangeEnd = DateTime(now.year, now.month + 1);
+
+    final completeSessions = sessions.where((session) {
+      if (session.evaluation == null) return false;
+      final date = _sessionDate(session);
+      return !date.isBefore(rangeStart) && date.isBefore(rangeEnd);
+    }).toList()..sort((a, b) => _sessionDate(a).compareTo(_sessionDate(b)));
+
+    final byMonth = <DateTime, List<Session>>{for (final start in bucketStarts) start: <Session>[]};
+    for (final session in completeSessions) {
+      final date = _sessionDate(session);
+      final key = DateTime(date.year, date.month);
+      byMonth[key]?.add(session);
+    }
+
+    final fallbackCalm = _average(completeSessions, _calmScoreFraction);
+    final fallbackEnergy = _average(completeSessions, _energyScoreFraction);
+    final fallbackStress = _average(completeSessions, _stressScoreFraction);
+    final fallbackStability = _average(completeSessions, _stabilityScoreFraction);
+
+    final points = bucketStarts.map((start) {
+      final monthSessions = byMonth[start] ?? const <Session>[];
+      final hasMonthData = monthSessions.isNotEmpty;
+      return LongtermMonthPoint(
+        label: _monthLabel(start),
+        calm: _average(monthSessions, _calmScoreFraction) ?? fallbackCalm,
+        energy: _average(monthSessions, _energyScoreFraction) ?? fallbackEnergy,
+        stress: _average(monthSessions, _stressScoreFraction) ?? fallbackStress,
+        stability: _average(monthSessions, _stabilityScoreFraction) ?? fallbackStability,
+        sessionCount: monthSessions.length,
+        isEstimated: !hasMonthData && completeSessions.isNotEmpty,
+      );
+    }).toList();
+
+    final emotionAverages = <String, double?>{
+      for (final emotion in emotions)
+        emotion.key: _average(completeSessions, (session) => _emotionValue(session, emotion.key)),
+    };
+
+    final monthlyTrend = _trendPercent(points.where((p) => !p.isEstimated).toList());
+    final sessionTrend = _sessionTrendPercent(completeSessions);
+    final trend = monthlyTrend ?? sessionTrend ?? _baselineTrendPercent(fallbackStability);
+
+    return LongtermAnalysis(
+      range: range,
+      points: points,
+      emotionAverages: emotionAverages,
+      stabilityTrendPercent: trend,
+      sessionCount: completeSessions.length,
+      isEstimatedTrend: monthlyTrend == null && trend != null,
+    );
+  }
+
+  static DateTime _sessionDate(Session session) {
     try {
-      final parsed = DateTime.parse(session.id);
-      return parsed.toLocal();
+      return DateTime.parse(session.id).toLocal();
     } catch (_) {
       return session.createdAt.toLocal();
     }
   }
 
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (sessions.isEmpty || latestDate == null) return;
-
-    final chartLeft = 90.0;
-    final chartRight = size.width - 20.0;
-    final chartWidth = chartRight - chartLeft;
-    final dayHeight = weekHeight / 7.0;
-
-    double toX(double score) => chartLeft + (score / 100.0) * chartWidth;
-    double toY(DateTime date) {
-      final d = DateTime(date.year, date.month, date.day);
-      final daysAgo = latestDate!.difference(d).inDays;
-      return topPadding + daysAgo * dayHeight;
-    }
-
-    final gridLinePaint = Paint()
-      ..color = colors.textMuted.withOpacity(0.4)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0;
-
-    final maxDaysAgo = latestDate!
-        .difference(
-          DateTime(
-            _sessionDate(sessions.last)!.year,
-            _sessionDate(sessions.last)!.month,
-            _sessionDate(sessions.last)!.day,
-          ),
-        )
-        .inDays;
-
-    final weeksToDraw = math.max((maxDaysAgo / 7.0).ceil(), 4);
-
-    for (int w = 1; w <= weeksToDraw; w++) {
-      final y = topPadding + w * 7 * dayHeight;
-      canvas.drawLine(Offset(75, y), Offset(size.width - 15, y), gridLinePaint);
-
-      String label;
-      if (w == 1) {
-        label = '1 Week ago';
-      } else if (w == 2) {
-        label = '2 Weeks ago';
-      } else {
-        final date = latestDate!.subtract(Duration(days: w * 7));
-        label = formatDate(date);
-      }
-
-      final textSpan = TextSpan(
-        text: label,
-        style: TextStyle(
-          color: colors.textMuted,
-          fontSize: 10,
-          fontWeight: FontWeight.w400,
-        ),
-      );
-      final tp = TextPainter(text: textSpan, textDirection: TextDirection.ltr)
-        ..layout();
-      tp.paint(canvas, Offset(70 - tp.width, y - tp.height / 2));
-    }
-
-    final calmPoints = <Offset>[];
-    final overallPoints = <Offset>[];
-    final stressPoints = <Offset>[];
-    final energyPoints = <Offset>[];
-
-    for (final session in sessions) {
-      final rawDate = _sessionDate(session);
-      if (rawDate == null) continue;
-      final date = DateTime(rawDate.year, rawDate.month, rawDate.day);
-      final y = toY(date);
-
-      final calmScore =
-          (session.evaluation?['emotions']?['satisfied'] ?? 0.72) * 100;
-      final overallScore =
-          (((session.evaluation?['mood'] ?? 0.0) + 1) / 2) * 100;
-      final stressScore =
-          (session.evaluation?['emotions']?['anxious'] ?? 0.34) * 100;
-      final energyScore =
-          (session.evaluation?['emotions']?['happy'] ?? 0.61) * 100;
-
-      calmPoints.add(Offset(toX(calmScore), y));
-      overallPoints.add(Offset(toX(overallScore), y));
-      stressPoints.add(Offset(toX(stressScore), y));
-      energyPoints.add(Offset(toX(energyScore), y));
-    }
-
-    Path buildSmoothPath(List<Offset> points) {
-      final path = Path();
-      if (points.isEmpty) return path;
-      path.moveTo(points.first.dx, points.first.dy);
-      for (var i = 1; i < points.length; i++) {
-        final current = points[i - 1];
-        final next = points[i];
-        final dy = next.dy - current.dy;
-        final ctrl1 = Offset(current.dx, current.dy + dy * 0.4);
-        final ctrl2 = Offset(next.dx, next.dy - dy * 0.4);
-        path.cubicTo(ctrl1.dx, ctrl1.dy, ctrl2.dx, ctrl2.dy, next.dx, next.dy);
-      }
-      return path;
-    }
-
-    void drawPath(Path path, Color color, double width) {
-      canvas.drawPath(
-        path,
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = width
-          ..strokeCap = StrokeCap.round
-          ..color = color,
-      );
-    }
-
-    drawPath(
-      buildSmoothPath(calmPoints),
-      colors.accentDeep.withOpacity(0.8),
-      2.0,
-    );
-    drawPath(
-      buildSmoothPath(stressPoints),
-      colors.accentPeach.withOpacity(0.8),
-      2.0,
-    );
-    drawPath(
-      buildSmoothPath(energyPoints),
-      colors.accentMint.withOpacity(0.8),
-      2.0,
-    );
-    drawPath(buildSmoothPath(overallPoints), colors.textPrimary, 3.2);
-
-    if (selectedSession != null) {
-      final rawSDate = _sessionDate(selectedSession!);
-      if (rawSDate != null) {
-        final sDate = DateTime(rawSDate.year, rawSDate.month, rawSDate.day);
-        final overallScore =
-            (((selectedSession!.evaluation?['mood'] ?? 0.0) + 1) / 2) * 100;
-        final x = toX(overallScore);
-        final y = toY(sDate);
-
-        final dotPaint = Paint()..color = colors.textPrimary;
-        canvas.drawCircle(Offset(x, y), 6.5, dotPaint);
-
-        final innerPaint = Paint()..color = colors.backgroundCard;
-        canvas.drawCircle(Offset(x, y), 2.0, innerPaint);
-
-        final textSpan = TextSpan(
-          text: '${formatDate(sDate)}: ${overallScore.round()}',
-          style: TextStyle(
-            color: colors.textPrimary,
-            fontSize: 11,
-            fontWeight: FontWeight.w500,
-          ),
-        );
-        final tp = TextPainter(text: textSpan, textDirection: TextDirection.ltr)
-          ..layout();
-
-        final bubbleWidth = tp.width + 20.0;
-        final bubbleHeight = tp.height + 12.0;
-
-        double bubbleLeft = x - bubbleWidth - 12.0;
-        if (bubbleLeft < 10.0) {
-          bubbleLeft = x + 12.0;
-        }
-        final bubbleTop = y - bubbleHeight / 2;
-
-        final bubbleRect = RRect.fromRectAndRadius(
-          Rect.fromLTWH(bubbleLeft, bubbleTop, bubbleWidth, bubbleHeight),
-          const Radius.circular(8.0),
-        );
-
-        final shadowPaint = Paint()
-          ..color = Colors.black.withOpacity(0.06)
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.0);
-        canvas.drawRRect(bubbleRect.shift(const Offset(0, 3)), shadowPaint);
-
-        final bgPaint = Paint()..color = colors.backgroundCard;
-        canvas.drawRRect(bubbleRect, bgPaint);
-
-        final borderPaint = Paint()
-          ..color = colors.borderSubtle
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.0;
-        canvas.drawRRect(bubbleRect, borderPaint);
-
-        tp.paint(canvas, Offset(bubbleLeft + 10.0, bubbleTop + 6.0));
-      }
-    }
+  static double? _average(List<Session> sessions, double? Function(Session) valueFor) {
+    final values = sessions.map(valueFor).whereType<double>().toList();
+    if (values.isEmpty) return null;
+    return values.reduce((a, b) => a + b) / values.length;
   }
 
-  @override
-  bool shouldRepaint(covariant LongtermChartPainter oldDelegate) {
-    return oldDelegate.colors != colors ||
-        oldDelegate.sessions != sessions ||
-        oldDelegate.latestDate != latestDate ||
-        oldDelegate.selectedSession != selectedSession;
+  static double? _emotionValue(Session session, String key) {
+    final emotions = session.evaluation?['emotions'];
+    if (emotions is! Map || emotions[key] is! num) return null;
+    return ((emotions[key] as num).toDouble()).clamp(0.0, 1.0);
   }
+
+  static double? _calmScoreFraction(Session session) {
+    final anxious = _emotionValue(session, 'anxious');
+    final angry = _emotionValue(session, 'angry');
+    final afraid = _emotionValue(session, 'afraid');
+    final satisfied = _emotionValue(session, 'satisfied');
+    final negativeValues = [anxious, angry, afraid].whereType<double>().toList();
+    if (negativeValues.isEmpty && satisfied == null) return null;
+    final negative = negativeValues.isEmpty ? 0.0 : negativeValues.reduce((a, b) => a + b) / negativeValues.length;
+    return (((1 - negative) + (satisfied ?? (1 - negative))) / 2).clamp(0.0, 1.0);
+  }
+
+  static double? _energyScoreFraction(Session session) {
+    final values = [
+      _emotionValue(session, 'happy'),
+      _emotionValue(session, 'proud'),
+      _emotionValue(session, 'satisfied'),
+    ].whereType<double>().toList();
+    if (values.isEmpty) return null;
+    return (values.reduce((a, b) => a + b) / values.length).clamp(0.0, 1.0);
+  }
+
+  static double? _stressScoreFraction(Session session) {
+    final values = [
+      _emotionValue(session, 'anxious'),
+      _emotionValue(session, 'angry'),
+      _emotionValue(session, 'afraid'),
+    ].whereType<double>().toList();
+    if (values.isEmpty) return null;
+    return (values.reduce((a, b) => a + b) / values.length).clamp(0.0, 1.0);
+  }
+
+  static double? _stabilityScoreFraction(Session session) {
+    final calm = _calmScoreFraction(session);
+    final energy = _energyScoreFraction(session);
+    final stress = _stressScoreFraction(session);
+    final values = [calm, energy, if (stress != null) 1 - stress].whereType<double>().toList();
+    if (values.isEmpty) return null;
+    return (values.reduce((a, b) => a + b) / values.length).clamp(0.0, 1.0);
+  }
+
+  static double? _trendPercent(List<LongtermMonthPoint> points) {
+    if (points.length < 2) return null;
+    final split = (points.length / 2).floor();
+    final first = points.take(split).map((p) => p.stability).whereType<double>().toList();
+    final second = points.skip(split).map((p) => p.stability).whereType<double>().toList();
+    if (first.isEmpty || second.isEmpty) return null;
+    final firstAverage = first.reduce((a, b) => a + b) / first.length;
+    final secondAverage = second.reduce((a, b) => a + b) / second.length;
+    if (firstAverage == 0) return null;
+    return ((secondAverage - firstAverage) / firstAverage) * 100;
+  }
+
+  static double? _sessionTrendPercent(List<Session> sessions) {
+    final values = sessions.map(_stabilityScoreFraction).whereType<double>().toList();
+    if (values.length < 2) return null;
+    final split = (values.length / 2).floor();
+    final first = values.take(split).toList();
+    final second = values.skip(split).toList();
+    if (first.isEmpty || second.isEmpty) return null;
+    final firstAverage = first.reduce((a, b) => a + b) / first.length;
+    final secondAverage = second.reduce((a, b) => a + b) / second.length;
+    if (firstAverage == 0) return null;
+    return ((secondAverage - firstAverage) / firstAverage) * 100;
+  }
+
+  static double? _baselineTrendPercent(double? stability) {
+    if (stability == null) return null;
+    return (stability - 0.5) * 100;
+  }
+
+  static String _monthLabel(DateTime date) {
+    const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return labels[date.month - 1];
+  }
+}
+
+@immutable
+class LongtermMonthPoint {
+  final String label;
+  final double? calm;
+  final double? energy;
+  final double? stress;
+  final double? stability;
+  final int sessionCount;
+  final bool isEstimated;
+
+  const LongtermMonthPoint({
+    required this.label,
+    required this.calm,
+    required this.energy,
+    required this.stress,
+    required this.stability,
+    required this.sessionCount,
+    required this.isEstimated,
+  });
+}
+
+@immutable
+class EmotionDefinition {
+  final String key;
+  final String label;
+  final bool isPositive;
+
+  const EmotionDefinition(this.key, this.label, this.isPositive);
 }

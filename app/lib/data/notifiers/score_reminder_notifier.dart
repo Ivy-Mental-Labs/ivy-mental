@@ -73,8 +73,9 @@ class ScoreReminderNotifier extends ChangeNotifier {
         threshold: _threshold,
         weeklyAverageScore: score,
       );
-    } catch (_) {
-
+    } catch (error, stackTrace) {
+      debugPrint('Failed to reschedule score reminder: $error');
+      debugPrintStack(stackTrace: stackTrace);
     }
   }
 }
