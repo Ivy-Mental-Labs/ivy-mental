@@ -36,4 +36,3 @@ flutter:
     - assets/ml/vocab.txt
     - assets/ml/model.onnx.data
     - assets/media/
-    - assets/models/ggml-tiny.bin
