@@ -37,27 +37,57 @@ class _OverviewPagerScreenState extends State<OverviewPagerScreen> {
     return Scaffold(
       backgroundColor: colors.backgroundPrimary,
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: PageView(
-                controller: _pageController,
-                onPageChanged: (page) => setState(() => _currentPage = page),
-                children: const [EvaluationScreen(), HistoryScreen()],
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(22, 20, 22, 0),
+          child: Column(
+            children: [
+              IvyHeader(trailing: _OverviewOrbButton(onTap: () => Navigator.of(context).pop())),
+              const SizedBox(height: 16),
+              Expanded(
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: PageView(
+                        controller: _pageController,
+                        onPageChanged: (page) => setState(() => _currentPage = page),
+                        children: const [EvaluationScreen(), HistoryScreen()],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 9),
+                      child: Column(
+                        children: [
+                          PageIndicator(currentIndex: _currentPage),
+                          const SizedBox(height: AppSpacing.lg),
+                          const PrivacyHint(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 9),
-              child: Column(
-                children: [
-                  PageIndicator(currentIndex: _currentPage),
-                  const SizedBox(height: AppSpacing.lg),
-                  const PrivacyHint(),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
+      ),
+    );
+  }
+}
+
+class _OverviewOrbButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _OverviewOrbButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: const SizedBox(
+        width: 48,
+        height: 48,
+        child: Center(child: MoodOrb(size: 45, variant: MoodOrbVariant.deep)),
       ),
     );
   }

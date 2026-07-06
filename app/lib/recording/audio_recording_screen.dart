@@ -23,8 +23,7 @@ class AudioRecordingScreen extends StatefulWidget {
   State<AudioRecordingScreen> createState() => _AudioRecordingScreenState();
 }
 
-class _AudioRecordingScreenState extends State<AudioRecordingScreen>
-    with SingleTickerProviderStateMixin {
+class _AudioRecordingScreenState extends State<AudioRecordingScreen> with SingleTickerProviderStateMixin {
   bool _isRecording = false;
   final AudioRecorder _audioRecorder = AudioRecorder();
   final WhisperController _whisperController = WhisperController();
@@ -51,24 +50,21 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen>
     _initModel();
     _recordingStopwatch = Stopwatch();
 
-    _breathingController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    );
-    _breathingAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
-      CurvedAnimation(parent: _breathingController, curve: Curves.easeInOut),
-    );
+    _breathingController = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200));
+    _breathingAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.05,
+    ).animate(CurvedAnimation(parent: _breathingController, curve: Curves.easeInOut));
     _breathingController.repeat(reverse: true);
 
-    _videoController =
-        VideoPlayerController.asset('assets/media/magic_bubble_v1.mp4')
-          ..setLooping(true)
-          ..initialize().then((_) {
-            if (mounted) {
-              setState(() {});
-              _videoController.play();
-            }
-          });
+    _videoController = VideoPlayerController.asset('assets/media/magic_bubble_v1.mp4')
+      ..setLooping(true)
+      ..initialize().then((_) {
+        if (mounted) {
+          setState(() {});
+          _videoController.play();
+        }
+      });
   }
 
   Future<void> _initModel() async {
@@ -106,9 +102,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen>
 
   Future<void> _startRecording() async {
     if (!_isModelLoaded) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Model is still loading...')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Model is still loading...')));
       return;
     }
 
@@ -118,40 +112,30 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen>
         final path = '${directory.path}/temp_record.wav';
 
         await _audioRecorder.start(
-          const RecordConfig(
-            encoder: AudioEncoder.wav,
-            sampleRate: 16000,
-            numChannels: 1,
-          ),
+          const RecordConfig(encoder: AudioEncoder.wav, sampleRate: 16000, numChannels: 1),
           path: path,
         );
 
         _recordingStopwatch.start();
-        _recordingTimer = Timer.periodic(const Duration(milliseconds: 100), (
-          timer,
-        ) {
+        _recordingTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
           if (mounted) {
             final seconds = _recordingStopwatch.elapsed.inSeconds;
             final minutes = seconds ~/ 60;
             final secs = seconds % 60;
             setState(() {
-              _recordingDuration =
-                  '$minutes:${secs.toString().padLeft(2, '0')}';
+              _recordingDuration = '$minutes:${secs.toString().padLeft(2, '0')}';
             });
           }
         });
 
-        _amplitudeSub = _audioRecorder
-            .onAmplitudeChanged(const Duration(milliseconds: 100))
-            .listen((amp) {
-              if (mounted) {
-                final double normalized =
-                    (amp.current.clamp(-40.0, 0.0) + 40.0) / 40.0;
-                setState(() {
-                  _audioScale = 1.0 + (normalized * 0.4);
-                });
-              }
+        _amplitudeSub = _audioRecorder.onAmplitudeChanged(const Duration(milliseconds: 100)).listen((amp) {
+          if (mounted) {
+            final double normalized = (amp.current.clamp(-40.0, 0.0) + 40.0) / 40.0;
+            setState(() {
+              _audioScale = 1.0 + (normalized * 0.4);
             });
+          }
+        });
 
         setState(() {
           _isRecording = true;
@@ -160,9 +144,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen>
         });
       } else {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Microphone permission denied')),
-          );
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Microphone permission denied')));
         }
       }
     } catch (e) {
@@ -192,14 +174,9 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen>
       if (path != null) {
         final audioFile = File(path);
         if (audioFile.existsSync() && audioFile.lengthSync() > 0) {
-          debugPrint(
-            'Audio file exists, size: ${audioFile.lengthSync()} bytes',
-          );
+          debugPrint('Audio file exists, size: ${audioFile.lengthSync()} bytes');
 
-          final placeholderSession = Session(
-            id: DateTime.now().toIso8601String(),
-            createdAt: DateTime.now(),
-          );
+          final placeholderSession = Session(id: DateTime.now().toIso8601String(), createdAt: DateTime.now());
           await notifier.upsert(placeholderSession);
 
           if (mounted) {
@@ -233,10 +210,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen>
     final notifier = context.read<SessionNotifier>();
     try {
       final analysisResult = await widget.analyzer.analyze(text);
-      await notifier.updateEvaluation(sessionId, {
-        'mood': analysisResult.mood,
-        'emotions': analysisResult.emotions,
-      });
+      await notifier.updateEvaluation(sessionId, {'mood': analysisResult.mood, 'emotions': analysisResult.emotions});
       return true;
     } catch (e) {
       debugPrint('Analysis error: $e');
@@ -244,19 +218,12 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen>
     }
   }
 
-  Future<void> _processRecordingInBackground(
-    String path,
-    Session session,
-  ) async {
+  Future<void> _processRecordingInBackground(String path, Session session) async {
     final audioFile = File(path);
     final notifier = context.read<SessionNotifier>();
 
     try {
-      final result = await _whisperController.transcribe(
-        model: WhisperModel.tiny,
-        audioPath: path,
-        lang: 'en',
-      );
+      final result = await _whisperController.transcribe(model: WhisperModel.tiny, audioPath: path, lang: 'en');
 
       final transcriptText = result?.transcription.text.trim();
       if (transcriptText != null && transcriptText.isNotEmpty) {
@@ -287,22 +254,15 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen>
   void _openOverview({int initialPage = 0}) {
     Navigator.of(context).push(
       PageRouteBuilder<void>(
-        transitionDuration: const Duration(milliseconds: 450),
+        transitionDuration: const Duration(milliseconds: 350),
         reverseTransitionDuration: const Duration(milliseconds: 350),
         pageBuilder: (context, animation, secondaryAnimation) {
           return OverviewPagerScreen(initialPage: initialPage);
         },
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          final curved = CurvedAnimation(
-            parent: animation,
-            curve: Curves.easeOutCubic,
-            reverseCurve: Curves.easeOutCubic,
-          );
+          final curved = CurvedAnimation(parent: animation, curve: Curves.easeInOut, reverseCurve: Curves.easeInOut);
           return SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(1, 0),
-              end: Offset.zero,
-            ).animate(curved),
+            position: Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero).animate(curved),
             child: child,
           );
         },
@@ -328,11 +288,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen>
                     trailing: IconButton(
                       onPressed: _openOverview,
                       splashRadius: 22,
-                      icon: Icon(
-                        Icons.arrow_forward,
-                        size: 20,
-                        color: colors.accentDeep,
-                      ),
+                      icon: Icon(Icons.arrow_forward, size: 20, color: colors.accentDeep),
                     ),
                   ),
 
@@ -344,11 +300,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen>
                       child: Text(
                         _transcriptionText,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 23,
-                          fontWeight: FontWeight.w200,
-                          color: colors.textPrimary,
-                        ),
+                        style: TextStyle(fontSize: 23, fontWeight: FontWeight.w200, color: colors.textPrimary),
                       ),
                     ),
 
@@ -359,14 +311,10 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen>
                     child: AnimatedBuilder(
                       animation: _breathingAnimation,
                       builder: (context, child) {
-                        final currentScale = _isRecording
-                            ? _audioScale
-                            : _breathingAnimation.value;
+                        final currentScale = _isRecording ? _audioScale : _breathingAnimation.value;
                         return AnimatedScale(
                           scale: currentScale,
-                          duration: _isRecording
-                              ? const Duration(milliseconds: 150)
-                              : Duration.zero,
+                          duration: _isRecording ? const Duration(milliseconds: 150) : Duration.zero,
                           curve: Curves.easeOutQuad,
                           child: child,
                         );
@@ -378,21 +326,15 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen>
                           Container(
                             width: 200,
                             height: 200,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                            ),
+                            decoration: const BoxDecoration(shape: BoxShape.circle),
                             child: ClipOval(
                               child: _videoController.value.isInitialized
                                   ? SizedBox.expand(
                                       child: FittedBox(
                                         fit: BoxFit.cover,
                                         child: SizedBox(
-                                          width:
-                                              _videoController.value.size.width,
-                                          height: _videoController
-                                              .value
-                                              .size
-                                              .height,
+                                          width: _videoController.value.size.width,
+                                          height: _videoController.value.size.height,
                                           child: VideoPlayer(_videoController),
                                         ),
                                       ),
@@ -444,30 +386,21 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen>
                             offset: const Offset(0, 1.5),
                           ),
                         ],
-                        border: Border.all(
-                          color: Colors.grey.withValues(alpha: 0.1),
-                          width: 1,
-                        ),
+                        border: Border.all(color: Colors.grey.withValues(alpha: 0.1), width: 1),
                       ),
                       child: Center(
                         child: AnimatedSwitcher(
                           duration: const Duration(milliseconds: 300),
-                          transitionBuilder:
-                              (Widget child, Animation<double> animation) {
-                                return ScaleTransition(
-                                  scale: animation,
-                                  child: child,
-                                );
-                              },
+                          transitionBuilder: (Widget child, Animation<double> animation) {
+                            return ScaleTransition(scale: animation, child: child);
+                          },
                           child: _isTranscribing
                               ? SizedBox(
                                   key: const ValueKey('loading'),
                                   width: 30,
                                   height: 30,
                                   child: CircularProgressIndicator(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primary,
+                                    color: Theme.of(context).colorScheme.primary,
                                     strokeWidth: 2,
                                   ),
                                 )
@@ -484,8 +417,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen>
                               : Icon(
                                   Icons.mic_none,
                                   key: const ValueKey('mic'),
-                                  color: Theme.of(context).colorScheme.onSurface
-                                      .withValues(alpha: 0.4),
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                                   size: 30,
                                 ),
                         ),
@@ -498,11 +430,7 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen>
                       padding: const EdgeInsets.only(top: 25.0),
                       child: Text(
                         _recordingDuration,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: colors.textMuted,
-                        ),
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: colors.textMuted),
                       ),
                     )
                   else
