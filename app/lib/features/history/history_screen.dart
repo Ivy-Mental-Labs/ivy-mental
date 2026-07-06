@@ -127,6 +127,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             : mood <= -0.2
             ? MoodOrbVariant.peach
             : MoodOrbVariant.deep,
+        emotion: _dominantEmotion(session.evaluation?['emotions']),
         session: session,
       );
     }).toList();
@@ -147,6 +148,25 @@ class _HistoryScreenState extends State<HistoryScreen> {
     return (words / 26).clamp(1, 9).round();
   }
 
+  String? _dominantEmotion(Map? emotions) {
+    if (emotions == null) return null;
+
+    String? bestLabel;
+    var bestValue = -1.0;
+    for (final entry in emotions.entries) {
+      final value = entry.value;
+      if (value is num) {
+        final score = value.toDouble();
+        if (score > bestValue) {
+          bestValue = score;
+          bestLabel = entry.key.toString();
+        }
+      }
+    }
+
+    return bestLabel?.toLowerCase();
+  }
+
   String _snippet(String? transcript) {
     final text = transcript?.trim();
     if (text == null || text.isEmpty) {
@@ -163,9 +183,10 @@ class ExperienceItem {
   final String meta;
   final String title;
   final MoodOrbVariant variant;
+  final String? emotion;
   final Session? session;
 
-  const ExperienceItem({required this.meta, required this.title, required this.variant, this.session});
+  const ExperienceItem({required this.meta, required this.title, required this.variant, this.emotion, this.session});
 }
 
 class ExperienceCard extends StatelessWidget {
@@ -193,7 +214,9 @@ class ExperienceCard extends StatelessWidget {
           ),
           child: Row(
             children: [
-              MoodOrb(size: 42, variant: item.variant),
+              if (item.emotion != null)
+                EmotionBubble(emotion: item.emotion ?? _emotionForVariant(item.variant), size: 42),
+
               const SizedBox(width: AppSpacing.lg),
               Expanded(
                 child: Column(
@@ -231,5 +254,16 @@ class ExperienceCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _emotionForVariant(MoodOrbVariant variant) {
+    switch (variant) {
+      case MoodOrbVariant.mint:
+        return 'happy';
+      case MoodOrbVariant.peach:
+        return 'angry';
+      case MoodOrbVariant.deep:
+    }
+    return 'satisfied';
   }
 }
