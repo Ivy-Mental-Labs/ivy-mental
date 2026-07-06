@@ -45,6 +45,7 @@ class SessionNotifier extends ChangeNotifier {
     await _repo.delete(id);
     _sessions = _repo.getAll();
     notifyListeners();
+    await _reschedule();
   }
 
   Future<void> _reschedule() async {
