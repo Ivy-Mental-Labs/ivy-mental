@@ -11,7 +11,6 @@ import '../services/tokenizer.dart';
 
 class OnnxTextAnalyzer implements TextAnalyzer {
   static const String _modelAssetPath = 'assets/ml/model.onnx';
-  static const String _modelDataAssetPath = 'assets/ml/model.onnx.data';
   static const String _vocabAssetPath = 'assets/ml/vocab.txt';
 
   static const List<String> _emotionLabels = [
@@ -38,7 +37,7 @@ class OnnxTextAnalyzer implements TextAnalyzer {
     _session = OrtSession.fromFile(modelFile, options);
 
     final vocabContent = await rootBundle.loadString(_vocabAssetPath);
-    _tokenizer = BertTokenizer(maxLength: _seqLength);
+    _tokenizer = BertTokenizer(maxLength: _seqLength, doLowerCase: false);
     _tokenizer.loadFromString(vocabContent);
   }
 
@@ -54,12 +53,8 @@ class OnnxTextAnalyzer implements TextAnalyzer {
     final modelFile = File(
       '${modelDir.path}${Platform.pathSeparator}model.onnx',
     );
-    final modelDataFile = File(
-      '${modelDir.path}${Platform.pathSeparator}model.onnx.data',
-    );
 
     await _copyAssetIfNeeded(_modelAssetPath, modelFile);
-    await _copyAssetIfNeeded(_modelDataAssetPath, modelDataFile);
 
     return modelFile;
   }

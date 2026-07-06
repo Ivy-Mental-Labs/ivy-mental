@@ -14,9 +14,10 @@ class BertTokenizer {
   static const String continuingSubwordPrefix = '##';
 
   final int maxLength;
+  final bool doLowerCase;
   late final Map<String, int> _vocab;
 
-  BertTokenizer({this.maxLength = 128});
+  BertTokenizer({this.maxLength = 128, this.doLowerCase = true});
 
   void loadFromString(String vocabContent) {
     _vocab = {};
@@ -34,7 +35,7 @@ class BertTokenizer {
   bool _inVocab(String token) => _vocab.containsKey(token);
 
   String _normalize(String text) {
-    var result = text.toLowerCase();
+    var result = doLowerCase ? text.toLowerCase() : text;
     result = result.replaceAll('\n', ' ');
     result = result.replaceAll('\r', ' ');
     result = result.replaceAll('\t', ' ');
