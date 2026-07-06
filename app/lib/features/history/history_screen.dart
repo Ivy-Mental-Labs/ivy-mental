@@ -50,77 +50,69 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final sessions = context.watch<SessionNotifier>().sessions;
     final items = _itemsFromSessions(sessions);
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(22, 20, 22, 0),
-      child: Column(
-        children: [
-          IvyHeader(trailing: _OverviewOrbButton(onTap: () => Navigator.of(context).pop())),
-          const SizedBox(height: 52),
-          Text(
-            'Your experiences',
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(color: colors.textSecondary, fontSize: 18, fontWeight: FontWeight.w200),
-          ),
-          const SizedBox(height: 42),
-          Expanded(
-            child: sessions.isEmpty
-                ? Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 32),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.history,
-                            size: 48,
-                            color: colors.textMuted.withOpacity(0.5),
+    return Column(
+      children: [
+        const SizedBox(height: 24),
+        Text(
+          'Your experiences',
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(color: colors.textSecondary, fontSize: 18, fontWeight: FontWeight.w200),
+        ),
+        const SizedBox(height: 42),
+        Expanded(
+          child: sessions.isEmpty
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.history, size: 48, color: colors.textMuted.withOpacity(0.5)),
+                        const SizedBox(height: AppSpacing.md),
+                        Text(
+                          'No entries yet',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: colors.textPrimary,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
                           ),
-                          const SizedBox(height: AppSpacing.md),
-                          Text(
-                            'No entries yet',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              color: colors.textPrimary,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                            ),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Text(
+                          'Hold the microphone button on the home screen to record your first check-in.',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: colors.textSecondary,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w300,
+                            height: 1.4,
                           ),
-                          const SizedBox(height: AppSpacing.sm),
-                          Text(
-                            'Hold the microphone button on the home screen to record your first check-in.',
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: colors.textSecondary,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w300,
-                              height: 1.4,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  )
-                : ListView.separated(
-                    controller: _scrollController,
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.only(bottom: 24),
-                    itemCount: items.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
-                    itemBuilder: (context, index) {
-                      final item = items[index];
-                      return ExperienceCard(
-                        item: item,
-                        onTap: item.session == null
-                            ? null
-                            : () => Navigator.of(
-                                context,
-                              ).push(MaterialPageRoute(builder: (_) => HistoryEntryScreen(session: item.session!))),
-                      );
-                    },
                   ),
-          ),
-        ],
-      ),
+                )
+              : ListView.separated(
+                  controller: _scrollController,
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.only(bottom: 24),
+                  itemCount: items.length,
+                  separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
+                  itemBuilder: (context, index) {
+                    final item = items[index];
+                    return ExperienceCard(
+                      item: item,
+                      onTap: item.session == null
+                          ? null
+                          : () => Navigator.of(
+                              context,
+                            ).push(MaterialPageRoute(builder: (_) => HistoryEntryScreen(session: item.session!))),
+                    );
+                  },
+                ),
+        ),
+      ],
     );
   }
 
@@ -164,25 +156,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
       return text;
     }
     return '${text.substring(0, 30)}...';
-  }
-}
-
-class _OverviewOrbButton extends StatelessWidget {
-  final VoidCallback onTap;
-
-  const _OverviewOrbButton({required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: const SizedBox(
-        width: 48,
-        height: 48,
-        child: Center(child: MoodOrb(size: 45, variant: MoodOrbVariant.deep)),
-      ),
-    );
   }
 }
 

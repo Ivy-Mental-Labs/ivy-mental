@@ -23,15 +23,14 @@ class _EvaluationScreenState extends State<EvaluationScreen> {
   @override
   void initState() {
     super.initState();
-    _videoController =
-        VideoPlayerController.asset('assets/media/sentiment_animation.mp4')
-          ..setLooping(true)
-          ..initialize().then((_) {
-            if (mounted) {
-              setState(() {});
-              _videoController.play();
-            }
-          });
+    _videoController = VideoPlayerController.asset('assets/media/sentiment_animation.mp4')
+      ..setLooping(true)
+      ..initialize().then((_) {
+        if (mounted) {
+          setState(() {});
+          _videoController.play();
+        }
+      });
   }
 
   @override
@@ -52,188 +51,143 @@ class _EvaluationScreenState extends State<EvaluationScreen> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final compact = constraints.maxHeight < 690;
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(22, 20, 22, 0),
-          child: Column(
-            children: [
-              IvyHeader(
-                trailing: _OverviewOrbButton(
-                  onTap: () => Navigator.of(context).pop(),
-                ),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.only(bottom: AppSpacing.xl),
-                  child: Column(
-                    children: [
-                      SizedBox(height: compact ? 28 : 52),
-                      Text(
-                        "Your week's evaluation",
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: colors.textSecondary,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w200,
-                        ),
+        return Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.only(bottom: AppSpacing.xl),
+                child: Column(
+                  children: [
+                    SizedBox(height: compact ? 28 : 52),
+                    Text(
+                      "Your week's evaluation",
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: colors.textSecondary,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w200,
                       ),
-                      SizedBox(height: compact ? 18 : 28),
-                      SizedBox(
-                        width: 214,
-                        height: 214,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            ShaderMask(
-                              shaderCallback: (bounds) {
-                                return const RadialGradient(
-                                  center: Alignment.center,
-                                  radius: 0.5,
-                                  colors: [
-                                    Colors.white,
-                                    Colors.white,
-                                    Colors.transparent,
-                                  ],
-                                  stops: [0.0, 0.7, 1.0],
-                                ).createShader(bounds);
-                              },
-                              blendMode: BlendMode.dstIn,
-                              child: ClipOval(
-                                child: SizedBox(
-                                  width: 214,
-                                  height: 200,
-                                  child: _videoController.value.isInitialized
-                                      ? FittedBox(
-                                          fit: BoxFit.cover,
-                                          child: SizedBox(
-                                            width: _videoController
-                                                .value
-                                                .size
-                                                .width,
-                                            height: _videoController
-                                                .value
-                                                .size
-                                                .height,
-                                            child: VideoPlayer(
-                                              _videoController,
-                                            ),
-                                          ),
-                                        )
-                                      : const SizedBox.shrink(),
-                                ),
-                              ),
-                            ),
-                            ShaderMask(
-                              shaderCallback: (bounds) {
-                                return const RadialGradient(
-                                  center: Alignment.center,
-                                  radius: 0.5,
-                                  colors: [Colors.white, Colors.transparent],
-                                  stops: [0.6, 1.0],
-                                ).createShader(bounds);
-                              },
-                              blendMode: BlendMode.dstIn,
-                              child: ClipOval(
-                                child: BackdropFilter(
-                                  filter: ImageFilter.blur(
-                                    sigmaX: 8,
-                                    sigmaY: 10,
-                                  ),
-                                  child: Container(
-                                    width: 140,
-                                    height: 140,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: colors.backgroundPrimary
-                                          .withValues(alpha: 0.75),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                if (score == null)
-                                  Text(
-                                    '--',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .displaySmall
-                                        ?.copyWith(
-                                          color: colors.textPrimary,
-                                          fontSize: 38,
-                                          fontWeight: FontWeight.w300,
-                                          height: 1,
-                                        ),
-                                  )
-                                else
-                                  TweenAnimationBuilder<double>(
-                                    duration: const Duration(
-                                      milliseconds: 5000,
-                                    ),
-                                    curve: Curves.easeOutCubic,
-                                    tween: Tween<double>(
-                                      begin: 0.0,
-                                      end: score.toDouble(),
-                                    ),
-                                    builder: (context, value, child) {
-                                      return Text(
-                                        '${value.round()}',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .displaySmall
-                                            ?.copyWith(
-                                              color: colors.textPrimary,
-                                              fontSize: 38,
-                                              fontWeight: FontWeight.w300,
-                                              height: 1,
-                                            ),
-                                      );
-                                    },
-                                  ),
-                                const SizedBox(height: 7),
-                                Text(
-                                  'Overall',
-                                  style: Theme.of(context).textTheme.bodySmall
-                                      ?.copyWith(
-                                        color: colors.textSecondary,
-                                        fontSize: 11,
-                                      ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    ),
+                    SizedBox(height: compact ? 18 : 28),
+                    SizedBox(
+                      width: 214,
+                      height: 214,
+                      child: Stack(
+                        alignment: Alignment.center,
                         children: [
-                          MetricItem(
-                            label: 'Calm',
-                            value: calm != null ? '$calm' : '--',
-                            color: colors.accentDeep,
+                          ShaderMask(
+                            shaderCallback: (bounds) {
+                              return const RadialGradient(
+                                center: Alignment.center,
+                                radius: 0.5,
+                                colors: [Colors.white, Colors.white, Colors.transparent],
+                                stops: [0.0, 0.7, 1.0],
+                              ).createShader(bounds);
+                            },
+                            blendMode: BlendMode.dstIn,
+                            child: ClipOval(
+                              child: SizedBox(
+                                width: 214,
+                                height: 200,
+                                child: _videoController.value.isInitialized
+                                    ? FittedBox(
+                                        fit: BoxFit.cover,
+                                        child: SizedBox(
+                                          width: _videoController.value.size.width,
+                                          height: _videoController.value.size.height,
+                                          child: VideoPlayer(_videoController),
+                                        ),
+                                      )
+                                    : const SizedBox.shrink(),
+                              ),
+                            ),
                           ),
-                          MetricItem(
-                            label: 'Energy',
-                            value: energy != null ? '$energy' : '--',
-                            color: colors.accentMint,
+                          ShaderMask(
+                            shaderCallback: (bounds) {
+                              return const RadialGradient(
+                                center: Alignment.center,
+                                radius: 0.5,
+                                colors: [Colors.white, Colors.transparent],
+                                stops: [0.6, 1.0],
+                              ).createShader(bounds);
+                            },
+                            blendMode: BlendMode.dstIn,
+                            child: ClipOval(
+                              child: BackdropFilter(
+                                filter: ImageFilter.blur(sigmaX: 8, sigmaY: 10),
+                                child: Container(
+                                  width: 140,
+                                  height: 140,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: colors.backgroundPrimary.withValues(alpha: 0.75),
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
-                          MetricItem(
-                            label: 'Stress',
-                            value: stress != null ? '$stress' : '--',
-                            color: colors.accentPeach,
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (score == null)
+                                Text(
+                                  '--',
+                                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                                    color: colors.textPrimary,
+                                    fontSize: 38,
+                                    fontWeight: FontWeight.w300,
+                                    height: 1,
+                                  ),
+                                )
+                              else
+                                TweenAnimationBuilder<double>(
+                                  duration: const Duration(milliseconds: 5000),
+                                  curve: Curves.easeOutCubic,
+                                  tween: Tween<double>(begin: 0.0, end: score.toDouble()),
+                                  builder: (context, value, child) {
+                                    return Text(
+                                      '${value.round()}',
+                                      style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                                        color: colors.textPrimary,
+                                        fontSize: 38,
+                                        fontWeight: FontWeight.w300,
+                                        height: 1,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              const SizedBox(height: 7),
+                              Text(
+                                'Overall',
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.bodySmall?.copyWith(color: colors.textSecondary, fontSize: 11),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                      SizedBox(height: compact ? 24 : 42),
-                      MoodTrendCard(sessions: sessions),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        MetricItem(label: 'Calm', value: calm != null ? '$calm' : '--', color: colors.accentDeep),
+                        MetricItem(label: 'Energy', value: energy != null ? '$energy' : '--', color: colors.accentMint),
+                        MetricItem(
+                          label: 'Stress',
+                          value: stress != null ? '$stress' : '--',
+                          color: colors.accentPeach,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: compact ? 24 : 42),
+                    MoodTrendCard(sessions: sessions),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         );
       },
     );
@@ -261,24 +215,5 @@ class _EvaluationScreenState extends State<EvaluationScreen> {
     if (values.isEmpty) return null;
     final average = values.reduce((a, b) => a + b) / math.max(values.length, 1);
     return (average * 100).clamp(0, 100).round();
-  }
-}
-
-class _OverviewOrbButton extends StatelessWidget {
-  final VoidCallback onTap;
-
-  const _OverviewOrbButton({required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: const SizedBox(
-        width: 48,
-        height: 48,
-        child: Center(child: MoodOrb(size: 45, variant: MoodOrbVariant.deep)),
-      ),
-    );
   }
 }
