@@ -7,6 +7,8 @@ import 'package:video_player/video_player.dart';
 
 import '../../data/models/session.dart';
 import '../../data/notifiers/session_notifier.dart';
+import '../../data/notifiers/settings_notifier.dart';
+import '../../core/localization/app_translations.dart';
 import '../../shared/widgets/ivy_visuals.dart';
 import '../../theme.dart';
 
@@ -43,6 +45,7 @@ class _EvaluationScreenState extends State<EvaluationScreen> {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final sessions = context.watch<SessionNotifier>().sessions;
+    final settings = context.watch<SettingsNotifier>();
     final score = _overallScore(sessions);
     final calm = _emotionScore(sessions, 'satisfied');
     final energy = _emotionScore(sessions, 'happy');
@@ -61,7 +64,7 @@ class _EvaluationScreenState extends State<EvaluationScreen> {
                   children: [
                     SizedBox(height: compact ? 28 : 52),
                     Text(
-                      "Your week's evaluation",
+                      AppTranslations.get('your_week_eval', settings.appLanguage),
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         color: colors.textSecondary,
                         fontSize: 18,
@@ -158,7 +161,7 @@ class _EvaluationScreenState extends State<EvaluationScreen> {
                                 ),
                               const SizedBox(height: 7),
                               Text(
-                                'Overall',
+                                AppTranslations.get('overall', settings.appLanguage),
                                 style: Theme.of(
                                   context,
                                 ).textTheme.bodySmall?.copyWith(color: colors.textSecondary, fontSize: 11),
@@ -172,10 +175,10 @@ class _EvaluationScreenState extends State<EvaluationScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        MetricItem(label: 'Calm', value: calm != null ? '$calm' : '--', color: colors.accentDeep),
-                        MetricItem(label: 'Energy', value: energy != null ? '$energy' : '--', color: colors.accentMint),
+                        MetricItem(label: AppTranslations.get('calm', settings.appLanguage), value: calm != null ? '$calm' : '--', color: colors.accentDeep),
+                        MetricItem(label: AppTranslations.get('energy', settings.appLanguage), value: energy != null ? '$energy' : '--', color: colors.accentMint),
                         MetricItem(
-                          label: 'Stress',
+                          label: AppTranslations.get('stress', settings.appLanguage),
                           value: stress != null ? '$stress' : '--',
                           color: colors.accentPeach,
                         ),

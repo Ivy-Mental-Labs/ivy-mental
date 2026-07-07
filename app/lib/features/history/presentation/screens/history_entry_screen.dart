@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 
 import '../../../../data/models/session.dart';
 import '../../../../data/notifiers/session_notifier.dart';
+import '../../../../data/notifiers/settings_notifier.dart';
+import '../../../../core/localization/app_translations.dart';
 import '../../../../data/repositories/session_repository.dart';
 import '../../../../shared/widgets/ivy_visuals.dart';
 
@@ -358,7 +360,7 @@ class _HistoryEntryScreenState extends State<HistoryEntryScreen>
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Delete this entry?',
+                  AppTranslations.get('delete_entry', context.read<SettingsNotifier>().appLanguage),
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: colors.textPrimary,
@@ -368,7 +370,7 @@ class _HistoryEntryScreenState extends State<HistoryEntryScreen>
                 ),
                 SizedBox(height: 16),
                 Text(
-                  'Are you sure you want to permanently delete this experience? This action cannot be undone.',
+                  AppTranslations.get('delete_entry_confirm', context.read<SettingsNotifier>().appLanguage),
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: colors.textSecondary,
@@ -384,9 +386,9 @@ class _HistoryEntryScreenState extends State<HistoryEntryScreen>
                     GestureDetector(
                       onTap: () => Navigator.of(context).pop(false),
 
-                      child: const Text(
-                        'Cancel',
-                        style: TextStyle(
+                      child: Text(
+                        AppTranslations.get('cancel', context.read<SettingsNotifier>().appLanguage),
+                        style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w400,
                         ),
@@ -396,9 +398,9 @@ class _HistoryEntryScreenState extends State<HistoryEntryScreen>
                     GestureDetector(
                       onTap: () => Navigator.of(context).pop(true),
 
-                      child: const Text(
-                        'Delete',
-                        style: TextStyle(
+                      child: Text(
+                        AppTranslations.get('delete', context.read<SettingsNotifier>().appLanguage),
+                        style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w400,
                           color: Color(0xFF8A3033),
@@ -489,7 +491,7 @@ class _HistoryEntryScreenState extends State<HistoryEntryScreen>
               ),
               const SizedBox(height: 24),
               Text(
-                'We’re transcribing your check-in...',
+                AppTranslations.get('transcribing', context.read<SettingsNotifier>().appLanguage),
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: const Color(0xFF5F665F),
@@ -501,7 +503,7 @@ class _HistoryEntryScreenState extends State<HistoryEntryScreen>
               _SoftCard(
                 padding: const EdgeInsets.all(18),
                 child: Text(
-                  'Your voice entry is being processed in the background. Come back in a moment to see the full transcript and analysis.',
+                  AppTranslations.get('transcribing_desc', context.read<SettingsNotifier>().appLanguage),
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: const Color(0xFF737A76),
@@ -571,7 +573,7 @@ class _HistoryEntryScreenState extends State<HistoryEntryScreen>
                         vertical: 8,
                       ),
                       child: Text(
-                        'Delete this entry',
+                        AppTranslations.get('delete_entry_btn', context.read<SettingsNotifier>().appLanguage),
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Color(0xFF8A3033),
                           fontSize: 12,

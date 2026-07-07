@@ -1,8 +1,10 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/models/session.dart';
 import '../../data/notifiers/session_notifier.dart';
+import '../../data/notifiers/settings_notifier.dart';
+import '../../core/localization/app_translations.dart';
 import '../../shared/widgets/ivy_visuals.dart';
 import '../../theme.dart';
 
@@ -147,6 +149,7 @@ class LongtermTrendCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final settings = context.watch<SettingsNotifier>();
     final trend = analysis.stabilityTrendPercent;
     final hasTrend = trend != null;
     final trendColor = !hasTrend || trend >= 0 ? colors.accentDeep : colors.accentPeach;
@@ -167,7 +170,7 @@ class LongtermTrendCard extends StatelessWidget {
         children: [
           SizedBox(height: AppSpacing.md),
           Text(
-            'Overall trend',
+            AppTranslations.get('overall_trend', settings.appLanguage),
             textAlign: TextAlign.center,
             style: Theme.of(
               context,
@@ -183,7 +186,7 @@ class LongtermTrendCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            analysis.trendTitle,
+            analysis.trendTitle(settings.appLanguage),
             textAlign: TextAlign.center,
             style: Theme.of(
               context,
@@ -193,7 +196,7 @@ class LongtermTrendCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Text(
-              analysis.trendDescription,
+              analysis.trendDescription(settings.appLanguage),
               textAlign: TextAlign.center,
               style: Theme.of(
                 context,
@@ -225,6 +228,7 @@ class LongtermChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final settings = context.watch<SettingsNotifier>();
 
     return SizedBox(
       height: 190,
@@ -235,7 +239,7 @@ class LongtermChart extends StatelessWidget {
             ? const SizedBox.expand()
             : Center(
                 child: Text(
-                  'No entries yet',
+                  AppTranslations.get('no_entries_yet', settings.appLanguage),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(color: colors.textMuted, fontSize: 12),
                 ),
               ),
@@ -388,15 +392,16 @@ class LongtermLegend extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final settings = context.watch<SettingsNotifier>();
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _LegendItem(label: 'Calm', color: colors.accentDeep),
+        _LegendItem(label: AppTranslations.get('calm', settings.appLanguage), color: colors.accentDeep),
         const SizedBox(width: AppSpacing.xl),
-        _LegendItem(label: 'Energy', color: colors.accentMint),
+        _LegendItem(label: AppTranslations.get('energy', settings.appLanguage), color: colors.accentMint),
         const SizedBox(width: AppSpacing.xl),
-        _LegendItem(label: 'Stress', color: colors.accentPeach),
+        _LegendItem(label: AppTranslations.get('stress', settings.appLanguage), color: colors.accentPeach),
       ],
     );
   }
@@ -439,6 +444,7 @@ class EmotionAverageCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final settings = context.watch<SettingsNotifier>();
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
@@ -461,10 +467,10 @@ class EmotionAverageCard extends StatelessWidget {
               ).textTheme.bodySmall?.copyWith(color: colors.textSecondary, fontSize: 12, fontWeight: FontWeight.w400),
               children: [
                 TextSpan(
-                  text: 'Emotional balance',
+                  text: AppTranslations.get('emotional_balance', settings.appLanguage),
                   style: TextStyle(color: colors.textPrimary, fontWeight: FontWeight.w600),
                 ),
-                TextSpan(text: '  •  ${analysis.range.label} average'),
+                TextSpan(text: '  •  ${analysis.range.label} ${AppTranslations.get('average', settings.appLanguage)}'),
               ],
             ),
           ),
@@ -489,6 +495,7 @@ class EmotionAverageRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final settings = context.watch<SettingsNotifier>();
     final score = ((value ?? 0) * 100).round();
     final color = emotion.isPositive ? colors.accentMint : colors.accentPeach;
     final dotColor = emotion.key == 'satisfied' || emotion.key == 'calm' ? colors.accentDeep : color;
@@ -504,7 +511,7 @@ class EmotionAverageRow extends StatelessWidget {
         SizedBox(
           width: 72,
           child: Text(
-            emotion.label,
+            AppTranslations.get('emotion_${emotion.key}', settings.appLanguage),
             overflow: TextOverflow.ellipsis,
             style: Theme.of(
               context,
@@ -582,33 +589,33 @@ class LongtermAnalysis {
 
   bool get hasChartData => points.any((point) => point.sessionCount > 0);
 
-  String get trendTitle {
+  String trendTitle(String lang) {
     final trend = stabilityTrendPercent;
-    if (trend == null) return 'Start your baseline';
-    if (trend > 3) return 'Stability improving';
-    if (trend < -3) return 'Stability softening';
-    return 'Stability steady';
+    if (trend == null) return AppTranslations.get('start_baseline', lang);
+    if (trend > 3) return AppTranslations.get('stability_improving', lang);
+    if (trend < -3) return AppTranslations.get('stability_softening', lang);
+    return AppTranslations.get('stability_steady', lang);
   }
 
-  String get trendDescription {
+  String trendDescription(String lang) {
     final label = range.label;
     final trend = stabilityTrendPercent;
     if (sessionCount == 0) {
-      return 'Record your first check-in to see your emotional balance over $label.';
+      return AppTranslations.get('longterm_desc_empty', lang, arguments: {'label': label});
     }
     if (isEstimatedTrend) {
-      return 'Showing an early estimate from your available check-ins in the selected $label period.';
+      return AppTranslations.get('longterm_desc_early', lang, arguments: {'label': label});
     }
     if (trend == null) {
-      return 'Your latest check-ins are forming a first baseline for the selected $label period.';
+      return AppTranslations.get('longterm_desc_baseline', lang, arguments: {'label': label});
     }
     if (trend > 3) {
-      return 'Your emotional balance strengthened across the selected $label period.';
+      return AppTranslations.get('longterm_desc_improving', lang, arguments: {'label': label});
     }
     if (trend < -3) {
-      return 'Your emotional balance was less steady across the selected $label period.';
+      return AppTranslations.get('longterm_desc_softening', lang, arguments: {'label': label});
     }
-    return 'Your emotional balance stayed relatively consistent across the selected $label period.';
+    return AppTranslations.get('longterm_desc_steady', lang, arguments: {'label': label});
   }
 
   factory LongtermAnalysis.fromSessions(List<Session> sessions, TimeRange range) {
