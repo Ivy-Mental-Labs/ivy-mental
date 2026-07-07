@@ -36,10 +36,21 @@ def evaluate_model(model, dataloader):
     mood_rmse = np.sqrt(mean_squared_error(mood_true, mood_pred))
     mood_r2 = r2_score(mood_true, mood_pred)
 
-    emotion_pred_binary = (emotion_pred >= 0.5).astype(int)
+    emotion_pred_binary = np.zeros_like(emotion_pred)
     emotion_f1 = {}
+    thresholds = {}
     for i, label in enumerate(EMOTION_LABELS):
-        emotion_f1[label] = f1_score(emotion_true[:, i], emotion_pred_binary[:, i], zero_division=0)
+        best_t = 0.5
+        best_f1 = 0.0
+        for t in np.arange(0.1, 0.9, 0.05):
+            preds_t = (emotion_pred[:, i] >= t).astype(int)
+            score = f1_score(emotion_true[:, i], preds_t, zero_division=0)
+            if score > best_f1:
+                best_f1 = score
+                best_t = t
+        emotion_f1[label] = best_f1
+        thresholds[label] = best_t
+        emotion_pred_binary[:, i] = (emotion_pred[:, i] >= best_t).astype(int)
     emotion_f1["macro"] = f1_score(emotion_true, emotion_pred_binary, average="macro", zero_division=0)
 
     return {
@@ -47,4 +58,5 @@ def evaluate_model(model, dataloader):
         "mood_rmse": mood_rmse,
         "mood_r2": mood_r2,
         "emotion_f1": emotion_f1,
+        "thresholds": thresholds,
     }

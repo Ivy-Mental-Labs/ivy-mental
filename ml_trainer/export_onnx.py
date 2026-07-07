@@ -43,11 +43,16 @@ def export_to_onnx():
     onnx_model = onnx.load(str(temp_output_path))
     onnx.save(onnx_model, str(temp_output_path))
 
+    import onnxruntime.quantization.quant_utils as _qu
+    _qu.load_model_with_shape_infer = lambda model_path: onnx.load(str(model_path))
+    _qu.save_and_reload_model_with_shape_infer = lambda model: model
+
     from onnxruntime.quantization import quantize_dynamic, QuantType
     quantize_dynamic(
         model_input=str(temp_output_path),
         model_output=str(output_path),
         weight_type=QuantType.QInt8,
+        extra_options={"DefaultTensorType": onnx.TensorProto.FLOAT}
     )
     temp_output_path.unlink(missing_ok=True)
     print(f"Quantized INT8 ONNX model exported to {output_path}")

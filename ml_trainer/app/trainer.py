@@ -15,8 +15,21 @@ def train_model(model, train_loader, val_loader):
     warmup_steps = int(0.1 * total_steps)
     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=warmup_steps, num_training_steps=total_steps)
 
+    dataset = train_loader.dataset
+    if hasattr(dataset, "indices") and hasattr(dataset, "dataset"):
+        indices = dataset.indices
+        labels = [dataset.dataset.emotion_labels[i] for i in indices]
+    else:
+        labels = dataset.emotion_labels
+        
+    labels = torch.tensor(labels, dtype=torch.float)
+    pos_counts = labels.sum(dim=0)
+    neg_counts = len(labels) - pos_counts
+    pos_weight = neg_counts / torch.clamp(pos_counts, min=1.0)
+    pos_weight = pos_weight.to(device)
+
     mood_criterion = nn.MSELoss()
-    emotion_criterion = nn.BCEWithLogitsLoss()
+    emotion_criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
 
     best_val_loss = float("inf")
     history = {"train_loss": [], "val_loss": []}
