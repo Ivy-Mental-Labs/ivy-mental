@@ -28,7 +28,7 @@ class HistoryEntryViewData {
     this.transcript,
   });
 
-  factory HistoryEntryViewData.fromSession(Session session) {
+  factory HistoryEntryViewData.fromSession(Session session, String lang) {
     final evaluation = session.evaluation;
     final moodScore = (evaluation?['mood'] as num?)?.toDouble() ?? 0.24;
     final emotions = evaluation?['emotions'];
@@ -44,27 +44,28 @@ class HistoryEntryViewData {
               .toList()
         : <EmotionalLayerViewData>[];
 
-    final pattern = _patternFor(moodScore);
+    final pattern = _patternFor(moodScore, lang);
 
     return HistoryEntryViewData(
       moodScore: moodScore.clamp(-1.0, 1.0),
-      analysisText: _analysisTextFor(moodScore),
+      analysisText: _analysisTextFor(moodScore, lang),
       patternText: pattern.key,
       patternFrequency: pattern.value,
       emotionalLayers: emotionalLayers.isEmpty
-          ? HistoryEntryViewData.fallback().emotionalLayers
+          ? HistoryEntryViewData.fallback(lang).emotionalLayers
           : emotionalLayers,
       transcript: session.transcript,
     );
   }
 
-  factory HistoryEntryViewData.fallback() {
-    return const HistoryEntryViewData(
+  factory HistoryEntryViewData.fallback(String lang) {
+    return HistoryEntryViewData(
       moodScore: 0.24,
-      analysisText:
-          'You sounded mentally tired but still grounded. Work pressure was present, yet moments of optimism and self-awareness came through.',
-      patternText: "Increased feelings of gratitude after social interactions.",
-      patternFrequency: '2x this week',
+      analysisText: AppTranslations.get('analysis_tired', lang),
+      patternText: lang == 'de'
+          ? "Gesteigerte Gefühle der Dankbarkeit nach sozialen Interaktionen."
+          : "Increased feelings of gratitude after social interactions.",
+      patternFrequency: lang == 'de' ? '2x diese Woche' : '2x this week',
       emotionalLayers: [
         EmotionalLayerViewData(
           label: 'Calm',
@@ -110,7 +111,7 @@ class HistoryEntryViewData {
     );
   }
 
-  static MapEntry<String, String> _patternFor(double moodScore) {
+  static MapEntry<String, String> _patternFor(double moodScore, String lang) {
     int count = 0;
     String text = "";
     String frequency = "";
@@ -141,82 +142,89 @@ class HistoryEntryViewData {
       }).toList();
 
       if (moodScore <= -0.7) {
-        text =
-            "Your mood has been very low. Please take a step back, prioritize rest, and consider talking to someone you trust.";
+        text = AppTranslations.get('pattern_very_low', lang);
         count = recentSessions
             .where((s) => (s.evaluation!['mood'] as num).toDouble() <= -0.7)
             .length;
-        frequency =
-            "$count check-in${count != 1 ? "s" : ""} at this level this week";
+        if (count == 1) {
+          frequency = AppTranslations.get('freq_checkin_singular', lang);
+        } else {
+          frequency = AppTranslations.get('freq_checkin_plural', lang, arguments: {'count': '$count'});
+        }
       } else if (moodScore <= -0.2) {
-        text =
-            "Your mood was not good at all. Try next week to bring it back up with some sports and time for yourself.";
+        text = AppTranslations.get('pattern_low', lang);
         count = recentSessions.where((s) {
           final m = (s.evaluation!['mood'] as num).toDouble();
           return m > -0.7 && m <= -0.2;
         }).length;
-        frequency =
-            "$count check-in${count != 1 ? "s" : ""} at this level this week";
+        if (count == 1) {
+          frequency = AppTranslations.get('freq_checkin_singular', lang);
+        } else {
+          frequency = AppTranslations.get('freq_checkin_plural', lang, arguments: {'count': '$count'});
+        }
       } else if (moodScore < 0.2) {
-        text =
-            "Your week was very balanced, cool! Try to maintain this stable energy.";
+        text = AppTranslations.get('pattern_balanced', lang);
         count = recentSessions.where((s) {
           final m = (s.evaluation!['mood'] as num).toDouble();
           return m > -0.2 && m < 0.2;
         }).length;
-        frequency = "$count balanced day${count != 1 ? "s" : ""} this week";
+        if (count == 1) {
+          frequency = AppTranslations.get('freq_balanced_singular', lang);
+        } else {
+          frequency = AppTranslations.get('freq_balanced_plural', lang, arguments: {'count': '$count'});
+        }
       } else if (moodScore < 0.7) {
-        text =
-            "You had a positive day! Sharing these good moments can further boost your energy.";
+        text = AppTranslations.get('pattern_positive', lang);
         count = recentSessions.where((s) {
           final m = (s.evaluation!['mood'] as num).toDouble();
           return m >= 0.2 && m < 0.7;
         }).length;
-        frequency = "$count positive day${count != 1 ? "s" : ""} this week";
+        if (count == 1) {
+          frequency = AppTranslations.get('freq_positive_singular', lang);
+        } else {
+          frequency = AppTranslations.get('freq_positive_plural', lang, arguments: {'count': '$count'});
+        }
       } else {
-        text =
-            "That was a super day, keep it up! Maintain this positive momentum.";
+        text = AppTranslations.get('pattern_super', lang);
         count = recentSessions
             .where((s) => (s.evaluation!['mood'] as num).toDouble() >= 0.7)
             .length;
-        frequency =
-            "$count check-in${count != 1 ? "s" : ""} at this high level this week";
+        if (count == 1) {
+          frequency = AppTranslations.get('freq_checkin_singular', lang);
+        } else {
+          frequency = AppTranslations.get('freq_checkin_plural', lang, arguments: {'count': '$count'});
+        }
       }
     } catch (e) {
       if (moodScore <= -0.7) {
-        text =
-            "Your mood has been very low. Please take a step back, prioritize rest, and consider talking to someone you trust.";
-        frequency = "1 check-in at this level this week";
+        text = AppTranslations.get('pattern_very_low', lang);
+        frequency = AppTranslations.get('freq_checkin_singular', lang);
       } else if (moodScore <= -0.2) {
-        text =
-            "Your mood was not good at all. Try next week to bring it back up with some sports and time for yourself.";
-        frequency = "1 check-in at this level this week";
+        text = AppTranslations.get('pattern_low', lang);
+        frequency = AppTranslations.get('freq_checkin_singular', lang);
       } else if (moodScore < 0.2) {
-        text =
-            "Your week was very balanced, cool! Try to maintain this stable energy.";
-        frequency = "1 balanced day this week";
+        text = AppTranslations.get('pattern_balanced', lang);
+        frequency = AppTranslations.get('freq_balanced_singular', lang);
       } else if (moodScore < 0.7) {
-        text =
-            "You had a positive day! Sharing these good moments can further boost your energy.";
-        frequency = "1 positive day this week";
+        text = AppTranslations.get('pattern_positive', lang);
+        frequency = AppTranslations.get('freq_positive_singular', lang);
       } else {
-        text =
-            "That was a super day, keep it up! Maintain this positive momentum.";
-        frequency = "1 check-in at this high level this week";
+        text = AppTranslations.get('pattern_super', lang);
+        frequency = AppTranslations.get('freq_checkin_singular', lang);
       }
     }
 
     return MapEntry(text, frequency);
   }
 
-  static String _analysisTextFor(double moodScore) {
+  static String _analysisTextFor(double moodScore, String lang) {
     if (moodScore <= -0.2) {
-      return 'You sounded mentally tired but still grounded. Work pressure was present, yet moments of optimism and self-awareness came through.';
+      return AppTranslations.get('analysis_tired', lang);
     }
     if (moodScore >= 0.35) {
-      return 'Your check-in carried a steadier tone today, with clear signs of optimism and self-awareness coming through.';
+      return AppTranslations.get('analysis_steady', lang);
     }
-    return 'You sounded mentally tired but still grounded. Work pressure was present, yet moments of optimism and self-awareness came through.';
+    return AppTranslations.get('analysis_tired', lang);
   }
 
   static String _titleCase(String value) {
@@ -225,13 +233,13 @@ class HistoryEntryViewData {
   }
 }
 
-String _relativeDate(DateTime date) {
+String _relativeDate(DateTime date, String lang) {
   final now = DateTime.now();
   final today = DateTime(now.year, now.month, now.day);
   final day = DateTime(date.year, date.month, date.day);
   final diff = today.difference(day).inDays;
-  if (diff == 0) return 'Today';
-  if (diff == 1) return 'Yesterday';
+  if (diff == 0) return AppTranslations.get('today', lang);
+  if (diff == 1) return AppTranslations.get('yesterday', lang);
   return '${date.day}.${date.month}.${date.year}';
 }
 
@@ -424,15 +432,17 @@ class _HistoryEntryScreenState extends State<HistoryEntryScreen>
 
   @override
   Widget build(BuildContext context) {
+    final lang = context.watch<SettingsNotifier>().appLanguage;
     final isPending = widget.session?.status == SessionStatus.transcribing;
     final viewData = isPending
         ? null
         : widget.data ??
               (widget.session == null
-                  ? HistoryEntryViewData.fallback()
-                  : HistoryEntryViewData.fromSession(widget.session!));
+                  ? HistoryEntryViewData.fallback(lang)
+                  : HistoryEntryViewData.fromSession(widget.session!, lang));
     final headerLabel = _relativeDate(
       widget.session?.createdAt ?? DateTime.now(),
+      lang,
     );
 
     return Scaffold(
@@ -468,7 +478,9 @@ class _HistoryEntryScreenState extends State<HistoryEntryScreen>
             ),
             const SizedBox(height: 3),
             Text(
-              "$headerLabel's Analysis",
+              AppTranslations.get('header_analysis', lang, arguments: {
+                'date': headerLabel,
+              }),
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 color: const Color(0xFFB4B6B4),
@@ -528,7 +540,7 @@ class _HistoryEntryScreenState extends State<HistoryEntryScreen>
                 ),
               ),
               const SizedBox(height: 56),
-              const _SectionLabel('Mood'),
+              _SectionLabel(AppTranslations.get('mood', lang)),
               const SizedBox(height: 11),
               _MoodCard(
                 score: viewData.moodScore,
@@ -540,14 +552,14 @@ class _HistoryEntryScreenState extends State<HistoryEntryScreen>
                 child: _AnalysisCard(text: viewData.analysisText),
               ),
               const SizedBox(height: 25),
-              const _SectionLabel('Pattern Recognition'),
+              _SectionLabel(AppTranslations.get('pattern_recognition', lang)),
               const SizedBox(height: 11),
               _PatternCard(
                 text: viewData.patternText,
                 frequency: viewData.patternFrequency,
               ),
               const SizedBox(height: 24),
-              const _SectionLabel('Emotional Layers'),
+              _SectionLabel(AppTranslations.get('emotional_layers', lang)),
               const SizedBox(height: 11),
               ...viewData.emotionalLayers.map(
                 (layer) => Padding(
@@ -557,7 +569,7 @@ class _HistoryEntryScreenState extends State<HistoryEntryScreen>
               ),
               if (viewData.transcript?.trim().isNotEmpty ?? false) ...[
                 const SizedBox(height: 11),
-                const _SectionLabel('Transcript'),
+                _SectionLabel(AppTranslations.get('transcript', lang)),
                 const SizedBox(height: 11),
                 _TranscriptCard(text: viewData.transcript!.trim()),
               ],
@@ -951,7 +963,7 @@ class _EmotionalLayerTile extends StatelessWidget {
           SizedBox(
             width: 68,
             child: Text(
-              layer.label,
+              AppTranslations.get('emotion_${layer.label.toLowerCase()}', context.read<SettingsNotifier>().appLanguage),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(

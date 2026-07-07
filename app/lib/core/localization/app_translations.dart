@@ -40,6 +40,10 @@ class AppTranslations {
       'en': "Your week's evaluation",
       'de': "Deine Wochenauswertung",
     },
+    'mood': {
+      'en': 'Mood',
+      'de': 'Stimmung',
+    },
     'mood_trend': {
       'en': 'Mood trend',
       'de': 'Stimmungstrend',
@@ -291,6 +295,126 @@ class AppTranslations {
     'downloading_model': {
       'en': 'Downloading model (approx. 75MB)...',
       'de': 'Modell wird geladen (ca. 75MB)...',
+    },
+    'listening': {
+      'en': 'Listening...',
+      'de': 'Ich höre zu...',
+    },
+    'saving_checkin': {
+      'en': 'Saving your check-in...',
+      'de': 'Dein Check-in wird gespeichert...',
+    },
+    'pattern_recognition': {
+      'en': 'Pattern Recognition',
+      'de': 'Mustererkennung',
+    },
+    'emotional_layers': {
+      'en': 'Emotional Layers',
+      'de': 'Emotionale Ebenen',
+    },
+    'transcript': {
+      'en': 'Transcript',
+      'de': 'Transkript',
+    },
+    'emotion_calm': {
+      'en': 'Calm',
+      'de': 'Gelassenheit',
+    },
+    'emotion_joy': {
+      'en': 'Joy',
+      'de': 'Freude',
+    },
+    'emotion_stress': {
+      'en': 'Stress',
+      'de': 'Stress',
+    },
+    'header_analysis': {
+      'en': '{date}\'s Analysis',
+      'de': 'Analyse von {date}',
+    },
+    'analysis_tired': {
+      'en': 'You sounded mentally tired but still grounded. Work pressure was present, yet moments of optimism and self-awareness came through.',
+      'de': 'Du wirktest mental müde, aber dennoch gefasst. Arbeitsdruck war spürbar, doch Momente von Optimismus und Selbstreflexion schienen durch.',
+    },
+    'analysis_steady': {
+      'en': 'Your check-in carried a steadier tone today, with clear signs of optimism and self-awareness coming through.',
+      'de': 'Dein Check-in hatte heute einen stabileren Ton, mit deutlichen Anzeichen von Optimismus und Selbstreflexion.',
+    },
+    'pattern_very_low': {
+      'en': 'Your mood has been very low. Please take a step back, prioritize rest, and consider talking to someone you trust.',
+      'de': 'Deine Stimmung war sehr gedrückt. Bitte nimm dir eine Auszeit, priorisiere Erholung und sprich mit jemandem, dem du vertraust.',
+    },
+    'pattern_low': {
+      'en': 'Your mood was not good at all. Try next week to bring it back up with some sports and time for yourself.',
+      'de': 'Deine Stimmung war gar nicht gut. Versuche nächste Woche, sie mit Sport und Zeit für dich selbst wieder aufzubauen.',
+    },
+    'pattern_balanced': {
+      'en': 'Your week was very balanced, cool! Try to maintain this stable energy.',
+      'de': 'Deine Woche war sehr ausgeglichen, cool! Versuche, diese stabile Energie beizubehalten.',
+    },
+    'pattern_positive': {
+      'en': 'You had a positive day! Sharing these good moments can further boost your energy.',
+      'de': 'Du hattest einen positiven Tag! Diese guten Momente zu teilen, kann deine Energie weiter steigern.',
+    },
+    'pattern_super': {
+      'en': 'That was a super day, keep it up! Maintain this positive momentum.',
+      'de': 'Das war ein super Tag, weiter so! Behalte diesen positiven Schwung bei.',
+    },
+    'freq_checkin_singular': {
+      'en': '1 check-in at this level this week',
+      'de': '1 Check-in auf diesem Niveau diese Woche',
+    },
+    'freq_checkin_plural': {
+      'en': '{count} check-ins at this level this week',
+      'de': '{count} Check-ins auf diesem Niveau diese Woche',
+    },
+    'freq_balanced_singular': {
+      'en': '1 balanced day this week',
+      'de': '1 ausgeglichener Tag diese Woche',
+    },
+    'freq_balanced_plural': {
+      'en': '{count} balanced days this week',
+      'de': '{count} ausgeglichene Tage diese Woche',
+    },
+    'freq_positive_singular': {
+      'en': '1 positive day this week',
+      'de': '1 positiver Tag diese Woche',
+    },
+    'freq_positive_plural': {
+      'en': '{count} positive days this week',
+      'de': '{count} positive Tage diese Woche',
+    },
+    'notif_diary_title': {
+      'en': 'Diary Time!',
+      'de': 'Tagebuch-Zeit!',
+    },
+    'notif_diary_body': {
+      'en': 'Take a moment for today\'s entry.',
+      'de': 'Nimm dir einen kurzen Moment für deinen heutigen Eintrag.',
+    },
+    'notif_alert_title': {
+      'en': 'Mental Health Alert',
+      'de': 'Achtung: Mentale Gesundheit',
+    },
+    'notif_alert_body': {
+      'en': 'Your average score this week is low ({score}/100). Please take care of yourself and consider seeking help.',
+      'de': 'Dein durchschnittlicher Wert diese Woche ist niedrig ({score}/100). Bitte achte auf dich und hole dir ggf. Unterstützung.',
+    },
+    'notif_test_title': {
+      'en': 'Test Notification',
+      'de': 'Test-Benachrichtigung',
+    },
+    'notif_test_body': {
+      'en': 'This is a test! Notifications are working.',
+      'de': 'Das ist ein Test! Benachrichtigungen funktionieren.',
+    },
+    'today': {
+      'en': 'Today',
+      'de': 'Heute',
+    },
+    'yesterday': {
+      'en': 'Yesterday',
+      'de': 'Gestern',
     },
   };
 

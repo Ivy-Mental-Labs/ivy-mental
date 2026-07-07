@@ -345,12 +345,15 @@ class _AudioRecordingScreenState extends State<AudioRecordingScreen>
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text(
-                        _transcriptionText == 'Tell me about your day'
-                            ? AppTranslations.get(
-                                'tell_me_about_day',
-                                settings.appLanguage,
-                              )
-                            : _transcriptionText,
+                        _isTranscribing
+                            ? AppTranslations.get('transcribing', settings.appLanguage)
+                            : _isRecording
+                                ? AppTranslations.get('listening', settings.appLanguage)
+                                : _transcriptionText == 'Tell me about your day'
+                                    ? AppTranslations.get('tell_me_about_day', settings.appLanguage)
+                                    : _transcriptionText == 'Saving your check-in...'
+                                        ? AppTranslations.get('saving_checkin', settings.appLanguage)
+                                        : _transcriptionText,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 23,
