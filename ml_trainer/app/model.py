@@ -6,7 +6,7 @@ from app.config import BASE_MODEL, NUM_EMOTIONS
 
 
 class DistilBERTForMoodAndEmotions(nn.Module):
-    def __init__(self, freeze_encoder=True):
+    def __init__(self, freeze_encoder=False):
         super().__init__()
         self.encoder = DistilBertModel.from_pretrained(BASE_MODEL)
         if freeze_encoder:
