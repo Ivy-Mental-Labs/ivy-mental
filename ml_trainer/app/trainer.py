@@ -3,20 +3,52 @@ import torch.nn as nn
 from torch.optim import AdamW
 from transformers import get_linear_schedule_with_warmup
 
-from app.config import LEARNING_RATE, NUM_EPOCHS, MOOD_LOSS_WEIGHT, EMOTION_LOSS_WEIGHT, MODEL_DIR, DEVICE
+from app.config import LEARNING_RATE, ENCODER_LR, NUM_EPOCHS, MOOD_LOSS_WEIGHT, EMOTION_LOSS_WEIGHT, MODEL_DIR, DEVICE
 
 
 def train_model(model, train_loader, val_loader):
     device = torch.device(DEVICE)
     model.to(device)
 
-    optimizer = AdamW(model.parameters(), lr=LEARNING_RATE)
+    # Freeze all encoder parameters
+    for param in model.encoder.parameters():
+        param.requires_grad = False
+
+    # Unfreeze only the last transformer layer of DistilBERT (layer index 5)
+    for param in model.encoder.transformer.layer[-1].parameters():
+        param.requires_grad = True
+
+    # Parameter groups with differential learning rates
+    last_layer_params = list(model.encoder.transformer.layer[-1].parameters())
+    head_params = (
+        list(model.shared_projection.parameters()) +
+        list(model.mood_head.parameters()) +
+        list(model.emotion_head.parameters())
+    )
+
+    optimizer = AdamW([
+        {"params": last_layer_params, "lr": ENCODER_LR},
+        {"params": head_params, "lr": LEARNING_RATE}
+    ], weight_decay=0.01)
     total_steps = len(train_loader) * NUM_EPOCHS
     warmup_steps = int(0.1 * total_steps)
     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=warmup_steps, num_training_steps=total_steps)
 
+    dataset = train_loader.dataset
+    if hasattr(dataset, "indices") and hasattr(dataset, "dataset"):
+        indices = dataset.indices
+        labels = [dataset.dataset.emotion_labels[i] for i in indices]
+    else:
+        labels = dataset.emotion_labels
+        
+    labels = torch.tensor(labels, dtype=torch.float)
+    pos_counts = labels.sum(dim=0)
+    neg_counts = len(labels) - pos_counts
+    pos_weight = neg_counts / torch.clamp(pos_counts, min=1.0)
+    pos_weight = pos_weight.to(device)
+
     mood_criterion = nn.MSELoss()
-    emotion_criterion = nn.BCEWithLogitsLoss()
+    emotion_criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
 
     best_val_loss = float("inf")
     history = {"train_loss": [], "val_loss": []}

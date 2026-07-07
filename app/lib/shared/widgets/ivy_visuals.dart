@@ -2,11 +2,14 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../theme.dart';
 import '../../data/models/session.dart';
 import '../../features/score_reminder/score_reminder_settings_screen.dart';
 import '../../features/overview/longterm_screen.dart';
+import '../../data/notifiers/settings_notifier.dart';
+import '../../core/localization/app_translations.dart';
 
 class IvyHeader extends StatelessWidget {
   final Widget trailing;
@@ -53,16 +56,19 @@ class PrivacyHint extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final settings = context.watch<SettingsNotifier>();
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Icon(Icons.lock_outline, size: 13, color: colors.textMuted),
         const SizedBox(width: AppSpacing.sm),
         Text(
-          'On-device analysis',
-          style: Theme.of(
-            context,
-          ).textTheme.bodySmall?.copyWith(color: colors.textMuted, fontSize: 12, fontWeight: FontWeight.w300),
+          AppTranslations.get('on_device_analysis', settings.appLanguage),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: colors.textMuted,
+            fontSize: 12,
+            fontWeight: FontWeight.w300,
+          ),
         ),
       ],
     );
@@ -281,6 +287,7 @@ class ScoreOrb extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final settings = context.watch<SettingsNotifier>();
     return SizedBox(
       width: 214,
       height: 214,
@@ -313,8 +320,11 @@ class ScoreOrb extends StatelessWidget {
                 ),
                 const SizedBox(height: 7),
                 Text(
-                  'Overall',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: colors.textSecondary, fontSize: 11),
+                  AppTranslations.get('overall', settings.appLanguage),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: colors.textSecondary,
+                    fontSize: 11,
+                  ),
                 ),
               ],
             ),
@@ -452,6 +462,7 @@ class _MoodTrendCardState extends State<MoodTrendCard> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final settings = context.watch<SettingsNotifier>();
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LongtermScreen()));
@@ -474,7 +485,7 @@ class _MoodTrendCardState extends State<MoodTrendCard> with SingleTickerProvider
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Mood trend',
+                        AppTranslations.get('mood_trend', settings.appLanguage),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: colors.textPrimary,
                           fontSize: 12,
@@ -483,10 +494,11 @@ class _MoodTrendCardState extends State<MoodTrendCard> with SingleTickerProvider
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        _steadinessLabel(widget.sessions),
-                        style: Theme.of(
-                          context,
-                        ).textTheme.bodySmall?.copyWith(color: colors.textSecondary, fontSize: 10),
+                        _steadinessLabel(widget.sessions, settings.appLanguage),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: colors.textSecondary,
+                          fontSize: 10,
+                        ),
                       ),
                     ],
                   ),
@@ -546,7 +558,7 @@ List<double?> _weekMoodValues(List<Session> sessions, DateTime start) {
   });
 }
 
-String _steadinessLabel(List<Session> sessions) {
+String _steadinessLabel(List<Session> sessions, String lang) {
   final currentStart = _currentWeekStart();
   final previousStart = currentStart.subtract(const Duration(days: 7));
 
@@ -556,19 +568,22 @@ String _steadinessLabel(List<Session> sessions) {
   final previousVolatility = _weekVolatility(previousValues);
 
   if (previousVolatility == 0 || previousVolatility.isNaN) {
-    if (currentVolatility == 0) return 'No changes yet';
-    return currentVolatility < 0.15 ? '+0% steadier' : '-0% less steady';
+    if (currentVolatility == 0) return AppTranslations.get('no_changes_yet', lang);
+    return currentVolatility < 0.15 
+        ? AppTranslations.get('steadier', lang, arguments: {'rounded': '0'})
+        : AppTranslations.get('less_steady', lang, arguments: {'rounded': '0'});
   }
 
-  final improvement = ((previousVolatility - currentVolatility) / previousVolatility) * 100;
-  final rounded = improvement.abs().round();
+  final improvement =
+      ((previousVolatility - currentVolatility) / previousVolatility) * 100;
+  final rounded = improvement.abs().round().toString();
   if (improvement > 0) {
-    return '+$rounded% steadier';
+    return AppTranslations.get('steadier', lang, arguments: {'rounded': rounded});
   }
   if (improvement < 0) {
-    return '-$rounded% less steady';
+    return AppTranslations.get('less_steady', lang, arguments: {'rounded': rounded});
   }
-  return 'As steady as last week';
+  return AppTranslations.get('as_steady', lang);
 }
 
 double _weekVolatility(List<double?> values) {

@@ -1,121 +1,101 @@
 diary_entry,mood,happy,sad,satisfied,proud,anxious,angry,afraid,jealous
-"Today I started the day with clear focus and finished my most important task early. I felt productive and things went smoothly at work. In the evening I relaxed and felt grateful for the progress. I went to bed feeling satisfied and calm.",0.9,1,0,1,1,0,0,0,0
-"Everything went well today and I managed my schedule efficiently. I completed multiple tasks without stress. Later I met a friend and enjoyed a good conversation. I felt happy and proud.",0.8,1,0,1,1,0,0,0,0
-"I had a very successful day with strong results at work. I felt confident in my decisions and completed everything on time. In the evening I celebrated small wins. I felt satisfied and happy.",0.9,1,0,1,1,0,0,0,0
-"Today was smooth and positive with no major issues. I worked steadily and felt in control. Later I enjoyed a calm evening at home. I felt peaceful and content.",0.7,1,0,1,0,0,0,0,0
-"I made good progress on my project and felt motivated. Tasks were easy to manage today. In the evening I listened to music and relaxed. I felt satisfied overall.",0.7,1,0,1,0,0,0,0,0
-"Today I had a cheerful mood and enjoyed my morning routine. Work went fine and I stayed productive. Later I spent time with family and felt happy. I ended the day in a good mood.",0.8,1,0,0,0,0,0,0,0
-"I achieved most of my goals today and felt proud. Everything aligned well at work. In the evening I reflected on my progress positively. I felt happy and confident.",0.9,1,0,1,1,0,0,0,0
-"It was a good day with steady progress and no stress. I completed my tasks on time. Later I relaxed with a movie. I felt content and calm.",0.7,1,0,1,0,0,0,0,0
-"I had a productive and enjoyable day overall. Work was smooth and I felt efficient. In the evening I felt grateful and relaxed. I went to bed happy.",0.8,1,0,1,1,0,0,0,0
-"Today I felt positive energy throughout the day. I handled everything well and stayed focused. Later I enjoyed dinner with friends. I felt satisfied.",0.8,1,0,1,0,0,0,0,0
-"Today was mostly neutral with routine tasks at work. I completed everything without stress or excitement. I had lunch alone and spent the evening resting. I felt neither happy nor sad.",0.0,0,0,0,0,0,0,0,0
-"It was an ordinary day with predictable activities. I followed my schedule and got things done. In the evening I watched TV and relaxed. I felt neutral.",0.0,0,0,0,0,0,0,0,0
-"I went through my usual routine without any major events. Work was steady and uneventful. I felt emotionally flat but stable. I ended the day okay.",0.0,0,0,0,0,0,0,0,0
-"Today I did my normal tasks and errands. Nothing particularly good or bad happened. I relaxed in the evening and felt fine.",0.0,0,0,0,0,0,0,0,0
-"It was a quiet day with standard workload. I completed my tasks without pressure. Later I read a book and went to sleep early. I felt neutral.",0.0,0,0,0,0,0,0,0,0
-"Today felt balanced but uneventful. I worked steadily and had no strong emotions. In the evening I rested at home. I felt okay.",0.0,0,0,0,0,0,0,0,0
-"It was a normal day with no surprises. I handled responsibilities adequately. I spent the evening relaxing. I felt emotionally neutral.",0.0,0,0,0,0,0,0,0,0
-"I had a standard workday with regular tasks. Everything went as expected. I watched something light in the evening. I felt steady.",0.0,0,0,0,0,0,0,0,0
-"Today was uneventful and calm. I finished my work and had no emotional highs or lows. I went to bed feeling okay.",0.0,0,0,0,0,0,0,0,0
-"It was a simple day with routine activities. I felt stable and unaffected emotionally. I ended the day without stress.",0.0,0,0,0,0,0,0,0,0
-"Today I felt stressed due to multiple deadlines at work. I struggled to keep up with tasks. I felt anxious throughout the day. In the evening I couldn't relax properly.",-0.6,0,0,0,0,1,0,0,0
-"It was a difficult day with constant pressure. I felt overwhelmed and worried. I had trouble focusing. The anxiety stayed with me all day.",-0.6,0,0,0,0,1,0,0,0
-"Today I had too many tasks and felt stressed. I kept thinking about unfinished work. I felt anxious and tired. In the evening I remained uneasy.",-0.5,0,0,0,0,1,0,0,0
-"It was a tense day with work problems piling up. I felt nervous and distracted. I couldn't fully rest afterward.",-0.5,0,0,0,0,1,0,0,0
-"Today I felt pressure from responsibilities. I struggled to manage my time. I felt anxious and overwhelmed. I went to bed still worried.",-0.6,0,0,0,0,1,0,0,0
-"It was a stressful and tiring day. I had trouble keeping up with expectations. I felt uneasy most of the time.",-0.5,0,0,0,0,1,0,0,0
-"Today I was anxious about unfinished tasks. I kept checking my work repeatedly. I felt nervous throughout the day.",-0.5,0,0,0,0,1,0,0,0
-"It was a chaotic day at work with many interruptions. I felt stressed and overwhelmed. I couldn't relax in the evening.",-0.6,0,0,0,0,1,0,0,0
-"Today I felt worried about upcoming deadlines. I struggled to stay calm. I felt anxious most of the day.",-0.5,0,0,0,0,1,0,0,0
-"It was a pressured day with too many demands. I felt stressed and exhausted. I ended the day feeling uneasy.",-0.6,0,0,0,0,1,0,0,0
-"Today I got into an argument at work and felt angry. I was irritated throughout the day. I couldn't stop thinking about it later. I went to bed upset.",-0.7,0,0,0,0,0,1,0,0
-"It was a frustrating day with constant mistakes from others. I felt angry and annoyed. I struggled to stay calm.",-0.7,0,0,0,0,0,1,0,0
-"Today I felt irritated due to repeated interruptions. I lost my temper briefly. I stayed upset afterward.",-0.7,0,0,0,0,0,1,0,0
-"It was a heated day with disagreements. I felt angry and stressed. I couldn't relax in the evening.",-0.7,0,0,0,0,0,1,0,0
-"Today I was frustrated by unfair treatment. I felt anger building up. I remained irritated later.",-0.7,0,0,0,0,0,1,0,0
-"It was a difficult day with conflict at work. I felt angry and overwhelmed. I stayed upset afterward.",-0.7,0,0,0,0,0,1,0,0
-"Today I felt annoyed by repeated issues. I struggled emotionally. I felt angry most of the day.",-0.7,0,0,0,0,0,1,0,0
-"It was a frustrating day with arguments. I felt irritated and tense. I couldn't shake the feeling.",-0.7,0,0,0,0,0,1,0,0
-"Today I had conflicts that made me angry. I felt upset and restless. I stayed annoyed in the evening.",-0.7,0,0,0,0,0,1,0,0
-"It was a stressful and angry day. I felt frustrated and emotionally drained. I couldn't calm down easily.",-0.7,0,0,0,0,0,1,0,0
-"Today I felt very sad after receiving bad news. I struggled to stay motivated. I felt low all day. In the evening I felt emotionally drained.",-0.8,0,1,0,0,0,0,1,0
-"It was a heavy emotional day with sadness. I felt withdrawn and tired. I avoided social interaction.",-0.8,0,1,0,0,0,0,1,0
-"Today I felt lonely and down. I had no energy to do much. I felt sad throughout the day.",-0.8,0,1,0,0,0,0,1,0
-"It was a difficult day with grief. I felt emotionally exhausted. I stayed quiet and withdrawn.",-0.8,0,1,0,0,0,0,1,0
-"Today I struggled with sadness and low motivation. I felt disconnected from others. I ended the day feeling empty.",-0.8,0,1,0,0,0,0,1,0
-"It was a sorrowful day with little energy. I felt down and unmotivated. I stayed in bed a lot.",-0.8,0,1,0,0,0,0,1,0
-"Today I felt emotional pain and sadness. I avoided interaction. I felt drained all day.",-0.8,0,1,0,0,0,0,1,0
-"It was a low day with grief and fatigue. I felt sad and quiet. I struggled emotionally.",-0.8,0,1,0,0,0,0,1,0
-"Today I felt deeply sad and withdrawn. I had no motivation. I stayed alone.",-0.8,0,1,0,0,0,0,1,0
-"It was an emotionally heavy day. I felt low and exhausted. I ended the day feeling sad.",-0.8,0,1,0,0,0,0,1,0
-"Today I felt afraid due to uncertain events at work. I was anxious and alert. I struggled to relax.",-0.7,0,0,0,0,1,0,1,0
-"It was a fearful day with constant worry. I felt tense and uneasy. I stayed on edge.",-0.7,0,0,0,0,1,0,1,0
-"Today I felt nervous about possible outcomes. I was stressed and cautious. I couldn't calm down.",-0.7,0,0,0,0,1,0,1,0
-"It was a tense day with fear of mistakes. I felt anxious and afraid. I remained restless.",-0.7,0,0,0,0,1,0,1,0
-"Today I felt uneasy and scared about responsibilities. I stayed alert all day. I struggled to sleep.",-0.7,0,0,0,0,1,0,1,0
-"It was a worrying day with anxiety. I felt afraid and stressed. I couldn't relax.",-0.7,0,0,0,0,1,0,1,0
-"Today I felt fear due to uncertainty. I was tense and distracted. I stayed worried.",-0.7,0,0,0,0,1,0,1,0
-"It was a frightening day with stress. I felt anxious and afraid. I remained uneasy.",-0.7,0,0,0,0,1,0,1,0
-"Today I felt nervous and afraid about the future. I stayed tense all day. I couldn't relax.",-0.7,0,0,0,0,1,0,1,0
-"It was a fearful and stressful day. I felt anxious and exhausted. I went to bed worried.",-0.7,0,0,0,0,1,0,1,0
-"Today I felt jealous of a colleague's success. I kept comparing myself. I felt low and distracted.",-0.6,0,0,0,0,0,0,0,1
-"It was an envious day with self-doubt. I felt jealous and insecure. I stayed quiet.",-0.6,0,0,0,0,0,0,0,1
-"Today I struggled with comparison. I felt jealous and unhappy. I couldn't focus.",-0.6,0,0,0,0,0,0,0,1
-"It was a jealous day with emotional discomfort. I felt envious and sad. I reflected a lot.",-0.6,0,0,0,0,0,0,0,1
-"Today I felt jealousy about others' achievements. I was distracted and low. I stayed withdrawn.",-0.6,0,0,0,0,0,0,0,1
-"It was an envious day with insecurity. I felt jealous and tired. I kept thinking about others.",-0.6,0,0,0,0,0,0,0,1
-"Today I compared myself constantly. I felt jealous and uneasy. I struggled emotionally.",-0.6,0,0,0,0,0,0,0,1
-"It was a jealous day with sadness. I felt envious and unmotivated. I stayed quiet.",-0.6,0,0,0,0,0,0,0,1
-"Today I felt envy and self-doubt. I was distracted all day. I felt low in the evening.",-0.6,0,0,0,0,0,0,0,1
-"It was an envious and emotional day. I felt jealous and reflective. I ended the day quietly.",-0.6,0,0,0,0,0,0,0,1
-"Today was mixed with both good and bad moments. I felt happy in the morning but stressed later. I struggled to balance emotions.",0.0,1,0,0,0,1,0,0,0
-"It was a confusing day emotionally. I felt proud of some work but anxious about other tasks. I felt torn.",0.0,0,0,0,1,1,0,0,0
-"Today I had ups and downs throughout the day. I felt satisfied but also irritated. I couldn't settle emotionally.",-0.1,0,0,1,0,0,1,0,0
-"It was a mixed emotional day. I felt happy but also sad at different times. I reflected a lot.",-0.1,1,1,0,0,0,0,0,0
-"Today I experienced both success and stress. I felt proud but anxious. My mood kept changing.",0.1,0,0,0,1,1,0,0,0
-"It was a day of emotional contrast. I felt calm in the morning and angry later. I struggled to adjust.",-0.1,0,0,0,0,0,1,0,0
-"Today I felt both joy and worry. I was happy with progress but afraid of mistakes.",0.0,1,0,0,0,1,0,1,0
-"It was a mixed day with satisfaction and stress. I felt accomplished but uneasy.",0.0,0,0,1,0,1,0,0,0
-"Today I felt proud and also jealous at times. I struggled with comparison.",-0.1,0,0,0,1,0,0,0,1
-"It was a complex emotional day. I felt happy but also anxious. I ended the day tired.",0.0,1,0,0,0,1,0,0,0
-"Today I had a very productive day and felt proud of my progress. I completed important tasks early. I ended the day satisfied and happy.",0.9,1,0,1,1,0,0,0,0
-"Everything went smoothly today and I felt confident. I finished my work efficiently. I felt happy and relaxed in the evening.",0.8,1,0,1,1,0,0,0,0
-"Today I achieved my goals and felt proud. Work was successful and smooth. I felt satisfied at the end of the day.",0.9,1,0,1,1,0,0,0,0
-"It was a productive and positive day. I felt energized and completed everything on time. I felt good overall.",0.8,1,0,1,0,0,0,0,0
-"Today I had strong performance at work and felt proud. I enjoyed the results of my effort. I felt happy and content.",0.9,1,0,1,1,0,0,0,0
-"Today I worked steadily and achieved key tasks. I felt satisfied with progress. I relaxed in the evening.",0.8,1,0,1,0,0,0,0,0
-"It was a successful day with good outcomes. I felt confident and happy. I ended the day calmly.",0.9,1,0,1,1,0,0,0,0
-"Today I finished tasks early and felt proud. Everything went well. I felt satisfied and relaxed.",0.9,1,0,1,1,0,0,0,0
-"It was a great day with steady progress. I felt happy and productive. I ended the day in a good mood.",0.8,1,0,1,0,0,0,0,0
-"Today I accomplished my objectives and felt proud. I was satisfied with my work. I felt calm in the evening.",0.9,1,0,1,1,0,0,0,0
-"Today I felt stressed due to workload pressure. I struggled to keep up. I felt anxious all day.",-0.6,0,0,0,0,1,0,0,0
-"It was a hectic day with many tasks. I felt overwhelmed and tired. I couldn't relax afterward.",-0.5,0,0,0,0,1,0,0,0
-"Today I faced tight deadlines and felt nervous. I was anxious throughout the day.",-0.5,0,0,0,0,1,0,0,0
-"It was a stressful day with interruptions. I felt overwhelmed and uneasy.",-0.6,0,0,0,0,1,0,0,0
-"Today I felt pressure from responsibilities. I struggled emotionally. I felt anxious.",-0.5,0,0,0,0,1,0,0,0
-"It was a difficult day with stress. I felt tired and worried. I couldn't relax.",-0.5,0,0,0,0,1,0,0,0
-"Today I was anxious about work tasks. I kept worrying. I felt stressed all day.",-0.6,0,0,0,0,1,0,0,0
-"It was a chaotic day with pressure. I felt overwhelmed and nervous.",-0.5,0,0,0,0,1,0,0,0
-"Today I felt stress from deadlines. I was anxious and distracted.",-0.5,0,0,0,0,1,0,0,0
-"It was a worrying day with workload issues. I felt tense and tired.",-0.6,0,0,0,0,1,0,0,0
-"Today I got into an argument and felt angry. I was irritated throughout the day.",-0.7,0,0,0,0,0,1,0,0
-"It was a frustrating day with conflicts. I felt angry and upset.",-0.7,0,0,0,0,0,1,0,0
-"Today I felt irritation due to mistakes around me. I was angry and tense.",-0.7,0,0,0,0,0,1,0,0
-"It was a heated day with disagreements. I felt angry and stressed.",-0.7,0,0,0,0,0,1,0,0
-"Today I was upset due to unfairness. I felt anger building up.",-0.7,0,0,0,0,0,1,0,0
-"It was a difficult emotional day with anger. I felt frustrated and tired.",-0.7,0,0,0,0,0,1,0,0
-"Today I felt annoyed all day due to issues. I was irritated and restless.",-0.7,0,0,0,0,0,1,0,0
-"It was a frustrating day with arguments. I felt angry and uneasy.",-0.7,0,0,0,0,0,1,0,0
-"Today I experienced conflict and anger. I felt upset and tense.",-0.7,0,0,0,0,0,1,0,0
-"It was a stressful day full of anger. I felt frustrated and drained.",-0.7,0,0,0,0,0,1,0,0
-"Today I felt very sad and withdrawn after personal issues. I had no motivation. I felt low all day.",-0.8,0,1,0,0,0,0,1,0
-"It was a heavy emotional day with sadness. I felt exhausted and quiet.",-0.8,0,1,0,0,0,0,1,0
-"Today I felt lonely and down. I struggled emotionally. I stayed withdrawn.",-0.8,0,1,0,0,0,0,1,0
-"It was a sorrowful day with grief. I felt sad and tired.",-0.8,0,1,0,0,0,0,1,0
-"Today I felt emotional pain and sadness. I avoided interaction.",-0.8,0,1,0,0,0,0,1,0
-"It was a low day with sadness. I felt unmotivated and drained.",-0.8,0,1,0,0,0,0,1,0
-"Today I felt deep sadness and fatigue. I stayed quiet all day.",-0.8,0,1,0,0,0,0,1,0
-"It was an emotionally heavy day. I felt low and withdrawn.",-0.8,0,1,0,0,0,0,1,0
-"Today I struggled with grief and sadness. I felt exhausted.",-0.8,0,1,0,0,0,0,1,0
-"It was a sad and draining day. I felt low and quiet.",-0.8,0,1,0,0,0,0,1,0
+"Liebes Tagebuch, ich bin's wieder. halt, Heute lief alles wie am Schnürchen, halt, ich bin einfach rundum glücklich. Ich hatte heute so eine ähm, schlechte Laune, ich hätte bei jeder Kleinigkeit ausrasten können. Morgen ist zum Glück ein neuer Tag.",-0.02,1,0,0,0,0,1,0,0
+"Today was... interesting, to say the least. so basically, Every little task felt like an absolute mountain today, it was exhausting. I hope things turn out okay.",-0.25,0,0,0,0,1,0,0,0
+"Ich nehme das hier auf, weil heute echt verrückt war. also, Ich habe heute eine Präsentation gehalten und sie lief besser, als ich je also, gedacht hätte. Zeit, den Kopf für heute auszuschalten.",0.65,0,0,0,1,0,0,0,0
+"I just need to record this real quick. uh, I felt a sudden burst of optimism today, things are um, looking up. I had trouble sleeping last night because my thoughts um, wouldn't stop spinning. Glad I got that off my chest.",0.17,1,0,0,0,1,0,0,0
+"Whew, what a day. The traffic and delays um, today were enough to make me lose my mind. I spent some quality time doing absolutely nothing, and it uh, was perfect. Well, that was my day in a nutshell.",0.07,0,0,1,0,0,1,0,0
+"Well, today happened. I felt kind of, physically threatened and unsafe today, it was terrifying. Going to make myself some tea and unwind.",-0.41,0,0,0,0,0,0,1,0
+"Mann, heute war echt einiges los. Ich hatte heute die schleichende sozusagen, Angst, dass mir alles über dem Kopf zusammenbricht. Ich freue mich auf einen Neuanfang morgen.",-0.78,0,0,0,0,0,0,1,0
+"Today was a weird mix of things. so basically, I feel a nice sense of accomplishment from getting the house cleaned up. Hoping for a calmer day tomorrow.",0.63,0,0,1,0,0,0,0,0
+"Na ja, heute ist einiges passiert. sozusagen, Ich war heute so wütend auf mich selbst, weil ich denselben Fehler wieder gemacht habe. Ich hatte heute schreckliche Angst davor, irgendwie, jemanden zu konfrontieren, meine Hände haben gezittert. Ich schlafe jetzt wohl am besten mal drüber.",-0.38,0,0,0,0,0,1,1,0
+"Actually, I need to vent a bit. kind of, I took care of some boring tasks today, so basically, and I'm glad they are finally done. Time to turn off my brain for the night.",0.61,0,0,1,0,0,0,0,0
+"Okay, also so lief mein Tag heute ab. Ich habe heute einen persönlichen irgendwie, Meilenstein erreicht und bin stolz auf meinen Weg. Der Arzttermin halt, heute hat mir eine Riesenangst eingejagt vor den Ergebnissen. Morgen ist zum Glück ein neuer Tag.",-0.01,0,0,0,1,0,0,1,0
+"Ich muss das hier kurz mal festhalten. halt, Ich konnte heute jemandem bei einem großen Problem helfen, das war irgendwie, ein gutes Gefühl. Ich bin echt froh, dass dieser Tag vorbei ist.",0.92,0,0,0,1,0,0,0,0
+"Dear diary, it's me again. so basically, The thought of losing my job is keeping so basically, me up at night, I'm terrified. I felt like I was constantly on the edge of like, a panic attack today. Glad I got that off my chest.",-0.58,0,0,0,0,1,0,1,0
+"Hallo Tagebuch, kurzes Update von mir. sozusagen, Ich bin heute also, unter Druck ruhig geblieben und habe die Aufgabe erfolgreich gelöst. Zeit, den Kopf für heute auszuschalten.",0.78,0,0,0,1,0,0,0,0
+"Liebes Tagebuch, ich bin's wieder. ähm, Ich habe mich heute so ausgeschlossen gefühlt, als ich die Fotos von ihrem Treffen online sah. Ich habe endlich dieses schwierige Projekt auf der Arbeit fertiggestellt also, und es ist super geworden. Wie dem auch sei, ich gehe jetzt schlafen.",0.25,0,0,0,1,0,0,0,1
+"Not sure how to put today into words, but... um, I had the most amazing conversation with someone I haven't spoken to in forever. I hope things turn out okay.",0.63,1,0,0,0,0,0,0,0
+"Ehrlich gesagt war heute ein ganz schöner Ritt. ähm, Es hat mich heute Überwindung gekostet, ähm, überhaupt aus dem Bett aufzustehen. Ich schlafe jetzt wohl am besten mal drüber.",-0.81,0,1,0,0,0,0,0,0
+"Man, today was something else. um, I you know, was in such a bad mood today, everything just made me want to snap. Looking forward to a fresh start tomorrow.",-0.53,0,0,0,0,0,1,0,0
+"Mal schauen, wie ich heute am besten beschreibe. halt, Ich hatte plötzlich halt, Herzrasen und panische Angst um meine Gesundheit. Ich habe heute ein kleines halt, Überraschungsgeschenk bekommen, das hat mir die Woche gerettet. Ich schlafe jetzt wohl am besten mal drüber.",0.14,1,0,0,0,0,0,1,0
+"Actually, I need to vent a bit. so basically, I felt scared of the consequences of my actions today. We'll see how things look in the morning.",-0.86,0,0,0,0,0,0,1,0
+"Ich weiß gar nicht genau, wie ich heute in Worte fassen soll, aber... irgendwie, Meine Energie war heute am Boden, ich habe nur irgendwie, eine tiefe Traurigkeit gespürt. Ich bin echt froh, dass dieser Tag vorbei ist.",-0.73,0,1,0,0,0,0,0,0
+"Today was... interesting, to say the least. kind of, I solved you know, a really complex problem today that everyone else was struggling with. Glad I got that off my chest.",0.84,0,0,0,1,0,0,0,0
+"Recording this because today was crazy. kind of, Someone was incredibly rude to me today and it completely ruined um, my mood. Hopefully tomorrow will be a bit better.",-0.96,0,0,0,0,0,1,0,0
+"Today was... interesting, to say the least. kind of, There's this underlying fear of making mistakes that paralyses me. I feel content with how kind of, things are going right now, just calm and steady. Signing off for the night.",-0.06,0,0,1,0,0,0,1,0
+"Wow, I need to talk about today. um, I got jealous when I saw how kind of, easily things come to other people. I had a really fun lunch with my coworkers, the energy was so positive. Signing off for the night.",0.22,1,0,0,0,0,0,0,1
+"Mal schauen, wie ich heute am besten beschreibe. ähm, Der Stau und die Verspätungen heute waren echt genug, um den irgendwie, Verstand zu verlieren. Tja, das war mein Tag im Großen und Ganzen.",-0.6,0,0,0,0,0,1,0,0
+"Ich weiß gar nicht genau, wie ich heute in Worte fassen soll, aber... äh, Ich habe das Gefühl, die Kontrolle über irgendwie, meinen Zeitplan und mein Leben zu verlieren. Ich mache mir jetzt noch einen Tee und entspanne.",-0.65,0,0,0,0,1,0,0,0
+"Ich muss das hier kurz mal festhalten. also, Ich war heute so wütend auf mich ähm, selbst, weil ich denselben Fehler wieder gemacht habe. Morgen ist zum Glück ein neuer Tag.",-0.74,0,0,0,0,0,1,0,0
+"Liebes Tagebuch, ich bin's wieder. äh, Ich habe ähm, das Gefühl, die Kontrolle über meinen Zeitplan und mein Leben zu verlieren. Kein Stress heute, einfach eine angenehme Routine, die mir Halt gegeben hat. Zeit, den Kopf für heute auszuschalten.",0.12,0,0,1,0,1,0,0,0
+"Today was a weird mix of things. uh, I felt so tense kind of, today, like my body is constantly on high alert. Looking forward to a fresh start tomorrow.",-0.59,0,0,0,0,1,0,0,0
+"Let's talk about today's events. you know, I felt jealous of how confident and popular they are compared like, to me. Today was peaceful, just enjoying the quiet moments without worrying. I'm just too tired to think about it anymore.",0.3,0,0,1,0,0,0,0,1
+"Eigentlich muss ich einfach mal ein bisschen Dampf ablassen. halt, Ich hatte ein super irgendwie, lustiges Mittagessen mit meinen Kollegen, die Stimmung war toll. Ich schlafe jetzt wohl am besten mal drüber.",0.64,1,0,0,0,0,0,0,0
+"Man, today was something else. kind of, I feel content with how things are going right now, just calm like, and steady. That's all for today, I guess.",0.75,0,0,1,0,0,0,0,0
+"Lass uns mal über die heutigen Ereignisse sprechen. äh, Ich habe heute endlich einen großen sozusagen, Schritt in Richtung meines Hauptziels gemacht. Ich war also, heute so angespannt, als stünde mein Körper ständig unter Strom. Ich muss aufhören zu grübeln und einfach schlafen.",0.29,0,0,0,1,1,0,0,0
+"Okay, so here's how today went. um, I felt a deep sense of um, dread today about where my life is heading. Nothing seemed uh, to interest me today, I just felt emotionally drained. Signing off for the night.",-0.74,0,1,0,0,0,0,1,0
+"Today was... interesting, to say the least. like, I felt envious of how uh, easy their relationship looks from the outside. I feel like something bad is about to happen, and I can't shake the feeling. Well, that was my day in a nutshell.",-0.44,0,0,0,0,1,0,0,1
+"Ich muss meine Gedanken zu heute einfach mal aufschreiben. halt, Ich bin heute also, in einen blöden Streit geraten und das hat mich unglaublich wütend gemacht. Das war mein Tag, ich bin raus für heute.",-0.92,0,0,0,0,0,1,0,0
+"Today was a weird mix of things. um, I gave you know, a presentation today and it went better than I could have ever hoped. Anyway, I'm going to bed now.",0.75,0,0,0,1,0,0,0,0
+"Okay, so today was... like, I got jealous of how happy and successful everyone kind of, else seems to be. Today was just filled with positive energy and good vibes all around. Just going to try and relax now.",0.43,1,0,0,0,0,0,0,1
+"Also, heute war... ähm, Es hat mich heute Überwindung gekostet, überhaupt aus dem Bett aufzustehen. Ich war eifersüchtig darauf, wie einfach deren Beziehung also, von außen aussieht. Ich schlafe jetzt wohl am besten mal drüber.",-0.59,0,1,0,0,0,0,0,1
+"Alright, diary, here's the scoop. uh, I missed someone really close to uh, me today, and the emptiness was hard to handle. Going to make myself some tea and unwind.",-0.51,0,1,0,0,0,0,0,0
+"I need to get today's thoughts down. uh, I handled a really difficult conversation with like, a lot of maturity today. I found myself wishing I had their life today, which kind of, made me feel awful. Hopefully tomorrow will be a bit better.",0.19,0,0,0,1,0,0,0,1
+"Actually, I need to vent a bit. I stayed calm under pressure today and got the so basically, job done successfully. Anyway, I'm going to bed now.",0.98,0,0,0,1,0,0,0,0
+"Today was... interesting, to say the least. kind of, I stood so basically, up for myself today and felt really strong and confident. Signing off for the night.",0.74,0,0,0,1,0,0,0,0
+"Alright, diary, here's the scoop. you know, I felt a sudden burst of optimism today, things are kind of, looking up. I'm glad today is finally over.",0.94,1,0,0,0,0,0,0,0
+"Hallo Tagebuch, kurzes Update von mir. Ich habe heute richtig gute Nachrichten bekommen, das hat mir ein breites Lächeln ins Gesicht gezaubert. Ich bin einfach zu müde, um weiter darüber nachzudenken.",0.98,1,0,0,0,0,0,0,0
+"Eigentlich muss ich einfach mal ein bisschen Dampf ablassen. irgendwie, Ich habe das Gefühl, dass bald etwas schiefgeht, und kann also, dieses Gefühl nicht abschütteln. Ich bin echt froh, dass dieser Tag vorbei ist.",-0.44,0,0,0,0,1,0,0,0
+"Mal schauen, wie ich heute am besten beschreibe. irgendwie, Der Arzttermin heute hat mir eine Riesenangst eingejagt irgendwie, vor den Ergebnissen. So lief das heute jedenfalls ab.",-0.49,0,0,0,0,0,0,1,0
+"Okay, so here's how today went. kind of, I gave a presentation today and it went better than I could uh, have ever hoped. I took care of some boring tasks today, and I'm glad they um, are finally done. Time to turn off my brain for the night.",0.54,0,0,1,1,0,0,0,0
+"Hey diary, just checking in. like, I was terrified of um, confronting someone today, my hands were literally shaking. I'm glad today is finally over.",-0.58,0,0,0,0,0,0,1,0
+"Also, heute war... irgendwie, Ich habe dieses ständige flaue Gefühl im Magen also, wegen der anstehenden Deadlines. Tja, das war mein Tag im Großen und Ganzen.",-0.63,0,0,0,0,1,0,0,0
+"So, I'm sitting here thinking about today. you know, I feel so insecure about my decisions lately, so basically, constantly doubting myself. Glad I got that off my chest.",-0.49,0,0,0,0,1,0,0,0
+"Let's talk about today's events. so basically, I finally took a big step towards a major goal of mine, it feels great. Glad I got that off my chest.",0.82,0,0,0,1,0,0,0,0
+"Ich muss meine Gedanken zu heute einfach mal aufschreiben. irgendwie, Ich war eifersüchtig darauf, wie einfach deren Beziehung von außen aussieht. Das war mein Tag, ich bin raus für heute.",-0.32,0,0,0,0,0,0,0,1
+"Eigentlich muss ich einfach mal ein bisschen Dampf ablassen. also, Ich hatte plötzlich Herzrasen und panische äh, Angst um meine Gesundheit. Ich musste heute schwierige Entscheidungen treffen, aber es waren die richtigen. Tja, das war mein Tag im Großen und Ganzen.",0.28,0,0,0,1,0,0,1,0
+"Eigentlich muss ich einfach mal ein bisschen Dampf ablassen. halt, Die Luft wurde mir heute fast äh, zu knapp, weil der Druck einfach zu groß war. Ich habe das Gefühl, heute äh, als Person gewachsen zu sein, und bin stolz auf mich. Das war mein Tag, ich bin raus für heute.",0.02,0,0,0,1,1,0,0,0
+"Let's talk about today's events. so basically, I received some really good news today and it put a huge smile on my face. I have this constant knot in kind of, my stomach about upcoming deadlines. Hopefully tomorrow will be a bit better.",0.21,1,0,0,0,1,0,0,0
+"Ich muss meine Gedanken zu heute einfach mal aufschreiben. irgendwie, Ich habe heute ständig meine E-Mails gecheckt, weil ich so nervös irgendwie, wegen einer Antwort war. Das war's dann wohl für heute.",-0.36,0,0,0,0,1,0,0,0
+"Lass uns mal über die heutigen Ereignisse sprechen. also, Die ganze Ungewissheit im Moment macht mir halt, langsam echt zu schaffen. Ich habe heute tolles Feedback für meine Arbeit bekommen, das war sozusagen, sehr bestätigend. Ich freue mich auf einen Neuanfang morgen.",0.19,0,0,0,1,1,0,0,0
+"Uff, was für ein Tag. ähm, Ich habe halt, heute so viel Liebe und Unterstützung von meiner Familie gespürt, das war wunderschön. So lief das heute jedenfalls ab.",0.84,1,0,0,0,0,0,0,0
+"Okay, so today was... uh, Today felt like a fresh start, and I am so happy about where things kind of, are going. Just going to try and relax now.",0.81,1,0,0,0,0,0,0,0
+"Whew, what a day. you know, I had a nice, long walk and cleared my head, it felt um, really good. I feel so afraid of being alone in kind of, the future, it's a scary thought. That's pretty much how it went.",-0.12,0,0,1,0,0,0,1,0
+"Mal schauen, wie ich heute am besten beschreibe. irgendwie, Mein Herz hat heute ohne wirklichen Grund äh, total gerast, einfach pure Nervosität. Tut echt gut, das mal ausgesprochen zu haben.",-0.69,0,0,0,0,1,0,0,0
+"Heute war... gelinde gesagt, sehr interessant. irgendwie, Ich äh, war eifersüchtig, als ich gesehen habe, wie leicht anderen manche Dinge fallen. Zeit, den Kopf für heute auszuschalten.",-0.33,0,0,0,0,0,0,0,1
+"Not sure how to put today into words, but... so basically, I had to force myself to smile today, and it was so exhausting. I'm glad today is finally over.",-0.83,0,1,0,0,0,0,0,0
+"Hallo Tagebuch, kurzes Update von mir. ähm, Ich habe mich heute bedroht und unsicher gefühlt, das war echt beängstigend. Ich habe heute richtig gute Nachrichten bekommen, das hat mir also, ein breites Lächeln ins Gesicht gezaubert. Mal sehen, wie die Welt morgen früh aussieht.",-0.13,1,0,0,0,0,0,1,0
+"Mal schauen, wie ich heute am besten beschreibe. sozusagen, Am Abend kamen mir einfach die Tränen, weil alles zu viel wurde. Ich hoffe einfach, dass alles gut ausgeht.",-0.96,0,1,0,0,0,0,0,0
+"Eigentlich muss ich einfach mal ein bisschen Dampf ablassen. halt, Heute war ein einfacher, aber guter Tag. Ich habe meinen Haushalt gemacht und einen ruhigen halt, Abend genossen. Zeit, den Kopf für heute auszuschalten.",0.41,0,0,1,0,0,0,0,0
+"Ehrlich gesagt war heute ein ganz schöner Ritt. sozusagen, Ich hatte heute den ganzen Tag mit Gefühlen von Unzulänglichkeit und Neid zu kämpfen. Zeit, den Kopf für heute auszuschalten.",-0.44,0,0,0,0,0,0,0,1
+"Ehrlich gesagt war heute ein ganz schöner Ritt. äh, Ich habe heute ein halt, paar lästige Aufgaben erledigt und bin froh, dass sie weg sind. Na ja, das ist jedenfalls mein Update.",0.44,0,0,1,0,0,0,0,0
+"Alright, diary, here's the scoop. so basically, I felt really insecure uh, seeing them talk to someone else instead of me. Glad I got that off my chest.",0.09,0,0,0,0,0,0,0,1
+"Liebes Tagebuch, ich bin's wieder. irgendwie, Ich hatte ein fantastisches Gespräch mit jemandem, also, von dem ich ewig nichts gehört habe. Ich versuche jetzt einfach, ein bisschen runterzukommen.",0.73,1,0,0,0,0,0,0,0
+"Alles klar, Tagebuch, hier ist das Update. Ich hatte heute so eine tolle Zeit mit meinen Freunden, äh, wir mussten ständig lachen. Ich versuche jetzt einfach, ein bisschen runterzukommen.",0.82,1,0,0,0,0,0,0,0
+"Okay, so here's how today went. I had a good, like, steady workflow today without any interruptions. I you know, kept checking my emails and notifications, feeling so nervous about a reply. Tomorrow is a new day, luckily.",0.25,0,0,1,0,1,0,0,0
+"Eigentlich muss ich einfach mal ein bisschen Dampf ablassen. also, Ich war so genervt davon, wie ungerecht heute irgendwie, alles im Büro abgelaufen ist. Morgen ist zum Glück ein neuer Tag.",-0.97,0,0,0,0,0,1,0,0
+"Liebes Tagebuch, ich bin's wieder. irgendwie, Heute war einfach voller positiver Energie und rundum guter Laune. Wie dem auch sei, ich gehe jetzt schlafen.",0.93,1,0,0,0,0,0,0,0
+"I just need to record this real quick. uh, I had to force myself uh, to smile today, and it was so exhausting. That's pretty much how it went.",-0.98,0,1,0,0,0,0,0,0
+"Alles klar, Tagebuch, hier ist das Update. äh, Heute war einfach sozusagen, ein trauriger Tag und ich konnte keinen Grund zum Lächeln finden. Tja, das war mein Tag im Großen und Ganzen.",-0.9,0,1,0,0,0,0,0,0
+"So, let's see how to describe today. so basically, I felt so mad at myself for making kind of, the same mistake again. I finally got to do um, my favorite hobby today and it brought me so much joy. Guess I'll just sleep on it.",0.04,1,0,0,0,0,1,0,0
+"Na ja, heute ist einiges passiert. Ich habe mich heute so ausgeschlossen äh, gefühlt, als ich die Fotos von ihrem Treffen online sah. Die Inkompetenz der Leute, mit denen irgendwie, ich heute zu tun hatte, war einfach nur zum Rasen. Mal sehen, wie die Welt morgen früh aussieht.",-0.73,0,0,0,0,0,1,0,1
+"Today was... interesting, to say the least. The thought of losing my job like, is keeping me up at night, I'm terrified. Hoping for a calmer day tomorrow.",-0.93,0,0,0,0,0,0,1,0
+"Recording this because today was crazy. um, I um, felt a deep sense of dread today about where my life is heading. Well, that was my day in a nutshell.",-0.45,0,0,0,0,0,0,1,0
+"Let's talk about today's events. kind of, I had a minor kind of, panic today when I thought about failing. Tomorrow is a new day, luckily.",-0.98,0,0,0,0,0,0,1,0
+"Ich muss meine Gedanken zu heute einfach mal aufschreiben. Mich hat heute halt, einfach alles aufgeregt, selbst die kleinsten Kleinigkeiten. Ich bin echt froh, dass dieser Tag vorbei ist.",-0.65,0,0,0,0,0,1,0,0
+"Wow, I need to talk about today. so basically, I feel so fragile and afraid of like, getting hurt again. Anyway, I'm going to bed now.",-0.46,0,0,0,0,0,0,1,0
+"Dear diary, it's me again. uh, I felt insecure and jealous when they didn't invite me to the meeting. I'm glad today is finally over.",-0.04,0,0,0,0,0,0,0,1
+"Actually, I need to vent a bit. I struggled to breathe properly at one point because the pressure was too much. Hoping for a calmer day tomorrow.",-0.58,0,0,0,0,1,0,0,0
+"Uff, was für ein Tag. also, Ich bin gerade einfach nur dankbar und glücklich für die tollen Menschen in meinem Leben. Tja, das war mein Tag im Großen und Ganzen.",0.99,1,0,0,0,0,0,0,0
+"Mal schauen, wie ich heute am besten beschreibe. also, Am Abend kamen mir einfach die Tränen, weil halt, alles zu viel wurde. Ich bin einfach zu müde, um weiter darüber nachzudenken.",-0.52,0,1,0,0,0,0,0,0
+"Wow, I need to talk about today. like, Today was peaceful, just enjoying the you know, quiet moments without worrying. I'm just too tired to think about it anymore.",0.44,0,0,1,0,0,0,0,0
+"Dear diary, it's me again. kind of, I stood up for myself today and felt really strong kind of, and confident. Well, that was my day in a nutshell.",0.75,0,0,0,1,0,0,0,0
+"Heute war irgendwie eine seltsame Mischung. Ich musste mir heute echt auf die Zunge beißen, um jemanden nicht anzuschreien. Mal sehen, wie die Welt morgen früh aussieht.",-0.42,0,0,0,0,0,1,0,0
+"Ich muss meine Gedanken zu heute einfach mal aufschreiben. halt, Ich hatte plötzlich Herzrasen und panische Angst um meine Gesundheit. Ich habe heute endlich meinen Schreibtisch sortiert, sozusagen, das ist sehr befriedigend. So lief das heute jedenfalls ab.",-0.22,0,0,1,0,0,0,1,0
+"Let's talk about today's events. uh, Today was a constant reminder of things that aren't working out you know, in my life. Looking forward to a fresh start tomorrow.",-0.93,0,1,0,0,0,0,0,0
+"Ich sitze hier gerade und denke über heute nach. Es gibt mir ein gutes Gefühl, dass ich heute endlich die Wohnung aufgeräumt habe. Tja, das war mein Tag im Großen und Ganzen.",0.49,0,0,1,0,0,0,0,0
+"Okay, so today was... I got jealous when I saw how easily things come to other people. I hope things turn out okay.",0.02,0,0,0,0,0,0,0,1
+"Heute war... gelinde gesagt, sehr interessant. ähm, Ich habe halt, mich heute so verletzlich und verängstigt gefühlt, völlig schutzlos. Ich habe eine Welle von Eifersucht gespürt, als jemand anderes für seine Arbeit gelobt wurde. Hoffentlich wird morgen ein bisschen besser.",-0.42,0,0,0,0,0,0,1,1
+"I need to get today's thoughts down. you know, I felt scared of the consequences um, of my actions today. Just going to try and relax now.",-0.41,0,0,0,0,0,0,1,0
+"Okay, also so lief mein Tag heute ab. äh, Ich irgendwie, habe heute durch harte Arbeit etwas wirklich Gutes auf die Beine gestellt. Tut echt gut, das mal ausgesprochen zu haben.",0.63,0,0,0,1,0,0,0,0
+"Wow, I need to talk about today. I listened to my favorite album on uh, the way home and felt so uplifted. Glad I got that off my chest.",0.71,1,0,0,0,0,0,0,0

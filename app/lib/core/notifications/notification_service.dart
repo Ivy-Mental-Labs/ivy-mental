@@ -8,6 +8,7 @@ import 'package:timezone/timezone.dart' as tz;
 
 import '../../data/models/session.dart';
 import '../../data/repositories/session_repository.dart';
+import '../localization/app_translations.dart';
 
 class NotificationService {
   static final FlutterLocalNotificationsPlugin _notificationsPlugin =
@@ -134,15 +135,19 @@ class NotificationService {
       return;
     }
 
-    String title = 'Diary Time!';
-    String body = "Take a moment for today's entry.";
+    final box = Hive.box('settings');
+    final lang = box.get('appLanguage', defaultValue: 'en') as String;
+
+    String title = AppTranslations.get('notif_diary_title', lang);
+    String body = AppTranslations.get('notif_diary_body', lang);
 
     if (isScoreActive && weeklyAverageScore != null) {
       final intScore = weeklyAverageScore.round();
       if (intScore < threshold) {
-        title = 'Mental Health Alert';
-        body =
-            'Your average score this week is low ($intScore/100). Please take care of yourself and consider seeking help.';
+        title = AppTranslations.get('notif_alert_title', lang);
+        body = AppTranslations.get('notif_alert_body', lang, arguments: {
+          'score': '$intScore',
+        });
       }
     }
 
@@ -203,19 +208,22 @@ class NotificationService {
     final isScoreActive = box.get('isScoreActive', defaultValue: true) as bool;
     final threshold = box.get('threshold', defaultValue: 45) as int;
 
+    final lang = box.get('appLanguage', defaultValue: 'en') as String;
+
     final sessions = SessionRepository().getAll();
     final weeklyAverageScore = calculateWeeklyAverageScore(sessions);
 
-    String title = 'Test Notification';
-    String body = 'This is a test! Notifications are working.';
+    String title = AppTranslations.get('notif_test_title', lang);
+    String body = AppTranslations.get('notif_test_body', lang);
 
     if (isScoreActive &&
         weeklyAverageScore != null &&
         weeklyAverageScore.round() < threshold) {
       final intScore = weeklyAverageScore.round();
-      title = 'Mental Health Alert';
-      body =
-          'Your average score this week is low ($intScore/100). Please take care of yourself and consider seeking help.';
+      title = AppTranslations.get('notif_alert_title', lang);
+      body = AppTranslations.get('notif_alert_body', lang, arguments: {
+        'score': '$intScore',
+      });
     }
 
     const AndroidNotificationDetails androidNotificationDetails =

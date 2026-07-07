@@ -18,6 +18,8 @@ def main():
     from app.dataset import tokenizer
     tokenizer.save_pretrained(str(tokenizer_path))
     print(f"Tokenizer saved to {tokenizer_path}")
+    tokenizer.save_vocabulary(str(MODEL_DIR))
+    print(f"Vocabulary saved to {MODEL_DIR}")
 
 
 if __name__ == "__main__":

@@ -27,7 +27,9 @@ def main():
     print()
     print("Emotion Predictions (F1 scores):")
     for label in EMOTION_LABELS:
-        print(f"  {label:>10}: {metrics['emotion_f1'][label]:.4f}")
+        f1 = metrics['emotion_f1'][label]
+        t = metrics['thresholds'][label]
+        print(f"  {label:>10}: {f1:.4f} (threshold: {t:.2f})")
     print(f"  {'macro':>10}: {metrics['emotion_f1']['macro']:.4f}")
 
 

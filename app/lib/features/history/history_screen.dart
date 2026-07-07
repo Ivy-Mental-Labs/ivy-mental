@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../../data/models/session.dart';
 import '../../data/notifiers/session_notifier.dart';
+import '../../data/notifiers/settings_notifier.dart';
+import '../../core/localization/app_translations.dart';
 import '../../shared/widgets/ivy_visuals.dart';
 import '../../theme.dart';
 import 'presentation/screens/history_entry_screen.dart';
@@ -49,12 +51,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final colors = context.appColors;
     final sessions = context.watch<SessionNotifier>().sessions;
     final items = _itemsFromSessions(sessions);
+    final settings = context.watch<SettingsNotifier>();
 
     return Column(
       children: [
         const SizedBox(height: 24),
         Text(
-          'Your experiences',
+          AppTranslations.get('your_experiences', settings.appLanguage),
           style: Theme.of(
             context,
           ).textTheme.titleLarge?.copyWith(color: colors.textSecondary, fontSize: 18, fontWeight: FontWeight.w200),
@@ -68,10 +71,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.history, size: 48, color: colors.textMuted.withOpacity(0.5)),
+                        Icon(Icons.history, size: 48, color: colors.textMuted.withValues(alpha: 0.5)),
                         const SizedBox(height: AppSpacing.md),
                         Text(
-                          'No entries yet',
+                          AppTranslations.get('no_entries_yet', settings.appLanguage),
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             color: colors.textPrimary,
                             fontSize: 16,
@@ -80,7 +83,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         ),
                         const SizedBox(height: AppSpacing.sm),
                         Text(
-                          'Hold the microphone button on the home screen to record your first check-in.',
+                          AppTranslations.get('no_entries_yet_desc', settings.appLanguage),
                           textAlign: TextAlign.center,
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: colors.textSecondary,

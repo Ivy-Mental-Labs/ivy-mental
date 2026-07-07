@@ -6,7 +6,7 @@ import 'core/ml/services/onnx_text_analyzer.dart';
 import 'core/ml/services/text_analyzer.dart';
 import 'core/notifications/notification_service.dart';
 import 'data/notifiers/session_notifier.dart';
-import 'data/notifiers/score_reminder_notifier.dart';
+import 'data/notifiers/settings_notifier.dart';
 // import 'data/mock_data_seeder.dart';
 import 'data/repositories/session_repository.dart';
 import 'features/main_navigation_screen.dart';
@@ -59,7 +59,7 @@ class MainApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => SessionNotifier(SessionRepository()),
         ),
-        ChangeNotifierProvider(create: (_) => ScoreReminderNotifier()),
+        ChangeNotifierProvider(create: (_) => SettingsNotifier()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
