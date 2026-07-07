@@ -14,11 +14,7 @@ import '../../core/localization/app_translations.dart';
 class IvyHeader extends StatelessWidget {
   final Widget trailing;
   final bool showSettings;
-  const IvyHeader({
-    required this.trailing,
-    this.showSettings = true,
-    super.key,
-  });
+  const IvyHeader({required this.trailing, this.showSettings = true, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -41,11 +37,7 @@ class IvyHeader extends StatelessWidget {
             if (showSettings)
               IconButton(
                 onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const ScoreReminderSettingsScreen(),
-                    ),
-                  );
+                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ScoreReminderSettingsScreen()));
                 },
                 splashRadius: 22,
                 icon: Icon(Icons.settings, size: 20, color: colors.textMuted),
@@ -116,11 +108,7 @@ class MoodOrb extends StatelessWidget {
   final double size;
   final MoodOrbVariant variant;
 
-  const MoodOrb({
-    this.size = 190,
-    this.variant = MoodOrbVariant.deep,
-    super.key,
-  });
+  const MoodOrb({this.size = 190, this.variant = MoodOrbVariant.deep, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -137,16 +125,8 @@ class MoodOrb extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               boxShadow: [
-                BoxShadow(
-                  color: colors.shadowSoft,
-                  blurRadius: size * 0.24,
-                  offset: Offset(0, size * 0.14),
-                ),
-                BoxShadow(
-                  color: colors.glowLight,
-                  blurRadius: size * 0.18,
-                  offset: Offset(0, -size * 0.08),
-                ),
+                BoxShadow(color: colors.shadowSoft, blurRadius: size * 0.24, offset: Offset(0, size * 0.14)),
+                BoxShadow(color: colors.glowLight, blurRadius: size * 0.18, offset: Offset(0, -size * 0.08)),
               ],
             ),
           ),
@@ -161,6 +141,24 @@ class MoodOrb extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class EmotionBubble extends StatelessWidget {
+  final String emotion;
+  final double size;
+
+  const EmotionBubble({required this.emotion, this.size = 42, super.key});
+
+  String get _assetPath => 'assets/media/bubbles/${_bubbleAssetName(emotion)}';
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: ClipOval(child: Image.asset(_assetPath, fit: BoxFit.cover)),
     );
   }
 }
@@ -192,10 +190,7 @@ class MoodOrbPainter extends CustomPainter {
       ..shader = RadialGradient(
         center: const Alignment(0.45, -0.25),
         radius: 0.65,
-        colors: [
-          colors.glowLight.withValues(alpha: 0.76),
-          colors.glowLight.withValues(alpha: 0),
-        ],
+        colors: [colors.glowLight.withValues(alpha: 0.76), colors.glowLight.withValues(alpha: 0)],
       ).createShader(rect);
     canvas.drawCircle(center, radius, haze);
 
@@ -203,10 +198,7 @@ class MoodOrbPainter extends CustomPainter {
       ..shader = RadialGradient(
         center: const Alignment(0.62, 0.18),
         radius: 0.55,
-        colors: [
-          colors.accentPeach.withValues(alpha: 0.52),
-          colors.accentPeach.withValues(alpha: 0),
-        ],
+        colors: [colors.accentPeach.withValues(alpha: 0.52), colors.accentPeach.withValues(alpha: 0)],
       ).createShader(rect);
     canvas.drawCircle(center, radius * 0.95, peachPaint);
 
@@ -230,17 +222,9 @@ class MoodOrbPainter extends CustomPainter {
     canvas.drawCircle(center, radius, rim);
 
     final dotPaint = Paint()..color = colors.glowLight.withValues(alpha: 0.62);
-    for (final offset in const [
-      Offset(-0.18, -0.22),
-      Offset(0.18, -0.1),
-      Offset(-0.02, 0.16),
-      Offset(0.28, 0.28),
-    ]) {
+    for (final offset in const [Offset(-0.18, -0.22), Offset(0.18, -0.1), Offset(-0.02, 0.16), Offset(0.28, 0.28)]) {
       canvas.drawCircle(
-        Offset(
-          center.dx + offset.dx * size.width,
-          center.dy + offset.dy * size.height,
-        ),
+        Offset(center.dx + offset.dx * size.width, center.dy + offset.dy * size.height),
         size.shortestSide * 0.006,
         dotPaint,
       );
@@ -279,6 +263,22 @@ class MoodOrbPainter extends CustomPainter {
   }
 }
 
+String _bubbleAssetName(String emotion) {
+  const mapping = {
+    'happy': 'bubble_02.png',
+    'sad': 'bubble_08.png',
+    'satisfied': 'bubble_07.png',
+    'proud': 'bubble_01.png',
+    'anxious': 'bubble_05.png',
+    'angry': 'bubble_03.png',
+    'afraid': 'bubble_05.png',
+    'jealous': 'bubble_06.png',
+  };
+
+  final key = emotion.trim().toLowerCase();
+  return mapping[key] ?? 'bubble_04.png';
+}
+
 class ScoreOrb extends StatelessWidget {
   final int score;
 
@@ -304,13 +304,7 @@ class ScoreOrb extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: colors.backgroundGlass,
-              boxShadow: [
-                BoxShadow(
-                  color: colors.glowLight.withValues(alpha: 0.78),
-                  blurRadius: 28,
-                  spreadRadius: 4,
-                ),
-              ],
+              boxShadow: [BoxShadow(color: colors.glowLight.withValues(alpha: 0.78), blurRadius: 28, spreadRadius: 4)],
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -368,13 +362,9 @@ class ScoreOrbPainter extends CustomPainter {
       final baseRadius = size.shortestSide * (0.32 + i * 0.025);
       for (var p = 0; p <= points; p++) {
         final angle = (p / points) * math.pi * 2;
-        final wobble =
-            math.sin(angle * 5 + i) * 5 + math.cos(angle * 3 - i) * 3;
+        final wobble = math.sin(angle * 5 + i) * 5 + math.cos(angle * 3 - i) * 3;
         final r = baseRadius + wobble;
-        final point = Offset(
-          center.dx + math.cos(angle) * r,
-          center.dy + math.sin(angle) * r,
-        );
+        final point = Offset(center.dx + math.cos(angle) * r, center.dy + math.sin(angle) * r);
         if (p == 0) {
           path.moveTo(point.dx, point.dy);
         } else {
@@ -385,8 +375,7 @@ class ScoreOrbPainter extends CustomPainter {
       final paint = Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.4
-        ..color = (i.isEven ? colors.accentMint : colors.accentPeach)
-            .withValues(alpha: 0.28);
+        ..color = (i.isEven ? colors.accentMint : colors.accentPeach).withValues(alpha: 0.28);
       canvas.drawPath(path, paint);
     }
   }
@@ -402,12 +391,7 @@ class MetricItem extends StatelessWidget {
   final String value;
   final Color color;
 
-  const MetricItem({
-    required this.label,
-    required this.value,
-    required this.color,
-    super.key,
-  });
+  const MetricItem({required this.label, required this.value, required this.color, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -416,20 +400,16 @@ class MetricItem extends StatelessWidget {
       children: [
         Text(
           label,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: colors.textPrimary,
-            fontSize: 12,
-            fontWeight: FontWeight.w400,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: colors.textPrimary, fontSize: 12, fontWeight: FontWeight.w400),
         ),
         const SizedBox(height: AppSpacing.xs),
         Text(
           value,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: colors.accentDeep,
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(color: colors.accentDeep, fontSize: 18, fontWeight: FontWeight.w500),
         ),
         const SizedBox(height: AppSpacing.sm),
         Container(
@@ -451,22 +431,15 @@ class MoodTrendCard extends StatefulWidget {
   State<MoodTrendCard> createState() => _MoodTrendCardState();
 }
 
-class _MoodTrendCardState extends State<MoodTrendCard>
-    with SingleTickerProviderStateMixin {
+class _MoodTrendCardState extends State<MoodTrendCard> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 1400),
-      vsync: this,
-    );
-    _animation = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOutQuart,
-    );
+    _controller = AnimationController(duration: const Duration(milliseconds: 1400), vsync: this);
+    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeOutQuart);
     _controller.forward();
   }
 
@@ -492,9 +465,7 @@ class _MoodTrendCardState extends State<MoodTrendCard>
     final settings = context.watch<SettingsNotifier>();
     return GestureDetector(
       onTap: () {
-        Navigator.of(
-          context,
-        ).push(MaterialPageRoute(builder: (_) => const LongtermScreen()));
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LongtermScreen()));
       },
       child: Container(
         padding: const EdgeInsets.fromLTRB(20, 18, 20, 14),
@@ -502,13 +473,7 @@ class _MoodTrendCardState extends State<MoodTrendCard>
           color: colors.backgroundGlass,
           borderRadius: BorderRadius.circular(AppRadius.lg),
           border: Border.all(color: colors.borderSubtle),
-          boxShadow: [
-            BoxShadow(
-              color: colors.shadowSoft,
-              blurRadius: 28,
-              offset: const Offset(0, 16),
-            ),
-          ],
+          boxShadow: [BoxShadow(color: colors.shadowSoft, blurRadius: 28, offset: const Offset(0, 16))],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -538,11 +503,7 @@ class _MoodTrendCardState extends State<MoodTrendCard>
                     ],
                   ),
                 ),
-                Icon(
-                  Icons.chevron_right_rounded,
-                  size: 22,
-                  color: colors.textMuted,
-                ),
+                Icon(Icons.chevron_right_rounded, size: 22, color: colors.textMuted),
               ],
             ),
             const SizedBox(height: AppSpacing.md),
@@ -554,10 +515,7 @@ class _MoodTrendCardState extends State<MoodTrendCard>
                   return CustomPaint(
                     painter: MoodTrendPainter(
                       colors: colors,
-                      values: _weekMoodValues(
-                        widget.sessions,
-                        _currentWeekStart(),
-                      ),
+                      values: _weekMoodValues(widget.sessions, _currentWeekStart()),
                       progress: _animation.value,
                     ),
                     child: child,
@@ -643,11 +601,7 @@ double _weekVolatility(List<double?> values) {
 
 DateTime _currentWeekStart() {
   final today = DateTime.now();
-  return DateTime(
-    today.year,
-    today.month,
-    today.day,
-  ).subtract(const Duration(days: 6));
+  return DateTime(today.year, today.month, today.day).subtract(const Duration(days: 6));
 }
 
 DateTime? _sessionDate(Session session) {
@@ -664,12 +618,9 @@ class MoodTrendPainter extends CustomPainter {
   final List<double?> values;
   final double progress;
 
-  MoodTrendPainter({
-    required this.colors,
-    required this.values,
-    this.progress = 1.0,
-  }) : assert(values.length == 7, 'values must have length 7'),
-       assert(progress >= 0 && progress <= 1);
+  MoodTrendPainter({required this.colors, required this.values, this.progress = 1.0})
+    : assert(values.length == 7, 'values must have length 7'),
+      assert(progress >= 0 && progress <= 1);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -681,9 +632,7 @@ class MoodTrendPainter extends CustomPainter {
     for (var i = 0; i < 7; i++) {
       final x = size.width * xFractions[i];
       final mood = values[i];
-      final y = mood == null
-          ? size.height * 0.50
-          : ((1 - mood) / 2) * (bottom - top) + top;
+      final y = mood == null ? size.height * 0.50 : ((1 - mood) / 2) * (bottom - top) + top;
       points.add(Offset(x, y));
     }
 
@@ -693,14 +642,7 @@ class MoodTrendPainter extends CustomPainter {
       final next = points[i];
       final control = Offset((current.dx + next.dx) / 2, current.dy);
       final control2 = Offset((current.dx + next.dx) / 2, next.dy);
-      path.cubicTo(
-        control.dx,
-        control.dy,
-        control2.dx,
-        control2.dy,
-        next.dx,
-        next.dy,
-      );
+      path.cubicTo(control.dx, control.dy, control2.dx, control2.dy, next.dx, next.dy);
     }
 
     final fillPath = Path.from(path)
@@ -756,24 +698,15 @@ class MoodTrendPainter extends CustomPainter {
     for (var i = 0; i < labels.length; i++) {
       textPainter.text = TextSpan(
         text: labels[i],
-        style: TextStyle(
-          color: colors.textMuted,
-          fontSize: 10,
-          fontWeight: FontWeight.w300,
-        ),
+        style: TextStyle(color: colors.textMuted, fontSize: 10, fontWeight: FontWeight.w300),
       );
       textPainter.layout();
-      textPainter.paint(
-        canvas,
-        Offset(points[i].dx - textPainter.width / 2, size.height - 12),
-      );
+      textPainter.paint(canvas, Offset(points[i].dx - textPainter.width / 2, size.height - 12));
     }
   }
 
   @override
   bool shouldRepaint(covariant MoodTrendPainter oldDelegate) {
-    return oldDelegate.colors != colors ||
-        oldDelegate.values != values ||
-        oldDelegate.progress != progress;
+    return oldDelegate.colors != colors || oldDelegate.values != values || oldDelegate.progress != progress;
   }
 }

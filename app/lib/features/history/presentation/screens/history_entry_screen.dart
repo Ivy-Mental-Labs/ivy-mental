@@ -17,6 +17,7 @@ class HistoryEntryViewData {
   final String patternText;
   final String patternFrequency;
   final List<EmotionalLayerViewData> emotionalLayers;
+  final String? dominantEmotion;
   final String? transcript;
 
   const HistoryEntryViewData({
@@ -25,6 +26,7 @@ class HistoryEntryViewData {
     required this.patternText,
     required this.patternFrequency,
     required this.emotionalLayers,
+    this.dominantEmotion,
     this.transcript,
   });
 
@@ -67,46 +69,14 @@ class HistoryEntryViewData {
           : "Increased feelings of gratitude after social interactions.",
       patternFrequency: lang == 'de' ? '2x diese Woche' : '2x this week',
       emotionalLayers: [
-        EmotionalLayerViewData(
-          label: 'Calm',
-          value: 63,
-          color: Color(0xFF8DA6AE),
-        ),
-        EmotionalLayerViewData(
-          label: 'Joy',
-          value: 42,
-          color: Color(0xFFD7DED4),
-        ),
-        EmotionalLayerViewData(
-          label: 'Stress',
-          value: 42,
-          color: Color(0xFFEABDB5),
-        ),
-        EmotionalLayerViewData(
-          label: 'Joy',
-          value: 42,
-          color: Color(0xFFD7DED4),
-        ),
-        EmotionalLayerViewData(
-          label: 'Joy',
-          value: 42,
-          color: Color(0xFFD7DED4),
-        ),
-        EmotionalLayerViewData(
-          label: 'Joy',
-          value: 42,
-          color: Color(0xFFD7DED4),
-        ),
-        EmotionalLayerViewData(
-          label: 'Joy',
-          value: 42,
-          color: Color(0xFFD7DED4),
-        ),
-        EmotionalLayerViewData(
-          label: 'Joy',
-          value: 42,
-          color: Color(0xFFD7DED4),
-        ),
+        EmotionalLayerViewData(label: 'Calm', value: 63, color: Color(0xFF8DA6AE)),
+        EmotionalLayerViewData(label: 'Joy', value: 42, color: Color(0xFFD7DED4)),
+        EmotionalLayerViewData(label: 'Stress', value: 42, color: Color(0xFFEABDB5)),
+        EmotionalLayerViewData(label: 'Joy', value: 42, color: Color(0xFFD7DED4)),
+        EmotionalLayerViewData(label: 'Joy', value: 42, color: Color(0xFFD7DED4)),
+        EmotionalLayerViewData(label: 'Joy', value: 42, color: Color(0xFFD7DED4)),
+        EmotionalLayerViewData(label: 'Joy', value: 42, color: Color(0xFFD7DED4)),
+        EmotionalLayerViewData(label: 'Joy', value: 42, color: Color(0xFFD7DED4)),
       ],
     );
   }
@@ -119,11 +89,7 @@ class HistoryEntryViewData {
     try {
       final allSessions = SessionRepository().getAll();
       final now = DateTime.now();
-      final startOf7DaysAgo = DateTime(
-        now.year,
-        now.month,
-        now.day,
-      ).subtract(const Duration(days: 6));
+      final startOf7DaysAgo = DateTime(now.year, now.month, now.day).subtract(const Duration(days: 6));
 
       final recentSessions = allSessions.where((s) {
         if (s.evaluation == null || s.evaluation!['mood'] is! num) return false;
@@ -133,11 +99,7 @@ class HistoryEntryViewData {
         } catch (_) {
           sessionDate = s.createdAt;
         }
-        final dateOnly = DateTime(
-          sessionDate.year,
-          sessionDate.month,
-          sessionDate.day,
-        );
+        final dateOnly = DateTime(sessionDate.year, sessionDate.month, sessionDate.day);
         return !dateOnly.isBefore(startOf7DaysAgo);
       }).toList();
 
@@ -231,6 +193,26 @@ class HistoryEntryViewData {
     if (value.isEmpty) return value;
     return '${value[0].toUpperCase()}${value.substring(1).toLowerCase()}';
   }
+
+  static String? _dominantEmotion(dynamic emotions) {
+    if (emotions is! Map) return null;
+
+    String? bestLabel;
+    var bestValue = -1.0;
+
+    for (final entry in emotions.entries) {
+      final value = entry.value;
+      if (value is num) {
+        final score = value.toDouble();
+        if (score > bestValue) {
+          bestValue = score;
+          bestLabel = entry.key.toString();
+        }
+      }
+    }
+
+    return bestLabel?.toLowerCase();
+  }
 }
 
 String _relativeDate(DateTime date, String lang) {
@@ -248,21 +230,10 @@ class EmotionalLayerViewData {
   final int value;
   final Color color;
 
-  const EmotionalLayerViewData({
-    required this.label,
-    required this.value,
-    required this.color,
-  });
+  const EmotionalLayerViewData({required this.label, required this.value, required this.color});
 
-  factory EmotionalLayerViewData.fromScore({
-    required String label,
-    required double score,
-  }) {
-    return EmotionalLayerViewData(
-      label: label,
-      value: (score.clamp(0.0, 1.0) * 100).round(),
-      color: _colorFor(label),
-    );
+  factory EmotionalLayerViewData.fromScore({required String label, required double score}) {
+    return EmotionalLayerViewData(label: label, value: (score.clamp(0.0, 1.0) * 100).round(), color: _colorFor(label));
   }
 
   static Color _colorFor(String label) {
@@ -303,8 +274,7 @@ class HistoryEntryScreen extends StatefulWidget {
   State<HistoryEntryScreen> createState() => _HistoryEntryScreenState();
 }
 
-class _HistoryEntryScreenState extends State<HistoryEntryScreen>
-    with SingleTickerProviderStateMixin {
+class _HistoryEntryScreenState extends State<HistoryEntryScreen> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _orbScale;
   late Animation<double> _scoreCounter;
@@ -312,10 +282,7 @@ class _HistoryEntryScreenState extends State<HistoryEntryScreen>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 1400),
-      vsync: this,
-    );
+    _controller = AnimationController(duration: const Duration(milliseconds: 1400), vsync: this);
 
     _orbScale = Tween<double>(
       begin: 1.0,
@@ -355,13 +322,7 @@ class _HistoryEntryScreenState extends State<HistoryEntryScreen>
               color: const Color(0xFFFFFEFC),
               borderRadius: BorderRadius.circular(13),
               border: Border.all(color: const Color(0x16D7D0C8)),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x0F776F66),
-                  blurRadius: 20,
-                  offset: Offset(0, 8),
-                ),
-              ],
+              boxShadow: const [BoxShadow(color: Color(0x0F776F66), blurRadius: 20, offset: Offset(0, 8))],
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -434,7 +395,7 @@ class _HistoryEntryScreenState extends State<HistoryEntryScreen>
   Widget build(BuildContext context) {
     final lang = context.watch<SettingsNotifier>().appLanguage;
     final isPending = widget.session?.status == SessionStatus.transcribing;
-    final viewData = isPending
+    final HistoryEntryViewData? viewData = isPending
         ? null
         : widget.data ??
               (widget.session == null
@@ -469,10 +430,7 @@ class _HistoryEntryScreenState extends State<HistoryEntryScreen>
                 color: const Color(0xFFA7AAA7),
                 iconSize: 20,
                 padding: EdgeInsets.zero,
-                constraints: const BoxConstraints.tightFor(
-                  width: 32,
-                  height: 32,
-                ),
+                constraints: const BoxConstraints.tightFor(width: 32, height: 32),
                 tooltip: 'Back',
               ),
             ),
@@ -495,10 +453,7 @@ class _HistoryEntryScreenState extends State<HistoryEntryScreen>
                 child: SizedBox(
                   width: 40,
                   height: 40,
-                  child: CircularProgressIndicator(
-                    color: const Color(0xFF6EA4A0),
-                    strokeWidth: 3,
-                  ),
+                  child: CircularProgressIndicator(color: const Color(0xFF6EA4A0), strokeWidth: 3),
                 ),
               ),
               const SizedBox(height: 24),
@@ -517,11 +472,9 @@ class _HistoryEntryScreenState extends State<HistoryEntryScreen>
                 child: Text(
                   AppTranslations.get('transcribing_desc', context.read<SettingsNotifier>().appLanguage),
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: const Color(0xFF737A76),
-                    fontSize: 14,
-                    height: 1.5,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: const Color(0xFF737A76), fontSize: 14, height: 1.5),
                 ),
               ),
               const SizedBox(height: 39),
@@ -595,10 +548,59 @@ class _HistoryEntryScreenState extends State<HistoryEntryScreen>
                       ),
                     ),
                   ),
-                ),
-              ],
-              const SizedBox(height: 39),
-              const PrivacyHint(),
+                  const SizedBox(height: 56),
+                  const _SectionLabel('Mood'),
+                  const SizedBox(height: 11),
+                  _MoodCard(score: viewData!.moodScore, animationValue: _scoreCounter),
+                  const SizedBox(height: 14),
+                  FadeTransition(
+                    opacity: _scoreCounter,
+                    child: _AnalysisCard(text: viewData!.analysisText),
+                  ),
+                  const SizedBox(height: 25),
+                  const _SectionLabel('Pattern Recognition'),
+                  const SizedBox(height: 11),
+                  _PatternCard(text: viewData!.patternText, frequency: viewData!.patternFrequency),
+                  const SizedBox(height: 24),
+                  const _SectionLabel('Emotional Layers'),
+                  const SizedBox(height: 11),
+                  ...viewData!.emotionalLayers.map(
+                    (layer) => Padding(
+                      padding: const EdgeInsets.only(bottom: 9),
+                      child: _EmotionalLayerTile(layer: layer),
+                    ),
+                  ),
+                  if (viewData!.transcript?.trim().isNotEmpty ?? false) ...[
+                    const SizedBox(height: 11),
+                    const _SectionLabel('Transcript'),
+                    const SizedBox(height: 11),
+                    _TranscriptCard(text: viewData!.transcript!.trim()),
+                  ],
+                  if (widget.session != null) ...[
+                    const SizedBox(height: 24),
+                    Center(
+                      child: InkWell(
+                        onTap: () => _showDeleteConfirmation(context),
+                        borderRadius: BorderRadius.circular(8),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: Text(
+                            'Delete this entry',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Color(0xFF8A3033),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w300,
+                              height: 1.35,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 39),
+                  const PrivacyHint(),
+                ],
+              ),
             ],
           ],
         ),
@@ -616,11 +618,9 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       label,
-      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-        color: const Color(0xFF838784),
-        fontSize: 12,
-        fontWeight: FontWeight.w300,
-      ),
+      style: Theme.of(
+        context,
+      ).textTheme.bodySmall?.copyWith(color: const Color(0xFF838784), fontSize: 12, fontWeight: FontWeight.w300),
     );
   }
 }
@@ -640,90 +640,17 @@ class _SoftCard extends StatelessWidget {
         color: const Color(0xFFFFFEFC),
         borderRadius: BorderRadius.circular(13),
         border: Border.all(color: const Color(0x16D7D0C8)),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0F776F66),
-            blurRadius: 15,
-            offset: Offset(0, 8),
-          ),
-        ],
+        boxShadow: const [BoxShadow(color: Color(0x0F776F66), blurRadius: 15, offset: Offset(0, 8))],
       ),
       child: child,
     );
   }
 }
 
-class _MoodOrb extends StatelessWidget {
-  final double score;
-
-  const _MoodOrb({required this.score});
-
-  @override
-  Widget build(BuildContext context) {
-    final intensity = score.abs().clamp(0.18, 1.0);
-    final baseColor = score < 0
-        ? const Color(0xFFDDA89C)
-        : const Color(0xFF6EA4A0);
-
-    return Container(
-      width: 76,
-      height: 76,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: baseColor.withValues(alpha: 0.24 + intensity * 0.1),
-            blurRadius: 21,
-            spreadRadius: 1,
-          ),
-          const BoxShadow(
-            color: Color(0x26000000),
-            blurRadius: 13,
-            offset: Offset(0, 8),
-          ),
-        ],
-      ),
-      child: ClipOval(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 1.5, sigmaY: 1.5),
-          child: Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: RadialGradient(
-                center: const Alignment(-0.32, -0.34),
-                radius: 0.98,
-                colors: [
-                  Colors.white.withValues(alpha: 0.86),
-                  baseColor.withValues(alpha: 0.37 + intensity * 0.28),
-                  const Color(0xFF2F756F).withValues(alpha: 0.44),
-                  const Color(0xFFE6DED3).withValues(alpha: 0.7),
-                ],
-                stops: const [0, 0.43, 0.76, 1],
-              ),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.66),
-                width: 1.2,
-              ),
-            ),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.white.withValues(alpha: 0.48),
-                    Colors.transparent,
-                    const Color(0xFF124B5F).withValues(alpha: 0.1),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+String _emotionForScore(double score) {
+  if (score >= 0.2) return 'happy';
+  if (score <= -0.2) return 'angry';
+  return 'satisfied';
 }
 
 class _MoodCard extends StatelessWidget {
@@ -739,10 +666,7 @@ class _MoodCard extends StatelessWidget {
       builder: (context, child) {
         final progress = animationValue.value;
         final animatedScore = score * progress;
-        final sliderValue = Tween<double>(
-          begin: -1.0,
-          end: score,
-        ).transform(progress);
+        final sliderValue = Tween<double>(begin: -1.0, end: score).transform(progress);
         return _SoftCard(
           padding: const EdgeInsets.fromLTRB(28, 30, 28, 23),
           child: Column(
@@ -779,19 +703,13 @@ class _MoodScale extends StatelessWidget {
           width: 27,
           child: Text(
             '-1',
-            style: TextStyle(
-              color: Color(0xFFE6A99E),
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(color: Color(0xFFE6A99E), fontSize: 11, fontWeight: FontWeight.w600),
           ),
         ),
         Expanded(
           child: SizedBox(
             height: 18,
-            child: CustomPaint(
-              painter: _MoodScalePainter(value: value.clamp(-1.0, 1.0)),
-            ),
+            child: CustomPaint(painter: _MoodScalePainter(value: value.clamp(-1.0, 1.0))),
           ),
         ),
         const SizedBox(
@@ -799,11 +717,7 @@ class _MoodScale extends StatelessWidget {
           child: Text(
             '1',
             textAlign: TextAlign.right,
-            style: TextStyle(
-              color: Color(0xFF8FAFA9),
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(color: Color(0xFF8FAFA9), fontSize: 11, fontWeight: FontWeight.w600),
           ),
         ),
       ],
@@ -841,16 +755,8 @@ class _MoodScalePainter extends CustomPainter {
     }
 
     final markerX = ((value + 1) / 2) * size.width;
-    canvas.drawCircle(
-      Offset(markerX, y),
-      6,
-      Paint()..color = const Color(0xFFFFFEFC),
-    );
-    canvas.drawCircle(
-      Offset(markerX, y),
-      4.4,
-      Paint()..color = const Color(0xFF2E6770),
-    );
+    canvas.drawCircle(Offset(markerX, y), 6, Paint()..color = const Color(0xFFFFFEFC));
+    canvas.drawCircle(Offset(markerX, y), 4.4, Paint()..color = const Color(0xFF2E6770));
   }
 
   @override
@@ -908,11 +814,9 @@ class _PatternCard extends StatelessWidget {
           Text(
             frequency,
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: const Color(0xFFB1B4B2),
-              fontSize: 12,
-              fontWeight: FontWeight.w300,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: const Color(0xFFB1B4B2), fontSize: 12, fontWeight: FontWeight.w300),
           ),
         ],
       ),
@@ -990,10 +894,7 @@ class _EmotionalLayerTile extends StatelessWidget {
                     Container(
                       width: constraints.maxWidth * progress,
                       height: 2.4,
-                      decoration: BoxDecoration(
-                        color: color,
-                        borderRadius: BorderRadius.circular(99),
-                      ),
+                      decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(99)),
                     ),
                   ],
                 );

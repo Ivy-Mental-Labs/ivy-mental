@@ -1,7 +1,7 @@
 name: app
 description: "A new Flutter project."
 publish_to: "none"
-version: 0.1.0+4
+version: 0.2.1+6
 
 environment:
   sdk: ^3.10.1
@@ -35,3 +35,4 @@ flutter:
     - assets/ml/model.onnx
     - assets/ml/vocab.txt
     - assets/media/
+    - assets/media/bubbles/
