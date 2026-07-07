@@ -548,59 +548,10 @@ class _HistoryEntryScreenState extends State<HistoryEntryScreen> with SingleTick
                       ),
                     ),
                   ),
-                  const SizedBox(height: 56),
-                  const _SectionLabel('Mood'),
-                  const SizedBox(height: 11),
-                  _MoodCard(score: viewData!.moodScore, animationValue: _scoreCounter),
-                  const SizedBox(height: 14),
-                  FadeTransition(
-                    opacity: _scoreCounter,
-                    child: _AnalysisCard(text: viewData!.analysisText),
-                  ),
-                  const SizedBox(height: 25),
-                  const _SectionLabel('Pattern Recognition'),
-                  const SizedBox(height: 11),
-                  _PatternCard(text: viewData!.patternText, frequency: viewData!.patternFrequency),
-                  const SizedBox(height: 24),
-                  const _SectionLabel('Emotional Layers'),
-                  const SizedBox(height: 11),
-                  ...viewData!.emotionalLayers.map(
-                    (layer) => Padding(
-                      padding: const EdgeInsets.only(bottom: 9),
-                      child: _EmotionalLayerTile(layer: layer),
-                    ),
-                  ),
-                  if (viewData!.transcript?.trim().isNotEmpty ?? false) ...[
-                    const SizedBox(height: 11),
-                    const _SectionLabel('Transcript'),
-                    const SizedBox(height: 11),
-                    _TranscriptCard(text: viewData!.transcript!.trim()),
-                  ],
-                  if (widget.session != null) ...[
-                    const SizedBox(height: 24),
-                    Center(
-                      child: InkWell(
-                        onTap: () => _showDeleteConfirmation(context),
-                        borderRadius: BorderRadius.circular(8),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          child: Text(
-                            'Delete this entry',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Color(0xFF8A3033),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w300,
-                              height: 1.35,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 39),
-                  const PrivacyHint(),
-                ],
-              ),
+                ),
+                const SizedBox(height: 39),
+                const PrivacyHint(),
+              ],
             ],
           ],
         ),
@@ -936,6 +887,79 @@ class _TranscriptCard extends StatelessWidget {
           fontSize: 12,
           fontWeight: FontWeight.w300,
           height: 1.35,
+        ),
+      ),
+    );
+  }
+}
+
+class _MoodOrb extends StatelessWidget {
+  final double score;
+
+  const _MoodOrb({required this.score});
+
+  @override
+  Widget build(BuildContext context) {
+    final intensity = score.abs().clamp(0.18, 1.0);
+    final baseColor = score < 0
+        ? const Color(0xFFDDA89C)
+        : const Color(0xFF6EA4A0);
+
+    return Container(
+      width: 76,
+      height: 76,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: baseColor.withValues(alpha: 0.24 + intensity * 0.1),
+            blurRadius: 21,
+            spreadRadius: 1,
+          ),
+          const BoxShadow(
+            color: Color(0x26000000),
+            blurRadius: 13,
+            offset: Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ClipOval(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 1.5, sigmaY: 1.5),
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                center: const Alignment(-0.32, -0.34),
+                radius: 0.98,
+                colors: [
+                  Colors.white.withValues(alpha: 0.86),
+                  baseColor.withValues(alpha: 0.37 + intensity * 0.28),
+                  const Color(0xFF2F756F).withValues(alpha: 0.44),
+                  const Color(0xFFE6DED3).withValues(alpha: 0.7),
+                ],
+                stops: const [0, 0.43, 0.76, 1],
+              ),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.66),
+                width: 1.2,
+              ),
+            ),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.white.withValues(alpha: 0.48),
+                    Colors.transparent,
+                    const Color(0xFF124B5F).withValues(alpha: 0.1),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );
